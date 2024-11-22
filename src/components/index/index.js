@@ -1,79 +1,52 @@
+function importPublicImages(folder, count, items = []) {
+  return Array.from({ length: count }, (_, i) => ({
+    img: `/img/${folder}/img (${i + 1}).webp`,
+    title: items[i]?.name || `Image ${i + 1}`, // Fallback to "Image X" if no name provided
+    price: (Math.random() * (50 - 10) + 10).toFixed(2), // Random price between $10 and $50
+    description: items[i]?.description || 'No description available.', // Fallback description
+    sizes: items[i]?.sizes || 'No available size variants'
+  }));
+}
 
-
-
-// import Tshirtimg1 from '../../../public/img/tshirts/img (1).webp';
-// import Tshirtimg2 from '../../../public/img/tshirts/img (2).webp';
-// import Tshirtimg3 from '../../../public/img/tshirts/img (3).webp';
-// import Tshirtimg4 from '../../../public/img/tshirts/img (4).webp';
-
-
-// import Beaniesimg1 from '../../../public/img/tshirts/img (1).webp';
-// import Beaniesimg2 from '../../../public/img/tshirts/img (2).webp';
-// import Beaniesimg3 from '../../../public/img/tshirts/img (3).webp';
-// import Beaniesimg4 from '../../../public/img/tshirts/img (4).webp';
-
-// export const Tshirts = {
-//     title: 'What would you like to buy from us?',
-//     img: [
-//         { img: Tshirtimg1 },
-//         { img: Tshirtimg2 },
-//         { img: Tshirtimg3 },
-//         { img: Tshirtimg4 },
-//     ]
-// };
-// export const Beanies = {
-//     title: 'Beanies',
-//     img: [
-//         { img: Beaniesimg1 },
-//         { img: Beaniesimg2 },
-//         { img: Beaniesimg3 },
-//         { img: Beaniesimg4 },
-//     ]
-// };
-function importPublicImages(folder, count, titles = []) {
-    return Array.from({ length: count }, (_, i) => ({
-      img: `/img/${folder}/img (${i + 1}).webp`,
-      title: titles[i] || `Image ${i + 1}`, // Default title if none provided
-      price: (Math.random() * (50 - 10) + 10).toFixed(2), // Random price between $10 and $50
-    }));
-  }
-  
-
-  export const Tshirts = {
-    title: 'What would you like to buy from us?',
-    img: importPublicImages('tshirts', 11, [
-      'Classic White Tee',
-      'Black V-neck',
-      'Striped Shirt',
-      'Graphic Tee',
-      'Sport Tee',
-      'Denim Shirt',
-      'Floral Print',
-      'Abstract Art Tee',
-      'Polo Shirt',
-      'Oversized Tee',
-      'Retro Tee',
-    ]),
-  };
-  
-  export const Beanies = {
-    title: 'Beanies',
-    img: importPublicImages('beanies', 15, [
-      'Classic Beanie',
-      'Knitted Beanie',
-      'Pom-Pom Beanie',
-      'Cuffed Beanie',
-      'Slouch Beanie',
-      'Striped Beanie',
-      'Ribbed Beanie',
-      'Fleece Lined Beanie',
-      'Cable Knit Beanie',
-      'Reversible Beanie',
-      'Wool Beanie',
-      'Embroidered Beanie',
-      'Tie-Dye Beanie',
-      'Solid Color Beanie',
-      'Patterned Beanie',
-    ]),
-  };
-  
+export const Products = [
+  {
+    Tshirts: {
+      title: 'Tees',
+      img: importPublicImages('tshirts', 11, [
+        { name: 'Classic White Tee', sizes: ['xs', 'sm', 'md', 'lg', 'xl', 'xxl'], description: 'A timeless staple for every wardrobe.' },
+        { name: 'Black V-neck', sizes: ['xs', 'sm', 'md', 'lg', 'xl', 'xxl'], description: 'Perfect for casual or semi-formal occasions.' },
+        { name: 'Striped Shirt', sizes: ['xs', 'sm', 'md', 'lg', 'xl', 'xxl'], description: 'Add some stripes to your style for a bold look.' },
+        { name: 'Graphic Tee', sizes: ['xs', 'sm', 'md', 'lg', 'xl', 'xxl'], description: 'Make a statement with unique graphic prints.' },
+        { name: 'Sport Tee', sizes: ['xs', 'sm', 'md', 'lg', 'xl', 'xxl'], description: 'Designed for performance and comfort.' },
+        { name: 'Denim Shirt', sizes: ['xs', 'sm', 'md', 'lg', 'xl', 'xxl'], description: 'A rugged and stylish piece for any outfit.' },
+        { name: 'Floral Print', sizes: ['xs', 'sm', 'md', 'lg', 'xl', 'xxl'], description: 'Soft fabric with a fresh floral vibe.' },
+        { name: 'Abstract Art Tee', sizes: ['xs', 'sm', 'md', 'lg', 'xl', 'xxl'], description: 'Wear your creativity with abstract designs.' },
+        { name: 'Polo Shirt', sizes: ['xs', 'sm', 'md', 'lg', 'xl', 'xxl'], description: 'Classic and sporty with a collar twist.' },
+        { name: 'Oversized Tee', sizes: ['xs', 'sm', 'md', 'lg', 'xl', 'xxl'], description: 'Casual comfort with a relaxed fit.' },
+        { name: 'Retro Tee', sizes: ['xs', 'sm', 'md', 'lg', 'xl', 'xxl'], description: 'Take a step back in time with vintage prints.' },
+      ]),
+    },
+  },
+  {
+    Beanies: {
+      title: 'Beanies',
+      img: importPublicImages('beanies', 15, [
+        { name: 'Classic Beanie', sizes: ['xs', 'sm', 'md', 'lg', 'xl', 'xxl'],  description: 'Keep it simple and cozy all winter long.' },
+        { name: 'Knitted Beanie', sizes: ['xs', 'sm', 'md', 'lg', 'xl', 'xxl'],  description: 'Soft and warm with a hand-knit look.' },
+        { name: 'Pom-Pom Beanie', sizes: ['xs', 'sm', 'md', 'lg', 'xl', 'xxl'],  description: 'Fun and stylish with a playful pom-pom.' },
+        { name: 'Cuffed Beanie', sizes: ['xs', 'sm', 'md', 'lg', 'xl', 'xxl'],  description: 'Adjustable and versatile for any occasion.' },
+        { name: 'Slouch Beanie', sizes: ['xs', 'sm', 'md', 'lg', 'xl', 'xxl'],  description: 'Relaxed fit for effortless style.' },
+        { name: 'Striped Beanie', sizes: ['xs', 'sm', 'md', 'lg', 'xl', 'xxl'],  description: 'Add some pattern to your winter wardrobe.' },
+        { name: 'Ribbed Beanie', sizes: ['xs', 'sm', 'md', 'lg', 'xl', 'xxl'],  description: 'Classic ribbed texture for a snug fit.' },
+        { name: 'Fleece Lined Beanie', sizes: ['xs', 'sm', 'md', 'lg', 'xl', 'xxl'],  description: 'Extra warmth with soft fleece lining.' },
+        { name: 'Cable Knit Beanie', sizes: ['xs', 'sm', 'md', 'lg', 'xl', 'xxl'],  description: 'Elegant and textured for a classy look.' },
+        { name: 'Reversible Beanie', sizes: ['xs', 'sm', 'md', 'lg', 'xl', 'xxl'],  description: 'Two styles in one for endless versatility.' },
+        { name: 'Wool Beanie', sizes: ['xs', 'sm', 'md', 'lg', 'xl', 'xxl'],  description: 'Natural warmth with premium wool material.' },
+        { name: 'Embroidered Beanie', sizes: ['xs', 'sm', 'md', 'lg', 'xl', 'xxl'],  description: 'Personalized details for unique charm.' },
+        { name: 'Tie-Dye Beanie', sizes: ['xs', 'sm', 'md', 'lg', 'xl', 'xxl'],  description: 'Colorful and trendy for a bold statement.' },
+        { name: 'Solid Color Beanie', sizes: ['xs', 'sm', 'md', 'lg', 'xl', 'xxl'],  description: 'Minimalist design for everyday wear.' },
+        { name: 'Patterned Beanie', sizes: ['xs', 'sm', 'md', 'lg', 'xl', 'xxl'],  description: 'Eye-catching patterns to elevate your style.' },
+      ]),
+    },
+  },
+];

@@ -14,19 +14,11 @@ export const GlobalStateProvider = ({ children }) => {
     fullName: '',
     email: '',
     password: '',
-    dateJoined: '',
     gender: '',
-    IP: '',
-    lastLoginIP: '',
-    referalCode: '',
-    referredBy: '',
-    userWallet: {},
-    walletAddresses: {},
-    totalBalance: 0,
-    referralLink: '',
     notification: [],
-    plans: [],
-    investments: [],
+    location: '',
+    cart: [],
+    cartNo: 0,
 
 
   // Admin-specific fields
@@ -53,7 +45,7 @@ export const GlobalStateProvider = ({ children }) => {
   return (
    <>
    <ToastContainer/>
-    <GlobalStateContext.Provider value={{ formData, setFormData, }}>
+    <GlobalStateContext.Provider value={{ formData, setFormData, formatBalance }}>
       {children}
     </GlobalStateContext.Provider>
    </>

@@ -10,8 +10,18 @@ module.exports = {
       colors: {
         background: "var(--background)",
         foreground: "var(--foreground)",
+        customGray: '#1e293b',
+        customWhite: '#F5F5F5',
+        customPink: '#FFE7D6',
+        customBlue: '#4A4ABF',
+      },
+      fontFamily: {
+        montserat: ['montserat', 'sans-serif'],
+        poppins: ['poppins', 'sans-serif'],
       },
     },
   },
-  plugins: [],
+  plugins: [
+    require('tailwind-scrollbar'), // Ensure this is added
+  ],
 };
