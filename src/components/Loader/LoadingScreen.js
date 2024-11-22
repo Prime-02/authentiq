@@ -1,5 +1,6 @@
 import React from 'react';
 import styled, { keyframes } from 'styled-components';
+import { Loader, LoaderStyle4Component, LoaderStyle5Component, LoaderStyle6Component, LoaderStyle7Component, LoaderStyle8Component, LoaderThree, LoaderTwo } from './Loader';
 
 const Wrapper = styled.div`
   text-align: center;
@@ -49,28 +50,8 @@ const FifthBar = styled(Bar)`
 
 export default function LoadingScreen() {
   return (
-    <Wrapper>
-      <LoaderContainer title="3">
-        <svg
-          version="1.1"
-          id="Layer_1"
-          xmlns="http://www.w3.org/2000/svg"
-          xmlnsXlink="http://www.w3.org/1999/xlink"
-          x="0px"
-          y="0px"
-          width="24px"
-          height="24px"
-          viewBox="0 0 24 24"
-          style={{ enableBackground: 'new 0 0 50 50' }}
-          xmlSpace="preserve"
-        >
-          <FirstBar x="0" y="0" width="4" height="7" />
-          <SecondBar x="10" y="0" width="4" height="7" />
-          <ThirdBar x="20" y="0" width="4" height="7" />
-          <ForthBar x="30" y="0" width="4" height="7" />
-          <FifthBar x="40" y="0" width="4" height="7" />
-        </svg>
-      </LoaderContainer>
+    <Wrapper className='flex w-full justify-between gap-x-32'>
+     <LoaderStyle8Component/>
     </Wrapper>
   );
 }
