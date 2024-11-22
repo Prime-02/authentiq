@@ -1,3 +1,8 @@
+import { RiRefund2Line } from "react-icons/ri";
+import { TbArrowsExchange, TbTruckDelivery } from "react-icons/tb";
+
+
+
 function importPublicImages(folder, count, items = []) {
   return Array.from({ length: count }, (_, i) => ({
     img: `/img/${folder}/img (${i + 1}).webp`,
@@ -50,3 +55,12 @@ export const Products = [
     },
   },
 ];
+
+export const Shipping = {
+  title: 'Shipping & Returns',
+  points: [
+    {heading: 'Quick Delivery', icon: <TbTruckDelivery/>, text: `Expect your order to reach you in 3-5 business days, either at a pick-up point or directly at your doorstep.`},
+    {heading: 'Simple Exchanges', icon: <TbArrowsExchange/>, text: `Not happy with the fit? We’ll gladly exchange your item for a more suitable size.`},
+    {heading: 'Hassle-Free Returns', icon: <RiRefund2Line/>, text: `If you’re not satisfied, simply return the product, and we’ll refund your money without any questions.`},
+  ]
+}

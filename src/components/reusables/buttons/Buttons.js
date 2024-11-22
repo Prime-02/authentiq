@@ -7,10 +7,10 @@ export const ButtonOne = ({ buttonValue, iconValue, IconButton, Clicked, disable
     onClick={Clicked}
     className={`flex items-center justify-center text-sm transition-all duration-300 cursor-pointer shadow-md active:translate-y-1 ${
       IconButton
-        ? 'w-9 h-9 rounded-full bg-white text-black border border-white'
-        : 'py-2 px-4 rounded-full bg-white text-black border border-white'
-    } hover:bg-transparent hover:text-white ${
-      disabled ? 'opacity-50 cursor-not-allowed hover:bg-transparent hover:text-white' : ''
+        ? 'w-9 h-9 rounded-full bg-white text-[#1a1a1a] border border-white'
+        : 'py-2 px-4 rounded-full bg-white text-[#1a1a1a] border border-white'
+    } hover:bg-[#1a1a1a] hover:text-white ${
+      disabled ? 'opacity-50 cursor-not-allowed hover:bg-[#1a1a1a] hover:text-white' : ''
     }`}
   >
     {buttonValue && <span>{buttonValue}</span>}
@@ -24,10 +24,10 @@ export const ButtonTwo = ({ buttonValue, iconValue, IconButton, Clicked, disable
     onClick={Clicked}
     className={`flex items-center justify-center text-sm transition-all duration-300 cursor-pointer shadow-md active:translate-y-1 ${
       IconButton
-        ? 'w-9 h-9 rounded-full border border-white text-white bg-transparent'
-        : 'py-2 px-4 rounded-full border border-white text-white bg-transparent'
-    } hover:bg-white hover:text-black ${
-      disabled ? 'opacity-50 cursor-not-allowed hover:bg-white hover:text-black' : ''
+        ? 'w-9 h-9 rounded-full border border-white text-white bg-[#1a1a1a]'
+        : 'py-2 px-4 rounded-full border border-white text-white bg-[#1a1a1a]'
+    } hover:bg-white hover:text-[#1a1a1a] ${
+      disabled ? 'opacity-50 cursor-not-allowed hover:bg-white hover:text-[#1a1a1a]' : ''
     }`}
   >
     {buttonValue && <p>{buttonValue}</p>}
@@ -44,7 +44,7 @@ export const DBButtonOne = ({ buttonValue, iconValue, IconButton, Clicked, disab
       IconButton
         ? 'w-9 h-9 rounded-full bg-blue-600 text-white border border-blue-600'
         : 'py-2 px-4 rounded-full bg-blue-600 text-white border border-blue-600'
-    } hover:bg-transparent hover:text-blue-600 ${
+    } hover:bg-[#1a1a1a] hover:text-blue-600 ${
       disabled ? 'opacity-50 cursor-not-allowed hover:bg-blue-600 hover:text-white' : ''
     }`}
   >
@@ -59,10 +59,10 @@ export const DBButtonTwo = ({ buttonValue, iconValue, IconButton, Clicked, disab
     onClick={Clicked}
     className={`flex items-center justify-center text-sm transition-all duration-300 cursor-pointer shadow-md active:translate-y-1 ${
       IconButton
-        ? 'w-9 h-9 rounded-full border border-blue-600 text-blue-600 bg-transparent'
-        : 'py-2 px-4 rounded-full border border-blue-600 text-blue-600 bg-transparent'
+        ? 'w-9 h-9 rounded-full border border-blue-600 text-blue-600 bg-[#1a1a1a]'
+        : 'py-2 px-4 rounded-full border border-blue-600 text-blue-600 bg-[#1a1a1a]'
     } hover:bg-blue-600 hover:text-white ${
-      disabled ? 'opacity-50 cursor-not-allowed hover:bg-transparent hover:text-blue-600' : ''
+      disabled ? 'opacity-50 cursor-not-allowed hover:bg-[#1a1a1a] hover:text-blue-600' : ''
     }`}
   >
     {buttonValue && <span>{buttonValue}</span>}
