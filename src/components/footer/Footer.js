@@ -1,67 +1,63 @@
 import React from 'react';
 import { FaInstagram, FaFacebookF, FaTwitter, FaWhatsapp } from 'react-icons/fa';
 import Link from 'next/link';
+import { FaXTwitter } from 'react-icons/fa6';
+import { RiInstagramLine } from 'react-icons/ri';
 
 const Footer = () => {
   return (
     <footer className="bg-gray-900 text-white pt-16">
-      <div className="md:w-[80%] w-full px-5 md:px-0 mx-auto flex flex-wrap justify-between">
-        <div className=''>
+      <div className="md:w-[80%] w-full px-5 md:px-0 mx-auto flex flex-col sm:flex-row justify-between">
+        <div className='w-full sm:w-1/3 mb-8 sm:mb-0'>
           {/* Title Section */}
-          <div className="w-full sm:w-1/3 mb-8 sm:mb-0">
-            <h2 className="text-2xl font-semibold">iSANS ORIGINALS</h2>
-            <p className="text-lg text-gray-400">Quality craftsmanship meets innovative design. Explore our exclusive collection.</p>
-          </div>
+          <h2 className="text-2xl sm:text-3xl font-semibold">iSANS ORIGINALS</h2>
+          <p className=" text-gray-400">Quality craftsmanship meets innovative design. Explore our exclusive collection.</p>
         </div>
 
-        <div className='flex justify-between w-1/3'>
+        <div className="flex flex-col sm:flex-row sm:w-1/3 justify-evenly w-full">
           {/* Social Media Links */}
-          <div className="w-full sm:w-1/4 mb-8 sm:mb-0">
-            <h3 className="text-xl font-semibold">Connect with Us</h3>
-            <ul className="list-none space-y-2">
+          <div className="w-full sm:w-1/2 mb-8 sm:mb-0">
+            <h3 className="text-xl sm:text-2xl font-semibold mb-4">Connect</h3>
+            <ul className="list-none space-y-2 flex gap-x-4 items-center justify-start ">
               <li>
-                <Link href="/" className="text-gray-400 hover:text-white flex items-center space-x-2">
-                  <FaInstagram />
-                  <span>Instagram</span>
+                <Link href="/" className="text-gray-400 hover:text-white">
+                  <RiInstagramLine size={20} className='mt-2' />
                 </Link>
               </li>
               <li>
-                <Link href="/" className="text-gray-400 hover:text-white flex items-center space-x-2">
-                  <FaFacebookF />
-                  <span>Facebook</span>
+                <Link href="/" className="text-gray-400 hover:text-white">
+                  <FaFacebookF size={20} />
                 </Link>
               </li>
               <li>
-                <Link href="/" className="text-gray-400 hover:text-white flex items-center space-x-2">
-                  <FaTwitter />
-                  <span>X</span>
+                <Link href="/" className="text-gray-400 hover:text-white">
+                  <FaXTwitter size={20} />
                 </Link>
               </li>
               <li>
-                <Link href="/" className="text-gray-400 hover:text-white flex items-center space-x-2">
-                  <FaWhatsapp />
-                  <span>Whatsapp</span>
+                <Link href="/" className="text-gray-400 hover:text-white">
+                  <FaWhatsapp size={20} />
                 </Link>
               </li>
             </ul>
           </div>
 
-          {/* Quick Links */}
-          <div className="w-full sm:w-1/4 mb-8 sm:mb-0">
-            <h3 className="text-xl font-semibold">Legal</h3>
+          {/* Legal Links */}
+          <div className="w-full sm:w-1/2 mb-8 sm:mb-0">
+            <h3 className="text-xl sm:text-2xl font-semibold mb-4">Legal</h3>
             <ul className="list-none space-y-2">
               <li>
-                <Link href="/" className="text-gray-400 hover:text-white">
-                  Terms of services
+                <Link href="/terms-of-services" className="text-gray-400 hover:text-white">
+                  Terms of Services
                 </Link>
               </li>
               <li>
-                <Link href="/" className="text-gray-400 hover:text-white">
+                <Link href="/privacy-policy" className="text-gray-400 hover:text-white">
                   Privacy Policy
                 </Link>
               </li>
               <li>
-                <Link href="/" className="text-gray-400 hover:text-white">
+                <Link href="/cookie-policy" className="text-gray-400 hover:text-white">
                   Cookie Policy
                 </Link>
               </li>
@@ -71,11 +67,11 @@ const Footer = () => {
       </div>
 
       {/* Footer Bottom */}
-      <div className="text-center pt-6 text-sm border-t py-5 w-[80%] mx-auto border-gray-500 text-gray-400">
-        <p>&copy; 2024 iSANS ORIGINALS. All Rights Reserved.</p>
+      <div className="text-center pt-6 mt-4 text-sm sm:text-base border-t py-5 w-full sm:w-[80%] mx-auto border-gray-500 text-gray-400">
+        <p>&copy; 2024 iSans Originals. All Rights Reserved.</p>
       </div>
     </footer>
   );
-}
+};
 
 export default Footer;

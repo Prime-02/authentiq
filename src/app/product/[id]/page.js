@@ -35,26 +35,27 @@ export default async function ProductPage({ params }) {
 
   if (!product) return <p>Product not found</p>;
   return (
-    <div className="w-[90%] sm:w-[70%] mx-auto h-screen flex items-center justify-center mt-24 sm:mt-0 ">
+    <div className="w-[90%] sm:w-[70%] mx-auto h-auto sm:h-screen flex items-center justify-center mt-24 sm:mt-0 ">
       <div className="flex flex-col sm:flex-row items-center gap-x-10 w-full">
-        <div className="flex items-center rounded-lg shadow-2xl bg-blue-200 w-full sm:w-1/2">
-          <Image
-            src={product.img}
-            alt={product.title}
-            width={500}
-            height={500}
-            className="rounded-lg object-cover"
-          />
-        </div>
+      <div className="flex items-center justify-center rounded-lg shadow-2xl bg-blue-200 h-[50dvh] w-full sm:w-1/2">
+  <Image
+    src={product.img}
+    alt={product.title}
+    width={300}
+    height={300}
+    className="rounded-lg object-contain"
+  />
+</div>
+
 
        <div className="sm:mt-0 flex flex-col w-full sm:w-1/2 gap-y-5 h-full items-start">
-  <p className="mt-4  text-2xl sm:text-4xl">{product.title}</p>
-  <p className="text-lg ">${product.price}</p>
+  {/* <p className="mt-4  text-2xl sm:text-4xl">{product.title}</p>
+  <p className="text-lg ">${product.price}</p> */}
   <SizeSelector sizes={product.sizes} product={product} />
-  <p className="text-sm mt-2">{product.description}</p>
+  {/* <p className="text-sm mt-2">{product.description}</p>
   <p className="text-sm mt-2">
     <ButtonTwo buttonValue={`Add to cart`} iconValue={<ShoppingCart size={20} />} />
-  </p>
+  </p> */}
 </div>
 
       </div>
