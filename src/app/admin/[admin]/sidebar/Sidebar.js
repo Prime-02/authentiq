@@ -1,13 +1,15 @@
 'use client'
+import { useGlobalState } from '@/app/GlobalStateProvider'
 import { adminDBSidebar } from '@/components/index'
 import { SearchTwo } from '@/components/inputs/SearchInputs'
 import Modal from '@/components/Modal/Modal'
 import { ButtonOne, ButtonTwo } from '@/components/reusables/buttons/Buttons'
-import { LogOutIcon, User, User2Icon, UserCircle } from 'lucide-react'
+import { Home, LogOutIcon, User, User2Icon, UserCircle } from 'lucide-react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import React, { useEffect, useState } from 'react'
 import { RiSideBarLine } from 'react-icons/ri'
+
 
 const Sidebar = () => {
   const [sideSlide, setSideSlide] = useState(false)
@@ -17,6 +19,12 @@ const Sidebar = () => {
 
   const formattedPath = pathname.replace(/\//g, ' > ').replace(/^ > /, '')
   const fullName = ''
+  const { formData } = useGlobalState();  // Access global state
+  const adminFullName = formData.adminFullName ? formData.adminFullName : 'admin'; // Extract adminFullName from formData
+
+  // Replace spaces with hyphens in the adminFullName
+  const formattedAdminFullName = adminFullName.replace(/\s+/g, '_');
+
 
   useEffect(() => {
     const handleResize = () => {
@@ -72,24 +80,28 @@ const Sidebar = () => {
       <aside className={`fixed top-0 h-screen w-1/2 sm:w-auto transition-transform duration-300 px-2 bg-gray-800 z-50 ${sideSlide ? 'translate-x-0' : '-translate-x-full sm:translate-x-0'}`}>
         <div className='flex flex-col h-full text-white pt-12'>
           <div className="h-16 flex items-center sm:items-start gap-1 px-4 pb-2 overflow-hidden ">
-            <span className="text-3xl border rounded-full h-12 w-12 bg-slate-500 flex items-center justify-center">
-              {fullName ? <strong>{fullName.charAt(0).toUpperCase()}</strong> : <UserCircle />}
+          <span className='p-2 border-gray-400 border-2 rounded-full'>
+              <Home size={20} />
             </span>
           </div>
 
           <div className='flex flex-col gap-y-2 sm:items-center items-start overflow-y-auto'>
-            {adminDBSidebar.map((links, index) => (
-              <div className='border-gray-700' key={index}>
-                <Link
-                  href={links.href}
-                  onClick={() => handleLinkClick(links.href)}
-                  className={`flex items-center mx-auto gap-2 py-2 hover:text-gray-400 text-base sm:text-lg focus:bg-white focus:text-slate-800 px-3 rounded-xl mr-3 transition duration-200 ${activeLink === links.href ? 'bg-gray-700 text-gray-200' : ''}`}
-                >
-                  <span className='text-xl'>{links.icons}</span>
-                  <span className='sm:hidden'>{links.name}</span>
-                </Link>
-              </div>
-            ))}
+            {adminDBSidebar.map((links, index) => {
+            const updatedHref = links.href.replace('/name', `/${formattedAdminFullName}`);
+              return  (
+                <div className='border-gray-700 my-4' key={index}>
+                  <Link
+                    href={updatedHref}
+                    onClick={() => handleLinkClick(links.href)}
+                    className={`flex items-center mx-auto gap-2 py-2 hover:text-gray-400 text-base sm:text-lg focus:bg-white focus:text-slate-800 px-3 rounded-xl mr-3 transition duration-200 ${activeLink === links.href ? 'bg-gray-700 text-gray-200' : ''}`}
+                  >
+                    <span className='text-xl'>{links.icons}</span>
+                    <span className='sm:hidden'>{links.name}</span>
+                  </Link>
+                </div>
+              )
+            }
+            )}
             <div className='border-gray-700'>
               <button
                 onClick={handleLogoutClick}
@@ -117,12 +129,12 @@ const Sidebar = () => {
             </span>
           </div>
 
-          <div className='w-full md:w-1/3 flex justify-end md:justify-center gap-x-4 items-center'>
+          <div className='w-full md:w-1/3 flex justify-between md:justify-center gap-x-4 items-center'>
             <span className=''>
               <SearchTwo />
             </span>
-            <span className='p-2 border-gray-400 border-2 rounded-full'>
-              <User2Icon size={20} />
+            <span className="text-3xl border-2 border-gray-400 rounded-full h-12 w-12 flex items-center justify-center">
+              {fullName ? <strong>{fullName.charAt(0).toUpperCase()}</strong> : <UserCircle />}
             </span>
           </div>
         </div>

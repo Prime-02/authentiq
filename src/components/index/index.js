@@ -69,12 +69,12 @@ export const Shipping = {
 }
 
 export const adminDBSidebar = [
-  {name: 'Dashboard', href: '/admin/admin', icons: <TbLayoutDashboardFilled/>},
-  {name: 'Customers', href: '/admin/admin/customers', icons: <Users/>},
-  {name: 'Products', href: '/admin/admin/products', icons: <FaBox/>},
-  {name: 'Barcodes', href: '/admin/admin/barcode', icons: <FaBarcode/>},
-  {name: 'Orders', href: '/admin/admin/order', icons: <ShoppingCart/>},
-  {name: 'Profile', href: '/admin/admin/profile', icons: <User/>},
+  {name: 'Dashboard', href: '/admin/name', icons: <TbLayoutDashboardFilled/>},
+  {name: 'Customers', href: '/admin/name/customers', icons: <Users/>},
+  {name: 'Products', href: '/admin/name/products', icons: <FaBox/>},
+  {name: 'Barcodes', href: '/admin/name/barcode', icons: <FaBarcode/>},
+  {name: 'Orders', href: '/admin/name/order', icons: <ShoppingCart/>},
+  {name: 'Profile', href: '/admin/name/profile', icons: <User/>},
 ];
 
 export const termsAndConditions = [

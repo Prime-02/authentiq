@@ -22,7 +22,7 @@ export const GlobalStateProvider = ({ children }) => {
 
 
   // Admin-specific fields
-  adminFullName: '',
+  adminFullName: 'Sage Prime',
   adminEmail: '',
   adminPassword: '',
   adminDateJoined: '',
