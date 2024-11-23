@@ -1,4 +1,4 @@
-import { User, Users } from "lucide-react";
+import { ShoppingCart, User, Users } from "lucide-react";
 import { FaBox } from "react-icons/fa";
 import { FaBarcode } from "react-icons/fa6";
 import { RiRefund2Line } from "react-icons/ri";
@@ -69,12 +69,12 @@ export const Shipping = {
 }
 
 export const adminDBSidebar = [
-  {name: 'Dashboard', href: '/admin', icons: <TbLayoutDashboardFilled/>},
-  {name: 'Customers', href: '/admin/customers', icons: <Users/>},
-  {name: 'Products', href: '/admin/products', icons: <FaBox/>},
-  {name: 'Barcodes', href: '/admin/barcode', icons: <FaBarcode/>},
-  {name: 'Orders', href: '/admin/order', icons: <TbMenuOrder/>},
-  {name: 'Profile', href: '/admin/profile', icons: <User/>},
+  {name: 'Dashboard', href: '/admin/admin', icons: <TbLayoutDashboardFilled/>},
+  {name: 'Customers', href: '/admin/admin/customers', icons: <Users/>},
+  {name: 'Products', href: '/admin/admin/products', icons: <FaBox/>},
+  {name: 'Barcodes', href: '/admin/admin/barcode', icons: <FaBarcode/>},
+  {name: 'Orders', href: '/admin/admin/order', icons: <ShoppingCart/>},
+  {name: 'Profile', href: '/admin/admin/profile', icons: <User/>},
 ];
 
 export const termsAndConditions = [

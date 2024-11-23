@@ -55,7 +55,7 @@ const Navbar = () => {
   };
   const AdminForm = async (e) => {
     e.preventDefault();
-    nav.push('/admin')
+    nav.push(`/admin/${adminEmail ? adminEmail : 'admin'}`)
 
   };
 
