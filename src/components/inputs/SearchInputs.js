@@ -1,3 +1,5 @@
+'use client'
+
 import { ArrowDown } from "lucide-react";
 import React, { useState } from "react";
 import { IoMdArrowDropdown, IoMdSearch } from "react-icons/io";
@@ -84,7 +86,7 @@ export const SearchTwo = () => {
   };
 
   return (
-    <form className="flex items-center max-w-sm mx-auto" onSubmit={handleSubmit}>
+    <form className="flex items-center w-full mx-auto" onSubmit={handleSubmit}>
       <label htmlFor="simple-search" className="sr-only">
         Search
       </label>

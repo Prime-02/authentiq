@@ -20,6 +20,7 @@ export default function ClientLayout({ children }) {
     // Show loading screen on route change
     const handleRouteChange = () => setLoading(true);
 
+
     // Trigger handleRouteChange on path update
     handleRouteChange();
 
@@ -27,7 +28,7 @@ export default function ClientLayout({ children }) {
     const timer = setTimeout(() => {
       setLoading(false);
 
-    }, 8000); // Adjust the delay as necessary
+    }, 1000); // Adjust the delay as necessary
 
     return () => clearTimeout(timer); // Clear timeout on unmount
   }, [pathname]);

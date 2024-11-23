@@ -1,5 +1,8 @@
+import { User, Users } from "lucide-react";
+import { FaBox } from "react-icons/fa";
+import { FaBarcode } from "react-icons/fa6";
 import { RiRefund2Line } from "react-icons/ri";
-import { TbArrowsExchange, TbTruckDelivery } from "react-icons/tb";
+import { TbArrowsExchange, TbLayoutDashboardFilled, TbMenuOrder, TbTruckDelivery } from "react-icons/tb";
 
 
 
@@ -65,6 +68,14 @@ export const Shipping = {
   ]
 }
 
+export const adminDBSidebar = [
+  {name: 'Dashboard', href: '/admin', icons: <TbLayoutDashboardFilled/>},
+  {name: 'Customers', href: '/admin/customers', icons: <Users/>},
+  {name: 'Products', href: '/admin/products', icons: <FaBox/>},
+  {name: 'Barcodes', href: '/admin/barcode', icons: <FaBarcode/>},
+  {name: 'Orders', href: '/admin/order', icons: <TbMenuOrder/>},
+  {name: 'Profile', href: '/admin/profile', icons: <User/>},
+];
 
 export const termsAndConditions = [
   {
@@ -454,4 +465,3 @@ export const cookiePolicy = [
     `,
   },
 ];
-

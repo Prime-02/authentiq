@@ -7,6 +7,7 @@ import { ButtonOne } from '../reusables/buttons/Buttons';
 import { Search, SearchTwo } from '../inputs/SearchInputs';
 import Modal from '../Modal/Modal';
 import { Textinput } from '../inputs/Textinput';
+import { useRouter } from 'next/navigation';
 
 const Navbar = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -22,7 +23,7 @@ const Navbar = () => {
   const [forgotPasswordEmail, setForgotPasswordEmail] = useState('');
   const [adminEmail, setAdminEmail] = useState('')
   const [adminPassword, setAdminPassword] = useState('')
-  
+  const nav = useRouter()
   const [cat] = useState([
     'All Categories',
     'Tees',
@@ -46,6 +47,17 @@ const Navbar = () => {
   const loginForm = async (e) => {
     e.preventDefault();
   };
+  const SignUpForm = async (e) => {
+    e.preventDefault();
+  };
+  const ForgottenPasswordForm = async (e) => {
+    e.preventDefault();
+  };
+  const AdminForm = async (e) => {
+    e.preventDefault();
+    nav.push('/admin')
+
+  };
 
   return (
     <>
@@ -64,8 +76,8 @@ const Navbar = () => {
           </section>
         </div>
         <div className="w-[80%] mx-auto flex md:hidden flex-row items-center justify-between relative">
-          <span>Logo</span>
-          <span onClick={toggleDropdown} className="cursor-pointer">
+        <span onClick={()=>openModal('admin')} className='cursor-pointer'>Logo</span>
+        <span onClick={toggleDropdown} className="cursor-pointer">
             {isDropdownOpen ? <X /> : <Menu />}
           </span>
         </div>
@@ -87,10 +99,12 @@ const Navbar = () => {
 
       {/* Single Modal for Login, SignUp, and Forgot Password */}
       <Modal
-        title={modalType === 'login' ? 'Login' : modalType === 'signup' ? 'Sign Up' : modalType === 'Forgot Password?'?  'Forgot Password?' : 'admin Login' }
+        title={modalType === 'login' ? 'Login' : modalType === 'signup' ? 'Sign Up' : modalType === 'forgotPassword'?  'Forgot Password?' : 'admin Login' }
         isOpen={modal}
         onClose={closeModal}
-        onSubmit={loginForm}
+        onSubmit={
+          modalType === 'login' ? loginForm : modalType === 'signup' ? SignUpForm : modalType === 'forgotPassword'?  ForgottenPasswordForm : AdminForm
+        }
         buttonValue={modalType === 'login' ? 'Login' : modalType === 'signup' ? 'Sign Up' : 'Submit'}
         subChildren={
           modalType === 'login' ? (
