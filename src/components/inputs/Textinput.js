@@ -65,7 +65,7 @@ export const FileInput = ({ accept, changed }) => {
       >
         <span>
           <Plus/>
-        </span>
+        </span className="hidden md:flex">
         <span>Choose Image</span>
       </label>
     </div>
@@ -107,7 +107,7 @@ export const CheckBoxList = ({ items = [], onChange }) => {
       <h3 className="mb-4 font-semibold text-">
         Select available variants
       </h3>
-      <ul className="items-center w-full text-sm font-medium bg-white border border-gray-200 rounded-lg sm:flex dark:bg-gray-700 dark:border-gray-600 ">
+      <ul className="items-center w-full text-sm font-medium bg-white border border-gray-200 rounded-lg sm:flex dark:border-gray-600 ">
         {items.map((item, index) => (
           <li
             key={item.id || index}
@@ -124,7 +124,7 @@ export const CheckBoxList = ({ items = [], onChange }) => {
                 value={item.value}
                 checked={item.checked}
                 onChange={() => onChange(item)}
-                className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-700 dark:focus:ring-offset-gray-700 focus:ring-2 dark:bg-gray-600 dark:border-gray-500"
+                className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-700 dark:focus:ring-offset-gray-700 focus:ring-2  dark:border-gray-500"
               />
               <label
                 htmlFor={`${item.id || `checkbox-${index}`}`}
