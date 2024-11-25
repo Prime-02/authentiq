@@ -32,6 +32,33 @@ export const GlobalStateProvider = ({ children }) => {
   adminReferralCode: '',
   adminReferredBy: '',
   adminNotification: [],
+  products: [
+  {
+    name: "Product A",
+    price: 29.99,
+    barcode: "123456789012",
+  },
+  {
+    name: "Product B",
+    price: 49.99,
+    barcode: "987654321098",
+  },
+  {
+    name: "Product C",
+    price: 19.99,
+    barcode: "456789123456",
+  },
+  {
+    name: "Product D",
+    price: 99.99,
+    barcode: "321654987654",
+  },
+  {
+    name: "Product E",
+    price: 5.99,
+    barcode: "654321789012",
+  },
+]
   });
 
  // utils/format.js

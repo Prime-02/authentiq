@@ -8,6 +8,7 @@ import { Search, SearchTwo } from '../inputs/SearchInputs';
 import Modal from '../Modal/Modal';
 import { Textinput } from '../inputs/Textinput';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 
 const Navbar = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -72,7 +73,7 @@ const Navbar = () => {
           <section className="flex flex-row justify-evenly items-center gap-x-5">
             <span><SearchTwo /></span>
             <span onClick={() => openModal('login')} className="cursor-pointer"><User /></span>
-            <span><ShoppingBag /></span>
+            <Link href={`/cart`} className="cursor-pointer py-2 flex items-center gap-x-2"><ShoppingBag /></Link>
           </section>
         </div>
         <div className="w-[80%] mx-auto flex md:hidden flex-row items-center justify-between relative">
@@ -89,9 +90,9 @@ const Navbar = () => {
               <span className="cursor-pointer py-2 flex items-center gap-x-2" onClick={() => openModal('login')}>
                 <User /> Profile
               </span>
-              <span className="cursor-pointer py-2 flex items-center gap-x-2">
+              <Link href={`/cart`} className="cursor-pointer py-2 flex items-center gap-x-2">
                 <ShoppingBag /> Cart
-              </span>
+              </Link>
             </div>
           </div>
         )}

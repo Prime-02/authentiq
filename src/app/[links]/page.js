@@ -37,7 +37,7 @@ const PolicyPage = ({ params }) => {
   return (
     <div className="min-h-screen bg-gray-100 text-gray-800 px-5 py-32">
       <div className="max-w-4xl mx-auto">
-        <h1 className="text-3xl font-bold mb-6">{policy.title}</h1>
+        <h1 className="text-3xl font-bold mb-6">{policy.title} </h1>
         {policy.content.map((section, index) => (
           <div key={index} className="mb-8">
             <h2 className="text-2xl font-semibold mb-3">{section.title}</h2>

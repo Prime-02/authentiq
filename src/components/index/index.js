@@ -71,7 +71,7 @@ export const Shipping = {
 export const adminDBSidebar = [
   {name: 'Dashboard', href: '/admin/name', icons: <TbLayoutDashboardFilled/>},
   {name: 'Customers', href: '/admin/name/customers', icons: <Users/>},
-  {name: 'Products', href: '/admin/name/products', icons: <FaBox/>},
+  {name: 'Products', href: '/admin/name/products/', icons: <FaBox/>},
   {name: 'Barcodes', href: '/admin/name/barcode', icons: <FaBarcode/>},
   {name: 'Orders', href: '/admin/name/order', icons: <ShoppingCart/>},
   {name: 'Profile', href: '/admin/name/profile', icons: <User/>},

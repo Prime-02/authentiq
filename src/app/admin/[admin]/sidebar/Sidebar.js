@@ -4,7 +4,7 @@ import { adminDBSidebar } from "@/components/index";
 import { SearchTwo } from "@/components/inputs/SearchInputs";
 import Modal from "@/components/Modal/Modal";
 import { ButtonOne, ButtonTwo } from "@/components/reusables/buttons/Buttons";
-import { Home, LogOutIcon, User, User2Icon, UserCircle } from "lucide-react";
+import { Home, LogOutIcon, User, User2Icon, UserCircle, X } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import React, { useEffect, useState } from "react";
@@ -78,12 +78,20 @@ const Sidebar = () => {
       )}
 
       <aside
-        className={`fixed top-0 h-screen w-1/2 sm:w-auto transition-transform duration-300 px-2 bg-gray-800 z-50 ${
+        className={`fixed top-0 h-screen w-[70%] sm:w-auto transition-transform duration-300 px-2 bg-gray-800 z-50 ${
           sideSlide ? "translate-x-0" : "-translate-x-full sm:translate-x-0"
         }`}
       >
+        {sideSlide && (
+          <span
+            className="absolute sm:hidden text-white right-3 top-3 border rounded-md cursor-pointer"
+            onClick={() => setSideSlide(!sideSlide)}
+          >
+            <X />
+          </span>
+        )}
         <div className="flex flex-col h-full text-white pt-12">
-          <div className="h-16 flex items-center sm:items-start gap-1 px-4 pb-2 overflow-hidden ">
+          <div className="h-16 flex items-center sm:items-start gap-1 px-4 pb-2 overflow-hidden cursor-pointer">
             <Link
               href={"/"}
               className="p-2 border-gray-400 border-2 rounded-full"
@@ -143,9 +151,7 @@ const Sidebar = () => {
             </span>
 
             {/* Path Indicator (hidden on smaller screens) */}
-            <span className="hidden sm:block text-xs">
-              {formattedPath}
-            </span>
+            <span className="hidden sm:block text-xs">{formattedPath}</span>
           </div>
 
           {/* Middle Section */}

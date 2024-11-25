@@ -1,4 +1,4 @@
-import { Eye, EyeClosed, Plus } from "lucide-react";
+import { Eye, EyeClosed, Image, Plus } from "lucide-react";
 import React, { useState } from "react";
 
 export const Textinput = ({ label, type, value, changed, className, placeholder }) => {
@@ -61,12 +61,12 @@ export const FileInput = ({ accept, changed }) => {
       {/* Custom Styled Label */}
       <label
         htmlFor="file_input"
-        className=" w-full text-sm text-white bg-blue-500 border border-blue-500 rounded-lg cursor-pointer px-4 py-2 text-center hover:bg-blue-600 dark:bg-blue-700 dark:border-blue-700 dark:hover:bg-blue-800 flex items-center gap-x-1"
+        className=" w-full text-sm text-white bg-blue-500 border border-blue-500 rounded-lg cursor-pointer px-3 py-1.5 text-center hover:bg-blue-600 dark:bg-blue-700 dark:border-blue-700 dark:hover:bg-blue-800 flex items-center gap-x-1"
       >
         <span>
-          <Plus/>
+          <Image/>
         </span>
-        <span>Choose Image</span>
+        <span className="hidden md:flex">Choose Image</span>
       </label>
     </div>
   );
@@ -124,7 +124,7 @@ export const CheckBoxList = ({ items = [], onChange }) => {
                 value={item.value}
                 checked={item.checked}
                 onChange={() => onChange(item)}
-                className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-700 dark:focus:ring-offset-gray-700 focus:ring-2 dark:bg-gray-600 dark:border-gray-500"
+                className="w-4 h-4 text-blue-600 border-gray-300  focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-700 dark:focus:ring-offset-gray-700 focus:ring-2  dark:border-gray-500 rounded-full"
               />
               <label
                 htmlFor={`${item.id || `checkbox-${index}`}`}

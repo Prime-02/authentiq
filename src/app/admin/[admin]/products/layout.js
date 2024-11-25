@@ -1,4 +1,5 @@
 "use client";
+import { useGlobalState } from "@/app/GlobalStateProvider";
 import {
   CheckBoxList,
   FileInput,
@@ -11,19 +12,22 @@ import Link from "next/link";
 import React, { useState } from "react";
 
 const Layout = ({ children }) => {
+  const {formData, setFormData} = useGlobalState()
   const [products, setProducts] = useState([]);
   const [prodModal, setProdModal] = useState(false);
   const [prodName, setProdName] = useState("");
   const [prodPrice, setProdPrice] = useState('');
   const [prodDesc, setProdDesc] = useState("");
   const [prodImg, setProdImg] = useState(null);
+  const [prodQuantity, setProdQuantity] = useState('')
   const [prodVariants, setProdVariants] = useState([
-    { id: "sm", label: "SM", value: "small", checked: false },
-    { id: "md", label: "MD", value: "medium", checked: false },
-    { id: "lg", label: "LG", value: "large", checked: false },
+    { id: "sm", label: "S", value: "small", checked: false },
+    { id: "md", label: "M", value: "medium", checked: false },
+    { id: "lg", label: "L", value: "large", checked: false },
     { id: "xl", label: "XL", value: "extra-large", checked: false },
     { id: "xxl", label: "XXL", value: "extra-extra-large", checked: false },
   ]);
+  const routeId = formData.adminFullName.replace(/\s+/g, "_");
 
   // Handle checkbox state toggle
   const handleCheckboxChange = (item) => {
@@ -60,7 +64,7 @@ const Layout = ({ children }) => {
 
     // Reset state
     setProdName("");
-    setProdPrice(0);
+    setProdPrice("");
     setProdDesc("");
     setProdImg(null);
     setProdVariants((prev) =>
@@ -76,20 +80,26 @@ const Layout = ({ children }) => {
         <nav className="w-full flex flex-wrap items-center justify-between pr-3">
           {/* Filters Section */}
           <div className="flex gap-4 flex-wrap text-xs sm:text-sm">
-            <Link href={``} className="cursor-pointer hover:underline">
+            <Link
+              href={`/admin/${routeId}/products`}
+              className="cursor-pointer hover:underline"
+            >
               All
             </Link>
-            <Link href={`available`} className="cursor-pointer hover:underline">
+            <Link
+              href={`/admin/${routeId}/products/available`}
+              className="cursor-pointer hover:underline"
+            >
               Available
             </Link>
             <Link
-              href={`out-of-stock`}
+              href={`/admin/${routeId}/products/out-of-stock`}
               className="cursor-pointer hover:underline"
             >
               Out of stock
             </Link>
             <Link
-              href={`pre-ordered`}
+              href={`/admin/${routeId}/products/pre-ordered`}
               className="cursor-pointer hover:underline"
             >
               Pre-ordered
@@ -148,6 +158,27 @@ const Layout = ({ children }) => {
               </select>
             </div>
           </section>
+          <section className="flex items-center justify-between ">
+            <span>
+              <Textinput
+                label={`Quantity`}
+                type={`text`}
+                value={prodPrice}
+                changed={(e) => setProdPrice(e.target.value)}
+                className={`border-b border-blue-600`}
+              />
+            </span>
+            <div className="col-span-2 sm:col-span-1">
+              <select
+                id="category"
+                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+              >
+                <option defaultValue="">Select Barcode</option>
+                <option value="tees">Tees</option>
+                <option value="accessories">Accessories</option>
+              </select>
+            </div>
+          </section>
           <section>
             <TextArea
               label={`Description`}
@@ -171,4 +202,3 @@ const Layout = ({ children }) => {
 };
 
 export default Layout;
-``;
