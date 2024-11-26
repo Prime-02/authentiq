@@ -16,6 +16,7 @@ const Navbar = () => {
   const [modalType, setModalType] = useState(null); // Determines which modal to show
   const [loginPassword, setLoginPassword] = useState('');
   const [signUpPassword, setSignUpPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [loginEmail, setLoginEmail] = useState('');
   const [signUpEmail, setSignUpEmail] = useState('');
   const [firstName, setFirstName] = useState('');
@@ -24,6 +25,7 @@ const Navbar = () => {
   const [forgotPasswordEmail, setForgotPasswordEmail] = useState('');
   const [adminEmail, setAdminEmail] = useState('')
   const [adminPassword, setAdminPassword] = useState('')
+  
   const nav = useRouter()
   const [cat] = useState([
     'All Categories',
@@ -227,6 +229,13 @@ const Navbar = () => {
               type="password"
               value={signUpPassword}
               changed={(e) => setSignUpPassword(e.target.value)}
+            />
+            <Textinput
+              label="Confirm Password"
+              className="border-b my-5"
+              type="password"
+              value={confirmPassword}
+              changed={(e) => setConfirmPassword(e.target.value)}
             />
           </>
         )}

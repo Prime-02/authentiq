@@ -15,6 +15,8 @@ const Sidebar = () => {
   const [activeLink, setActiveLink] = useState("");
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const pathname = usePathname();
+  const current = usePathname();
+  const isCurrent = (href) => current === href;
 
   const formattedPath = pathname.replace(/\//g, " > ").replace(/^ > /, "");
   const fullName = "";
@@ -110,11 +112,9 @@ const Sidebar = () => {
                 <div className="border-gray-700 my-4" key={index}>
                   <Link
                     href={updatedHref}
-                    onClick={() => handleLinkClick(links.href)}
+                    // onClick={() => handleLinkClick(links.href)}
                     className={`flex items-center mx-auto gap-2 py-2 hover:text-gray-400 text-base sm:text-lg focus:bg-white focus:text-slate-800 px-3 rounded-xl mr-3 transition duration-200 ${
-                      activeLink === links.href
-                        ? "bg-gray-700 text-gray-200"
-                        : ""
+                      isCurrent(updatedHref) ? "bg-white text-gray-900" : ""
                     }`}
                   >
                     <span className="text-xl">{links.icons}</span>

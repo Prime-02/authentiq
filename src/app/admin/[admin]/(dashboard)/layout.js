@@ -1,44 +1,59 @@
-'use client'
-import { useGlobalState } from '@/app/GlobalStateProvider';
-import { BarChart, Database, TrendingUp } from 'lucide-react';
-import Link from 'next/link';
-import React from 'react'
+"use client";
+import { useGlobalState } from "@/app/GlobalStateProvider";
+import { BarChart, Database, TrendingUp } from "lucide-react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import React from "react";
 
+const Layout = ({ children }) => {
+  const { formData } = useGlobalState();
+  const current = usePathname();
 
-const layout = ({children}) => {
-    const {formData} = useGlobalState()
+  // Determine if the current link is active
+  const isCurrent = (href) => current === href;
+
+  // Format the adminFullName for use in routes
   const routeId = formData.adminFullName.replace(/\s+/g, "_");
+
+  // Define the dashboard routes
+  const DashBoardRoute = [
+    { link: "data", icon: <Database size={20} />, href: `/admin/${routeId}/` },
+    {
+      link: "stats",
+      icon: <TrendingUp size={20} />,
+      href: `/admin/${routeId}/stats`,
+    },
+    {
+      link: "analytics",
+      icon: <BarChart size={20} />,
+      href: `/admin/${routeId}/analytics`,
+    },
+  ];
+
   return (
     <div>
-      <nav className=" flex gap-x-5">
-        <Link href={`/admin/${routeId}/`} className="flex gap-1 items-center">
-          <p>Data</p>
-          <p>
-            <Database size={20} />
-          </p>
-        </Link>
-        <Link
-          href={`/admin/${routeId}/stats`}
-          className="flex gap-1 items-center"
-        >
-          <p>stats</p>
-          <p>
-            <TrendingUp size={20} />
-          </p>
-        </Link>
-        <Link
-          href={`/admin/${routeId}/analitics`}
-          className="flex gap-1 items-center"
-        >
-          <p>Analitics</p>
-          <p>
-            <BarChart size={20} />
-          </p>
-        </Link>
+      {/* Navigation Bar */}
+      <nav className="flex gap-x-5 p-4">
+        {DashBoardRoute.map((links, indx) => (
+          <Link
+            href={links.href}
+            key={indx}
+            className={`flex gap-2 items-center px-3 py-2 rounded-lg transition duration-300 ${
+              isCurrent(links.href)
+                ? "bg-blue-500 text-white"
+                : ""
+            }`}
+          >
+            <p>{links.icon}</p>
+            <p>{links.link}</p>
+          </Link>
+        ))}
       </nav>
-      {children}
+
+      {/* Main Content */}
+      <main>{children}</main>
     </div>
   );
-}
+};
 
-export default layout
+export default Layout;
