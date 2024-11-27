@@ -1,8 +1,8 @@
 "use client";
 import { useGlobalState } from "@/app/GlobalStateProvider";
+import { CheckBoxList } from "@/components/inputs/CheckBox";
+import { FileInput } from "@/components/inputs/FIleInput";
 import {
-  CheckBoxList,
-  FileInput,
   TextArea,
   Textinput,
 } from "@/components/inputs/Textinput";

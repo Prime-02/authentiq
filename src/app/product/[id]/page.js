@@ -2,9 +2,7 @@
 
 // app/product/[id]/page.js
 import { Products } from "@/components/index";
-import { ButtonOne, ButtonTwo } from "@/components/reusables/buttons/Buttons";
 import SizeSelector from "@/components/reusables/Selectors/SizeSelector";
-import { ShoppingCart } from "lucide-react";
 import Image from "next/image";
 
 // This will be used to generate paths for the dynamic route
@@ -35,7 +33,7 @@ export default async function ProductPage({ params }) {
 
   if (!product) return <p>Product not found</p>;
   return (
-    <div className="w-[90%] sm:w-[70%] mx-auto h-auto sm:h-screen flex items-center justify-center mt-24 sm:mt-0 ">
+    <div className="w-[90%] sm:w-[70%] mx-auto min-h-screen flex items-center justify-center mt-24 sm:mt-0 ">
       <div className="flex flex-col sm:flex-row items-center gap-x-10 w-full">
       <div className="flex items-center justify-center rounded-lg shadow-2xl bg-blue-200 h-[50dvh] w-full sm:w-1/2">
   <Image
@@ -48,7 +46,7 @@ export default async function ProductPage({ params }) {
 </div>
 
 
-       <div className="sm:mt-0 flex flex-col w-full sm:w-1/2 gap-y-5 h-full items-start">
+       <div className="sm:mt-0 mb-10 flex flex-col w-full sm:w-1/2 gap-y-5 h-full items-start">
   {/* <p className="mt-4  text-2xl sm:text-4xl">{product.title}</p>
   <p className="text-lg ">${product.price}</p> */}
   <SizeSelector sizes={product.sizes} product={product} />

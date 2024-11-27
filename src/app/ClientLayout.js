@@ -34,7 +34,7 @@ export default function ClientLayout({ children }) {
   }, [pathname]);
 
   return (
-    <>
+    <main className='min-h-screen'>
       {/* Loading screen */}
       {loading && (
         <div className="fixed z-50 h-screen w-full bg-white  justify-center flex flex-col items-center overflow-hidden">
@@ -48,9 +48,11 @@ export default function ClientLayout({ children }) {
       {!shouldHideNavbarAndFooter && <Navbar />}
 
       {/* Render the page content */}
+      <div className='w-full min-h-screen'>
       {children}
+      </div>
 
       {!shouldHideNavbarAndFooter && <Footer />}
-    </>
+    </main>
   );
 }

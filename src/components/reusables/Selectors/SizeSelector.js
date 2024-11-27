@@ -58,7 +58,7 @@ export default function SizeSelector({ sizes, product }) {
         </p>
 
         <div
-          className={`overflow-hidden transition-all duration-500 ease-in-out ${prodInfo ? 'max-h-64 opacity-100' : 'max-h-0 opacity-0'}`}
+          className={`overflow-hidden transition-all duration-500 ease-in-out ${prodInfo ? 'max-h-auto opacity-100' : 'max-h-0 opacity-0'}`}
         >
           {Shipping.points.map((ship, ind) => (
             <div className="flex items-start space-x-4 py-2 px-4" key={ind}>

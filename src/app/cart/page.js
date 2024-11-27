@@ -2,7 +2,11 @@ import React from 'react'
 
 const Cart = () => {
   return (
-    <div className=''>Cart</div>
+    <div className='flex items-center justify-center w-full h-screen'>
+      <section>
+        hello
+      </section>
+    </div>
   )
 }
 

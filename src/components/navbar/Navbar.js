@@ -30,7 +30,7 @@ const Navbar = () => {
   const [cat] = useState([
     'All Categories',
     'Tees',
-    'Beanies',
+    'Accessories',
   ]);
 
   const toggleDropdown = () => {
@@ -70,7 +70,7 @@ const Navbar = () => {
             <span onClick={()=>openModal('admin')} className='cursor-pointer'>Logo</span>
             <span>All</span>
             <span>Tees</span>
-            <span>Beanies</span>
+            <span>Accessories</span>
           </section>
           <section className="flex flex-row justify-evenly items-center gap-x-5">
             <span><SearchTwo /></span>
