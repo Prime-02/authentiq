@@ -41,8 +41,7 @@ export default function Home() {
                         alt={`Image ${imgInd + 1}`}
                         width={250}
                         height={250}
-                        className="object-cover hover:scale-125 transition"
-                        style={{ width: "auto", height: "auto" }}
+                        className="object-cover drop-shadow-2xl hover:scale-125 transition w-auto h-auto"
                       />
                     </Link>
                     <div className="w-full flex flex-row items-center justify-between">

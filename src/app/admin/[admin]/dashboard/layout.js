@@ -13,20 +13,20 @@ const Layout = ({ children }) => {
   const isCurrent = (href) => current === href;
 
   // Format the adminFullName for use in routes
-  const routeId = formData.adminFullName.replace(/\s+/g, "_");
+  const routeId = formData.adminFirstName.replace(/\s+/g, "_");
 
   // Define the dashboard routes
   const DashBoardRoute = [
-    { link: "data", icon: <Database size={20} />, href: `/admin/${routeId}/` },
+    { link: "data", icon: <Database size={20} />, href: `/admin/${routeId}/dashboard` },
     {
       link: "stats",
       icon: <TrendingUp size={20} />,
-      href: `/admin/${routeId}/stats`,
+      href: `/admin/${routeId}/dashboard/stats`,
     },
     {
       link: "analytics",
       icon: <BarChart size={20} />,
-      href: `/admin/${routeId}/analytics`,
+      href: `/admin/${routeId}/dashboard/analytics`,
     },
   ];
 

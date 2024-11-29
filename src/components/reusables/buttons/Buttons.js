@@ -118,3 +118,33 @@ export const Button = ({ clicked, value }) => {
     </button>
   );
 };
+
+
+import { useRouter } from "next/router";
+
+export const LanguageSwitcher = () => {
+  const { locale, locales, asPath } = useRouter();
+
+  const handleChangeLanguage = (lang) => {
+    // Update the language and keep the same path
+    window.location.href = `/${lang}${asPath}`; // Change the URL with the selected language
+  };
+
+  return (
+    <div className="language-switcher">
+      {locales.map((lang) => (
+        <button
+          key={lang}
+          onClick={() => handleChangeLanguage(lang)}
+          style={{
+            margin: "0 5px",
+            fontWeight: lang === locale ? "bold" : "normal",
+          }}
+        >
+          {lang.toUpperCase()}
+        </button>
+      ))}
+    </div>
+  );
+};
+

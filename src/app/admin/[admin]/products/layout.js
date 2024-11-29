@@ -27,7 +27,7 @@ const Layout = ({ children }) => {
     { id: "xl", label: "XL", value: "extra-large", checked: false },
     { id: "xxl", label: "XXL", value: "extra-extra-large", checked: false },
   ]);
-  const routeId = formData.adminFullName.replace(/\s+/g, "_");
+  const routeId = formData.adminFirstName.replace(/\s+/g, "_");
 
   // Handle checkbox state toggle
   const handleCheckboxChange = (item) => {

@@ -13,7 +13,7 @@ const Layout = ({ children }) => {
   const isCurrent = (href) => current === href;
 
   // Format the adminFullName for use in routes
-  const routeId = formData.adminFullName.replace(/\s+/g, "_");
+  const routeId = formData.adminFirstName.replace(/\s+/g, "_");
 
   // Define the dashboard routes
   const DashBoardRoute = [

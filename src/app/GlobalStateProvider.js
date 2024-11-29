@@ -11,7 +11,8 @@ export const GlobalStateProvider = ({ children }) => {
   
   const [formData, setFormData] = useState({
     userId: '',
-    fullName: '',
+    userFirstName: '',
+    userLastName: '',
     email: '',
     password: '',
     gender: '',
@@ -22,7 +23,8 @@ export const GlobalStateProvider = ({ children }) => {
 
 
   // Admin-specific fields
-  adminFullName: 'Sage Prime',
+  adminFirstName: '',
+  adminLastName: '',
   adminEmail: '',
   adminPassword: '',
   adminDateJoined: '',

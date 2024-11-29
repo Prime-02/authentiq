@@ -19,14 +19,14 @@ const Sidebar = () => {
   const isCurrent = (href) => current === href;
 
   const formattedPath = pathname.replace(/\//g, " > ").replace(/^ > /, "");
-  const fullName = "";
-  const { formData } = useGlobalState(); // Access global state
-  const adminFullName = formData.adminFullName
-    ? formData.adminFullName
-    : "admin"; // Extract adminFullName from formData
 
-  // Replace spaces with hyphens in the adminFullName
-  const formattedAdminFullName = adminFullName.replace(/\s+/g, "_");
+  const { formData } = useGlobalState(); // Access global state
+  const adminFirstName = formData.adminFirstName
+    ? formData.adminFirstName
+    : "admin"; // Extract adminFirstName from formData
+
+  // Replace spaces with hyphens in the adminFirstName
+  const formattedadminFirstName = adminFirstName.replace(/\s+/g, "_");
 
   useEffect(() => {
     const handleResize = () => {
@@ -106,7 +106,7 @@ const Sidebar = () => {
             {adminDBSidebar.map((links, index) => {
               const updatedHref = links.href.replace(
                 "/name",
-                `/${formattedAdminFullName}`
+                `/${formattedadminFirstName}`
               );
               return (
                 <div className="border-gray-700 my-4" key={index}>
@@ -168,8 +168,8 @@ const Sidebar = () => {
 
             {/* User Icon or Initial */}
             <span className="text-2xl border-2 border-gray-400 rounded-full h-10 w-10 flex items-center justify-center">
-              {fullName ? (
-                <strong>{fullName.charAt(0).toUpperCase()}</strong>
+              {adminFirstName ? (
+                <strong>{adminFirstName.charAt(0).toUpperCase()}</strong>
               ) : (
                 <UserCircle />
               )}

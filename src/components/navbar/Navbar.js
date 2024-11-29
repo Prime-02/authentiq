@@ -1,37 +1,39 @@
-'use client';
+"use client";
 
-import React, { useState } from 'react';
-import { IoMdCart } from 'react-icons/io';
-import { Menu, ShoppingBag, User, X } from 'lucide-react';
-import { ButtonOne } from '../reusables/buttons/Buttons';
-import { Search, SearchTwo } from '../inputs/SearchInputs';
-import Modal from '../Modal/Modal';
-import { Textinput } from '../inputs/Textinput';
-import { useRouter } from 'next/navigation';
-import Link from 'next/link';
+import React, { useEffect, useRef, useState } from "react";
+import { IoMdCart } from "react-icons/io";
+import { Menu, Settings, ShoppingBag, User, X } from "lucide-react";
+import { ButtonOne, ButtonTwo } from "../reusables/buttons/Buttons";
+import { Search, SearchTwo } from "../inputs/SearchInputs";
+import Modal from "../Modal/Modal";
+import { Textinput } from "../inputs/Textinput";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { useGlobalState } from "@/app/GlobalStateProvider";
+import { FaSignOutAlt } from "react-icons/fa";
 
 const Navbar = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [profile, setProfile] = useState(false);
   const [modal, setModal] = useState(false);
   const [modalType, setModalType] = useState(null); // Determines which modal to show
-  const [loginPassword, setLoginPassword] = useState('');
-  const [signUpPassword, setSignUpPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [loginEmail, setLoginEmail] = useState('');
-  const [signUpEmail, setSignUpEmail] = useState('');
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
+  const [loginPassword, setLoginPassword] = useState("");
+  const [signUpPassword, setSignUpPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [loginEmail, setLoginEmail] = useState("");
+  const [signUpEmail, setSignUpEmail] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
-  const [forgotPasswordEmail, setForgotPasswordEmail] = useState('');
-  const [adminEmail, setAdminEmail] = useState('')
-  const [adminPassword, setAdminPassword] = useState('')
-  
-  const nav = useRouter()
-  const [cat] = useState([
-    'All Categories',
-    'Tees',
-    'Accessories',
-  ]);
+  const [forgotPasswordEmail, setForgotPasswordEmail] = useState("");
+  const [adminEmail, setAdminEmail] = useState("");
+  const [adminPassword, setAdminPassword] = useState("");
+  const [auth, setAuth] = useState(false);
+  const { formData } = useGlobalState(); // Access global state
+  const userFirstName = formData.userFirstName ? formData.userFirstName : "";
+
+  const nav = useRouter();
+  const [cat] = useState(["All Categories", "Tees", "Accessories"]);
 
   const toggleDropdown = () => {
     setIsDropdownOpen(!isDropdownOpen);
@@ -58,41 +60,134 @@ const Navbar = () => {
   };
   const AdminForm = async (e) => {
     e.preventDefault();
-    nav.push(`/admin/${adminEmail ? adminEmail : 'admin'}`)
-
+    nav.push(`/admin/${adminEmail ? adminEmail : "admin"}/dashboard`);
   };
+
+  const profileRef = useRef(null);
+  const handleClickOutside = (event) => {
+    if (profileRef.current && !profileRef.current.contains(event.target)) {
+      setProfile(false);
+    }
+  };
+
+  useEffect(() => {
+    if (profile) {
+      document.addEventListener("mousedown", handleClickOutside);
+    } else {
+      document.removeEventListener("mousedown", handleClickOutside);
+    }
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [profile]);
 
   return (
     <>
-      <nav className="fixed top-0 w-full py-5 flex items-center justify-center backdrop-blur-lg">
+      <nav className="fixed top-0 w-full py-5 flex items-center justify-center backdrop-blur-lg ">
         <div className="w-[80%] mx-auto hidden md:flex flex-row items-center justify-between">
           <section className="flex flex-row justify-evenly gap-x-5">
-            <span onClick={()=>openModal('admin')} className='cursor-pointer'>Logo</span>
+            <span onClick={() => openModal("admin")} className="cursor-pointer">
+              Logo
+            </span>
             <span>All</span>
             <span>Tees</span>
             <span>Accessories</span>
           </section>
           <section className="flex flex-row justify-evenly items-center gap-x-5">
-            <span><SearchTwo /></span>
-            <span onClick={() => openModal('login')} className="cursor-pointer"><User /></span>
-            <Link href={`/cart`} className="cursor-pointer py-2 flex items-center gap-x-2"><ShoppingBag /></Link>
+            <span>
+              <SearchTwo />
+            </span>
+            <span
+              className="text- rounded-full text-2xl h-10 w-10 flex items-center justify-center cursor-pointer"
+              onClick={() => setProfile(!profile)}
+            >
+              {userFirstName ? (
+                <strong>{userFirstName.charAt(0).toUpperCase()}</strong>
+              ) : (
+                <User />
+              )}
+              <span
+                ref={profileRef}
+                className={`absolute  right-0 top-2 bg-white  px-2 min-w-32 h-auto py-2 w-auto  rounded-lg flex flex-col items-end justify-center gap-y-1 transition duration-300 ${
+                  !profile ? "translate-x-full" : "translate-x-0"
+                }`}
+              >
+                {auth ? (
+                  <span className="text-base flex items-center gap-x-2">
+                    <p>Settings</p>
+                    <p>
+                      <Settings size={20} />
+                    </p>
+                  </span>
+                ) : (
+                  ""
+                )}
+                {!auth ? (
+                  <span className="flex gap-x-3">
+                    <span>
+                      <ButtonOne
+                        buttonValue={`Login`}
+                        Clicked={() => openModal("login")}
+                      />
+                    </span>
+                    <span>
+                      <ButtonTwo
+                        buttonValue={`Sign up`}
+                        Clicked={() => openModal("signup")}
+                      />
+                    </span>
+                  </span>
+                ) : (
+                  <ButtonTwo
+                    buttonValue={`Sign Out`}
+                    iconValue={<FaSignOutAlt size={15} />}
+                  />
+                )}
+              </span>
+            </span>
+            <Link
+              href={`/cart`}
+              className="cursor-pointer py-2 flex items-center gap-x-2"
+            >
+              <ShoppingBag />
+            </Link>
           </section>
         </div>
         <div className="w-[80%] mx-auto flex md:hidden flex-row items-center justify-between relative">
-        <span onClick={()=>openModal('admin')} className='cursor-pointer'>Logo</span>
-        <span onClick={toggleDropdown} className="cursor-pointer">
+          <span onClick={() => openModal("admin")} className="cursor-pointer">
+            Logo
+          </span>
+          <span onClick={toggleDropdown} className="cursor-pointer">
             {isDropdownOpen ? <X /> : <Menu />}
           </span>
         </div>
         {isDropdownOpen && (
           <div className="absolute top-full left-0 w-full bg-white text-customGray border-t shadow-lg md:hidden">
             <div className="flex flex-col px-5 py-4">
-              <span className="cursor-pointer py-2"><Search category={cat} /></span>
-              <hr className="my-2" />
-              <span className="cursor-pointer py-2 flex items-center gap-x-2" onClick={() => openModal('login')}>
-                <User /> Profile
+              <span className="cursor-pointer py-2">
+                <Search category={cat} />
               </span>
-              <Link href={`/cart`} className="cursor-pointer py-2 flex items-center gap-x-2">
+              <hr className="my-2" />
+              <span
+                onClick={() => openModal(`login`)}
+                className="text-2xl rounded-full px-5 cursor-pointer h-10 w-10 flex items-center justify-center"
+              >
+                {userFirstName ? (
+                  <span className="flex items-center gap-x-2 ml-10">
+                    <strong>{userFirstName.charAt(0).toUpperCase()}</strong>
+                    <p className="font-normal text-base ">Profile</p>
+                  </span>
+                ) : (
+                  <span className="flex ml-8">
+                    <User />
+                    <p className="font-normal text-base ">Profile</p>
+                  </span>
+                )}
+              </span>
+              <Link
+                href={`/cart`}
+                className="cursor-pointer py-2 flex items-center gap-x-2"
+              >
                 <ShoppingBag /> Cart
               </Link>
             </div>
@@ -102,40 +197,70 @@ const Navbar = () => {
 
       {/* Single Modal for Login, SignUp, and Forgot Password */}
       <Modal
-        title={modalType === 'login' ? 'Login' : modalType === 'signup' ? 'Sign Up' : modalType === 'forgotPassword'?  'Forgot Password?' : 'admin Login' }
+        title={
+          modalType === "login"
+            ? "Login"
+            : modalType === "signup"
+            ? "Sign Up"
+            : modalType === "forgotPassword"
+            ? "Forgot Password?"
+            : "admin Login"
+        }
         isOpen={modal}
         onClose={closeModal}
         onSubmit={
-          modalType === 'login' ? loginForm : modalType === 'signup' ? SignUpForm : modalType === 'forgotPassword'?  ForgottenPasswordForm : AdminForm
+          modalType === "login"
+            ? loginForm
+            : modalType === "signup"
+            ? SignUpForm
+            : modalType === "forgotPassword"
+            ? ForgottenPasswordForm
+            : AdminForm
         }
-        buttonValue={modalType === 'login' ? 'Login' : modalType === 'signup' ? 'Sign Up' : 'Submit'}
+        buttonValue={
+          modalType === "login"
+            ? "Login"
+            : modalType === "signup"
+            ? "Sign Up"
+            : "Submit"
+        }
         subChildren={
-          modalType === 'login' ? (
+          modalType === "login" ? (
             <span className="text-center gap-x-2 items-center justify-center flex text-sm">
               <p>Don't have an account?</p>
-              <span className="text-blue-600 cursor-pointer" onClick={() => openModal('signup')}>
+              <span
+                className="text-blue-600 cursor-pointer"
+                onClick={() => openModal("signup")}
+              >
                 Sign up
               </span>
             </span>
-          ) : modalType === 'signup' ? (
+          ) : modalType === "signup" ? (
             <span className="w-full justify-center items-center text-sm flex gap-x-2">
               <p>Already have an account?</p>
-              <span className="text-blue-600 cursor-pointer" onClick={() => openModal('login')}>
+              <span
+                className="text-blue-600 cursor-pointer"
+                onClick={() => openModal("login")}
+              >
                 Log in
               </span>
             </span>
-          ) : modalType === 'admin'? '' 
-          :  (
+          ) : modalType === "admin" ? (
+            ""
+          ) : (
             <span className="w-full justify-center items-center text-sm flex gap-x-2">
               <p>Remember your password?</p>
-              <span className="text-blue-600 cursor-pointer" onClick={() => openModal('login')}>
+              <span
+                className="text-blue-600 cursor-pointer"
+                onClick={() => openModal("login")}
+              >
                 Log in
               </span>
             </span>
           )
         }
       >
-        {modalType === 'login' && (
+        {modalType === "login" && (
           <>
             <Textinput
               label="Email"
@@ -160,16 +285,21 @@ const Navbar = () => {
                   onChange={() => setRememberMe(!rememberMe)}
                   className="accent-blue-600"
                 />
-                <label htmlFor="rememberMe" className="ml-2 text-black">Remember Me</label>
+                <label htmlFor="rememberMe" className="ml-2 text-black">
+                  Remember Me
+                </label>
               </div>
-              <span onClick={() => openModal('forgotPassword')} className="cursor-pointer">
+              <span
+                onClick={() => openModal("forgotPassword")}
+                className="cursor-pointer"
+              >
                 Forgot password?
               </span>
             </span>
           </>
         )}
 
-{modalType === 'admin' && (
+        {modalType === "admin" && (
           <>
             <Textinput
               label="Email"
@@ -194,13 +324,15 @@ const Navbar = () => {
                   onChange={() => setRememberMe(!rememberMe)}
                   className="accent-blue-600"
                 />
-                <label htmlFor="rememberMe" className="ml-2 text-black">Remember Me</label>
+                <label htmlFor="rememberMe" className="ml-2 text-black">
+                  Remember Me
+                </label>
               </div>
             </span>
           </>
         )}
 
-        {modalType === 'signup' && (
+        {modalType === "signup" && (
           <>
             <Textinput
               label="First Name"
@@ -240,7 +372,7 @@ const Navbar = () => {
           </>
         )}
 
-        {modalType === 'forgotPassword' && (
+        {modalType === "forgotPassword" && (
           <>
             <p>Please enter your email</p>
             <Textinput
