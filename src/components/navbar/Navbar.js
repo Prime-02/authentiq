@@ -11,6 +11,8 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useGlobalState } from "@/app/GlobalStateProvider";
 import { FaSignOutAlt } from "react-icons/fa";
+import { toast } from "react-toastify";
+import axios from "axios";
 
 const Navbar = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -28,7 +30,8 @@ const Navbar = () => {
   const [forgotPasswordEmail, setForgotPasswordEmail] = useState("");
   const [adminEmail, setAdminEmail] = useState("");
   const [adminPassword, setAdminPassword] = useState("");
-  const [auth, setAuth] = useState(false);
+  const [auth, setAuth] = useState(true);
+  const [loading, setLoading] = useState(false);
   const { formData } = useGlobalState(); // Access global state
   const userFirstName = formData.userFirstName ? formData.userFirstName : "";
 
@@ -38,6 +41,14 @@ const Navbar = () => {
   const toggleDropdown = () => {
     setIsDropdownOpen(!isDropdownOpen);
   };
+
+  const Clear = () => {
+    localStorage.removeItem("userAuthToken");
+    sessionStorage.removeItem("userAuthToken");
+    alert(`cleared`);
+  };
+  console.log(localStorage.getItem(`userAuthToken`));
+  console.log(localStorage.getItem(`adminAuthToken`));
 
   const openModal = (type) => {
     setModalType(type); // Set the type of modal to display
@@ -51,16 +62,177 @@ const Navbar = () => {
 
   const loginForm = async (e) => {
     e.preventDefault();
+    setLoading(true);
+
+    try {
+      const response = await axios.post(
+        "https://isans.pythonanywhere.com/users/login/",
+        {
+          email: loginEmail,
+          password: loginPassword,
+        }
+      );
+
+      if (response.status === 200 || response.status === 201) {
+        const token = response.data.access;
+
+        // Save token in local or session storage based on "Remember Me" selection
+        if (rememberMe) {
+          localStorage.setItem("userAuthToken", token);
+        } else {
+          sessionStorage.setItem("userAuthToken", token);
+        }
+
+        toast.success("Welcome!", { position: "top-right", autoClose: 5000 });
+        setLoginEmail("");
+        setLoginPassword("");
+      } else {
+        toast.error("Login failed. Please try again.", {
+          position: "top-right",
+          autoClose: 5000,
+        });
+      }
+    } catch (err) {
+      const errorMsg = err.response
+        ? err.response.status === 401
+          ? "Incorrect password. Please try again."
+          : `An error occurred. ${
+              err.response.data.email ||
+              err.response.data.password ||
+              "Please check your Internet and try again."
+            }`
+        : "An error occurred. Please check your Internet and try again.";
+      toast.error(errorMsg, { position: "top-right", autoClose: 5000 });
+    } finally {
+      setLoading(false);
+    }
   };
+
   const SignUpForm = async (e) => {
     e.preventDefault();
+    setLoading(true);
+
+    if (signUpPassword !== confirmPassword) {
+      toast.error("Passwords do not match.", {
+        position: "top-right",
+        autoClose: 5000,
+      });
+      setLoading(false);
+      return;
+    }
+
+    try {
+      const response = await axios.post(
+        "https://isans.pythonanywhere.com/users/register/",
+        {
+          email: signUpEmail,
+          password: signUpPassword,
+          first_name: firstName,
+          last_name: lastName,
+          location: "not set",
+        }
+      );
+
+      // Log the API response
+      console.log("API Response:", response);
+
+      if (response.status === 201 || response.status === 200) {
+        sessionStorage.setItem("userAuthToken", response.data.token);
+        toast.success("Welcome aboard! Now login.", {
+          position: "top-right",
+          autoClose: 5000,
+        });
+
+        // Reset form fields
+        setFirstName("");
+        setLastName("");
+        setSignUpEmail("");
+        setSignUpPassword("");
+        setConfirmPassword("");
+
+        setModalType("login");
+      }
+    } catch (err) {
+      const errorMsg =
+        err.response?.data?.message ||
+        err.response?.data?.email ||
+        err.response?.data?.password ||
+        "An unexpected error occurred. Please try again.";
+      toast.error(errorMsg, {
+        position: "top-right",
+        autoClose: 5000,
+      });
+    } finally {
+      setLoading(false);
+    }
   };
+
   const ForgottenPasswordForm = async (e) => {
     e.preventDefault();
   };
   const AdminForm = async (e) => {
     e.preventDefault();
-    nav.push(`/admin/${adminEmail ? adminEmail : "admin"}/dashboard`);
+    setLoading(true);
+
+    // Log the email and password before sending the request
+    console.log("Sending login data:", {
+      email: adminEmail,
+      password: adminPassword,
+    });
+
+    try {
+      // Start of the request
+      console.log("Sending request to server...");
+
+      const response = await axios.post(
+        "https://isans.pythonanywhere.com/users/admin/login/",
+        {
+          email: adminEmail,
+          password: adminPassword,
+        }
+      );
+
+      // Log the response when received
+      console.log("Response received:", response);
+
+      if (response.status === 200 || response.status === 201) {
+        const token = response.data.access;
+
+        // Save token in local or session storage based on "Remember Me" selection
+        if (rememberMe) {
+          localStorage.setItem("adminAuthToken", token);
+        } else {
+          sessionStorage.setItem("adminAuthToken", token);
+        }
+
+        toast.success("Welcome!", { position: "top-right", autoClose: 5000 });
+        setLoginEmail("");
+        setLoginPassword("");
+        nav.push(`/admin/${adminEmail ? adminEmail : "admin"}/dashboard`);
+      } else {
+        console.log("Login failed with status:", response.status);
+        toast.error("Login failed. Please try again.", {
+          position: "top-right",
+          autoClose: 5000,
+        });
+      }
+    } catch (err) {
+      // Log the error if something goes wrong
+      console.error("Error occurred during login:", err);
+      const errorMsg = err.response
+        ? err.response.status === 401
+          ? "Incorrect password. Please try again."
+          : `An error occurred. ${
+              err.response.data.email ||
+              err.response.data.password ||
+              "Please check your Internet and try again."
+            }`
+        : "An error occurred. Please check your Internet and try again.";
+
+      toast.error(errorMsg, { position: "top-right", autoClose: 5000 });
+    } finally {
+      setLoading(false);
+    }
   };
 
   const profileRef = useRef(null);
@@ -81,9 +253,20 @@ const Navbar = () => {
     };
   }, [profile]);
 
+  useEffect(() => {
+    // Check if 'userAuthToken' exists in localStorage
+    const token = localStorage.getItem("userAuthToken");
+
+    if (token && token !== "") {
+      setAuth(true); // Set auth to true if token is found
+    } else {
+      setAuth(false); // Set auth to false if token is not found
+    }
+  }, []);
+
   return (
     <>
-      <nav className="fixed top-0 w-full py-5 flex items-center justify-center backdrop-blur-lg ">
+      <nav className="fixed top-0 w-full py-5 flex items-center justify-center backdrop-blur-lg z-50">
         <div className="w-[80%] mx-auto hidden md:flex flex-row items-center justify-between">
           <section className="flex flex-row justify-evenly gap-x-5">
             <span onClick={() => openModal("admin")} className="cursor-pointer">
@@ -140,7 +323,11 @@ const Navbar = () => {
                 ) : (
                   <ButtonTwo
                     buttonValue={`Sign Out`}
-                    iconValue={<FaSignOutAlt size={15} />}
+                    iconValue={
+                      <FaSignOutAlt
+                        size={15}
+                      />
+                    }
                   />
                 )}
               </span>
@@ -197,6 +384,9 @@ const Navbar = () => {
 
       {/* Single Modal for Login, SignUp, and Forgot Password */}
       <Modal
+        clickedTitle={Clear}
+        loading={loading}
+        disabled={loading}
         title={
           modalType === "login"
             ? "Login"

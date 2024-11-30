@@ -3,12 +3,13 @@ import { useGlobalState } from "@/app/GlobalStateProvider";
 import { adminDBSidebar } from "@/components/index";
 import { SearchTwo } from "@/components/inputs/SearchInputs";
 import Modal from "@/components/Modal/Modal";
-import { ButtonOne, ButtonTwo } from "@/components/reusables/buttons/Buttons";
+import { ButtonOne, ButtonTwo, DBButtonOne } from "@/components/reusables/buttons/Buttons";
 import { Home, LogOutIcon, User, User2Icon, UserCircle, X } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { RiSideBarLine } from "react-icons/ri";
+
 
 const Sidebar = () => {
   const [sideSlide, setSideSlide] = useState(false);

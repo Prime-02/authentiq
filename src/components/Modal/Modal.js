@@ -4,7 +4,7 @@ import { X } from 'lucide-react';
 import React from 'react';
 import { ButtonOne, ButtonTwo } from '../reusables/buttons/Buttons';
 
-const Modal = ({ isOpen, onClose, title, children, onSubmit, disabled, loading, buttonValue, subChildren, customButton }) => {
+const Modal = ({ isOpen, onClose, title, children, onSubmit, disabled, loading, clickedTitle, buttonValue, subChildren, customButton }) => {
   if (!isOpen) return null;
 
   const handleOutsideClick = (e) => {
@@ -27,7 +27,7 @@ const Modal = ({ isOpen, onClose, title, children, onSubmit, disabled, loading, 
           <X />
         </button>
         {title && (
-          <h2 className="text-2xl font-semibold mb-4 text-gray-900">{title}</h2>
+          <h2 onClick={clickedTitle} className="text-2xl font-semibold mb-4 text-gray-900">{title}</h2>
         )}
         {onSubmit ? (
           <form onSubmit={onSubmit} className="flex flex-col gap-y-3">
