@@ -47,8 +47,13 @@ const Navbar = () => {
     sessionStorage.removeItem("userAuthToken");
     alert(`cleared`);
   };
+  const SignOut = () => {
+    localStorage.removeItem("userAuthToken");
+    sessionStorage.removeItem("userAuthToken");
+    window.location.reload();
+  };
   console.log(localStorage.getItem(`userAuthToken`));
-  console.log(localStorage.getItem(`adminAuthToken`));
+  console.log(sessionStorage.getItem(`userAuthToken`));
 
   const openModal = (type) => {
     setModalType(type); // Set the type of modal to display
@@ -86,6 +91,7 @@ const Navbar = () => {
         toast.success("Welcome!", { position: "top-right", autoClose: 5000 });
         setLoginEmail("");
         setLoginPassword("");
+        window.location.reload();
       } else {
         toast.error("Login failed. Please try again.", {
           position: "top-right",
@@ -255,7 +261,9 @@ const Navbar = () => {
 
   useEffect(() => {
     // Check if 'userAuthToken' exists in localStorage
-    const token = localStorage.getItem("userAuthToken");
+    const token =
+      localStorage.getItem("userAuthToken") ||
+      sessionStorage.getItem("userAuthToken");
 
     if (token && token !== "") {
       setAuth(true); // Set auth to true if token is found
@@ -323,11 +331,8 @@ const Navbar = () => {
                 ) : (
                   <ButtonTwo
                     buttonValue={`Sign Out`}
-                    iconValue={
-                      <FaSignOutAlt
-                        size={15}
-                      />
-                    }
+                    iconValue={<FaSignOutAlt size={15} />}
+                    Clicked={SignOut}
                   />
                 )}
               </span>
