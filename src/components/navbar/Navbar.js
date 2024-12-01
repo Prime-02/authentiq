@@ -1,8 +1,7 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
-import { IoMdCart } from "react-icons/io";
-import { Menu, Settings, ShoppingBag, User, X } from "lucide-react";
+import { Heart, icons, Menu, Settings, ShoppingBag, User, X } from "lucide-react";
 import { ButtonOne, ButtonTwo } from "../reusables/buttons/Buttons";
 import { Search, SearchTwo } from "../inputs/SearchInputs";
 import Modal from "../Modal/Modal";
@@ -34,6 +33,14 @@ const Navbar = () => {
   const [loading, setLoading] = useState(false);
   const { formData } = useGlobalState(); // Access global state
   const userFirstName = formData.userFirstName ? formData.userFirstName : "";
+  const profileNav = {
+    profileName: `${userFirstName} ${formData.userLastName}.`,
+    navigations: [
+      {nav: 'Profile', href: '/profile/profile', icon: <User size={15}/>},
+      {nav: 'Wish List', href: '/profile/wish-list', icon: <Heart size={15}/>},
+      {nav: 'Setting', href: '/profile/settings', icon:<Settings size={15}/>},
+    ]
+  };
 
   const nav = useRouter();
   const [cat] = useState(["All Categories", "Tees", "Accessories"]);
@@ -299,17 +306,26 @@ const Navbar = () => {
               )}
               <span
                 ref={profileRef}
-                className={`absolute  right-0 top-2 bg-white  px-2 min-w-32 h-auto py-2 w-auto  rounded-lg flex flex-col items-end justify-center gap-y-1 transition duration-300 ${
+                className={`absolute  right-0 top-2 card  px-2  ${
+                  auth ? "h-screen w-44" : "h-auto w-auto"
+                } py-2  rounded-lg flex flex-col gap-y-1 transition duration-300 ${
                   !profile ? "translate-x-full" : "translate-x-0"
                 }`}
               >
                 {auth ? (
-                  <span className="text-base flex items-center gap-x-2">
-                    <p>Settings</p>
-                    <p>
-                      <Settings size={20} />
-                    </p>
-                  </span>
+                  <div className="flex flex-col text-base  space-y-10 gap-y-3 mt-2">
+                    <h1 className="font-bold text">{profileNav.profileName}</h1>
+                    {profileNav.navigations.map((nav, ind) => (
+                      <Link
+                        href={nav.href}
+                        key={ind}
+                        className="flex gap-x-2 items-center"
+                      >
+                        <span>{nav.icon}</span>
+                        <span>{nav.nav}</span>
+                      </Link>
+                    ))}
+                  </div>
                 ) : (
                   ""
                 )}
@@ -329,11 +345,13 @@ const Navbar = () => {
                     </span>
                   </span>
                 ) : (
-                  <ButtonTwo
-                    buttonValue={`Sign Out`}
-                    iconValue={<FaSignOutAlt size={15} />}
-                    Clicked={SignOut}
-                  />
+                  <span className="absolute bottom-5 ">
+                    <ButtonTwo
+                      buttonValue={`Sign Out`}
+                      iconValue={<FaSignOutAlt size={15} />}
+                      Clicked={SignOut}
+                    />
+                  </span>
                 )}
               </span>
             </span>
@@ -354,14 +372,14 @@ const Navbar = () => {
           </span>
         </div>
         {isDropdownOpen && (
-          <div className="absolute top-full left-0 w-full bg-white text-customGray border-t shadow-lg md:hidden">
+          <div className="absolute top-full left-0 w-full bg-white text-customGray border-t shadow-lg md:hidden h-auto">
             <div className="flex flex-col px-5 py-4">
               <span className="cursor-pointer py-2">
                 <Search category={cat} />
               </span>
               <hr className="my-2" />
               <span
-                onClick={() => openModal(`login`)}
+                onClick={() => setProfile(!profile)}
                 className="text-2xl rounded-full px-5 cursor-pointer h-10 w-10 flex items-center justify-center"
               >
                 {userFirstName ? (
@@ -376,11 +394,26 @@ const Navbar = () => {
                   </span>
                 )}
               </span>
+              {profile && (
+                <div className="flex flex-col gap-y-3 mt-2">
+                  <h1 className="font-bold text">{profileNav.profileName}</h1>
+                  {profileNav.navigations.map((nav, ind) => (
+                    <Link
+                      href={nav.href}
+                      key={ind}
+                      className="flex gap-x-2 items-center"
+                    >
+                      <span>{nav.icon}</span>
+                      <span>{nav.nav}</span>
+                    </Link>
+                  ))}
+                </div>
+              )}
               <Link
                 href={`/cart`}
                 className="cursor-pointer py-2 flex items-center gap-x-2"
               >
-                <ShoppingBag /> Cart
+                <ShoppingBag size={15} /> Cart
               </Link>
             </div>
           </div>

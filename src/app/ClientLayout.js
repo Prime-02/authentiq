@@ -20,14 +20,14 @@ export default function ClientLayout({ children }) {
   // Example login state (replace with actual auth logic)
   useEffect(() => {
     // Simulate a user login (replace this with real authentication logic)
-    const user = formData.userId ? formData.userId : ''; // Replace with data from your auth logic
+    const user = formData.email ? formData.email : ""; // Replace with data from your auth logic
     if (user) {
       setIsLoggedIn(true);
       setUserName(user.name);
 
       // Add query parameter for the logged-in user
-      if (!pathname.includes(`id=${user}`)) {
-        const updatedPath = `${pathname}?id=${encodeURIComponent(user)}`;
+      if (!pathname.includes(`user=${user}`)) {
+        const updatedPath = `${pathname}?user=${encodeURIComponent(user)}`;
         router.push(updatedPath);
       }
     } else {
@@ -36,7 +36,8 @@ export default function ClientLayout({ children }) {
   }, [pathname, router]);
 
   // Check if the current path starts with '/admin'
-  const shouldHideNavbarAndFooter = pathname.startsWith("/admin");
+  const shouldHideNavbarAndFooter =
+    pathname.startsWith("/admin") || pathname.startsWith("/profile");
 
   useEffect(() => {
     // Show loading screen on route change
