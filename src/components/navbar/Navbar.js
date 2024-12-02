@@ -388,7 +388,7 @@ const Navbar = () => {
                   </span>
                 )}
               </span>
-              {profile && (
+              {profile && auth ? (
                 <div className="flex flex-col gap-y-3 mt-2">
                   <h1 className="font-bold text">{profileNav.profileName}</h1>
                   {profileNav.navigations.map((nav, ind) => (
@@ -402,6 +402,23 @@ const Navbar = () => {
                     </Link>
                   ))}
                 </div>
+              ) : (
+                profile && (
+                  <span className="flex flex-col gap-y-3">
+                    <span>
+                      <ButtonOne
+                        buttonValue={`Login`}
+                        Clicked={() => openModal("login")}
+                      />
+                    </span>
+                    <span>
+                      <ButtonTwo
+                        buttonValue={`Sign Up`}
+                        Clicked={() => openModal("signup")}
+                      />
+                    </span>
+                  </span>
+                )
               )}
               <Link
                 href={`/cart`}
