@@ -1,17 +1,17 @@
 "use client";
+import { useGlobalState } from "@/app/GlobalStateProvider";
 import React, { useEffect } from "react";
-import { useGlobalState } from "../GlobalStateProvider";
 
-const Cart = () => {
-  const { formData, fetchCart } = useGlobalState();
+const Wishlist = () => {
+  const { formData, fetchWishlist } = useGlobalState();
   useEffect(() => {
-    fetchCart();
-  }, [fetchCart]);
+    fetchWishlist();
+  }, [fetchWishlist]);
   const cart = formData.cart;
   return (
     <div className="flex p-12 w-full justify-between mx-auto flex-col md:flex-row gap-4 h-screen ">
       <section className="  w-1/2">
-        <h1 className="text-2xl md:text-4xl ">Shopping Cart</h1>
+        <h1 className="text-2xl md:text-4xl ">Shopping Wishlist</h1>
         <ul>
           {cart.map((cart, index) => (
             <li key={index}>
@@ -29,4 +29,4 @@ const Cart = () => {
   );
 };
 
-export default Cart;
+export default Wishlist;

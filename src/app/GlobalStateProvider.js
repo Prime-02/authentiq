@@ -48,7 +48,7 @@ export const GlobalStateProvider = ({ children }) => {
     adminReferredBy: "",
     adminNotification: [],
     products: [],
-    barcodes: [] // Add barcodes field
+    barcodes: [], // Add barcodes field
   });
 
   // Utils: Format balance
@@ -62,52 +62,51 @@ export const GlobalStateProvider = ({ children }) => {
     return "0.00";
   };
 
-
-const addToEndpoint = async ({ productId, endpoint, action, quantity }) => {
-  if (!productId) {
-    toast.error("Invalid product ID. Please try again.");
-    return;
-  }
-
-  // Retrieve adminAuthToken from local or session storage
-  const token =
-    localStorage.getItem("adminAuthToken") ||
-    sessionStorage.getItem("adminAuthToken");
-
-  if (!token) {
-    toast.warning("You need to log in to perform this action.");
-    return;
-  }
-
-  try {
-    // API request payload
-    const payload = {
-      product_id: productId,
-      quantity: quantity? quantity : 1, // Fixed quantity for cart; adjust as needed for other endpoints
-    };
-
-    // Send POST request to the API
-    const response = await axios.post(endpoint, payload, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
-    });
-
-    // Show success message
-    if (response.status === 200 || response.status === 201) {
-      toast.success(`Product successfully added to ${action}!`);
-    } else {
-      toast.warning(`Failed to add product to ${action}. Please try again.`);
+  const addToEndpoint = async ({ productId, endpoint, action, quantity }) => {
+    if (!productId) {
+      toast.error("Invalid product ID. Please try again.");
+      return;
     }
-  } catch (error) {
-    console.error(`Error adding to ${action}:`, error);
-    const errorMessage =
-      error.response?.data?.message ||
-      `Failed to add product to ${action}. Please try again.`;
-    toast.error(errorMessage);
-  }
-};
+
+    // Retrieve adminAuthToken from local or session storage
+    const token =
+      localStorage.getItem("adminAuthToken") ||
+      sessionStorage.getItem("adminAuthToken");
+
+    if (!token) {
+      toast.warning("You need to log in to perform this action.");
+      return;
+    }
+
+    try {
+      // API request payload
+      const payload = {
+        product_id: productId,
+        quantity: quantity ? quantity : 1, // Fixed quantity for cart; adjust as needed for other endpoints
+      };
+
+      // Send POST request to the API
+      const response = await axios.post(endpoint, payload, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
+
+      // Show success message
+      if (response.status === 200 || response.status === 201) {
+        toast.success(`Product successfully added to ${action}!`);
+      } else {
+        toast.warning(`Failed to add product to ${action}. Please try again.`);
+      }
+    } catch (error) {
+      console.error(`Error adding to ${action}:`, error);
+      const errorMessage =
+        error.response?.data?.message ||
+        `Failed to add product to ${action}. Please try again.`;
+      toast.error(errorMessage);
+    }
+  };
 
   // Fetch user data
   const fetchUserData = useCallback(async () => {
@@ -149,85 +148,82 @@ const addToEndpoint = async ({ productId, endpoint, action, quantity }) => {
     }
   }, []);
 
-  const fetchCart = useCallback(
-    async () => {
-  try {
-    // Retrieve the user authentication token
-    const userAuthToken =
-      localStorage.getItem("userAuthToken") ||
-      sessionStorage.getItem("userAuthToken");
+  const fetchCart = useCallback(async () => {
+    try {
+      // Retrieve the user authentication token
+      const userAuthToken =
+        localStorage.getItem("userAuthToken") ||
+        sessionStorage.getItem("userAuthToken");
 
-    if (!userAuthToken) {
-      toast.warning("Authentication token is not available. Please log in.");
-      return;
-    }
-
-    // Make the API request to fetch the cart data
-    const response = await axios.get(
-      "https://isans.pythonanywhere.com/shop/cart/",
-      {
-        headers: {
-          Authorization: `Bearer ${userAuthToken}`,
-        },
+      if (!userAuthToken) {
+        toast.warning("Authentication token is not available. Please log in.");
+        return;
       }
-    );
 
-    // Validate and update the cart data
-    const cart = response.data || []; // Fallback to an empty array if 'cart' is undefined
-    setFormData((prevState) => ({
-      ...prevState,
-      cart,
-      cartNo: cart.length, // Optional: Update the cart count
-    }));
+      // Make the API request to fetch the cart data
+      const response = await axios.get(
+        "https://isans.pythonanywhere.com/shop/cart/",
+        {
+          headers: {
+            Authorization: `Bearer ${userAuthToken}`,
+          },
+        }
+      );
 
-    console.log("Cart data retrieved:", cart);
-  } catch (error) {
-    console.error("Error fetching cart data:", error.message || error);
-    const errorMessage = error.response?.data?.message || "Unable to fetch cart data.";
-    toast.error(errorMessage);
-  }
-}, []
-  )
-  const fetchWishlist = useCallback(
-    async () => {
-  try {
-    // Retrieve the user authentication token
-    const userAuthToken =
-      localStorage.getItem("userAuthToken") ||
-      sessionStorage.getItem("userAuthToken");
+      // Validate and update the cart data
+      const cart = response.data || []; // Fallback to an empty array if 'cart' is undefined
+      setFormData((prevState) => ({
+        ...prevState,
+        cart,
+        cartNo: cart.length, // Optional: Update the cart count
+      }));
 
-    if (!userAuthToken) {
-      toast.warning("Authentication token is not available. Please log in.");
-      return;
+      console.log("Cart data retrieved:", cart);
+    } catch (error) {
+      console.error("Error fetching cart data:", error.message || error);
+      const errorMessage =
+        error.response?.data?.message || "Unable to fetch cart data.";
+      toast.error(errorMessage);
     }
+  }, []);
+  const fetchWishlist = useCallback(async () => {
+    try {
+      // Retrieve the user authentication token
+      const userAuthToken =
+        localStorage.getItem("userAuthToken") ||
+        sessionStorage.getItem("userAuthToken");
 
-    // Make the API request to fetch the cart data
-    const response = await axios.get(
-      "https://isans.pythonanywhere.com/shop/wishlist/",
-      {
-        headers: {
-          Authorization: `Bearer ${userAuthToken}`,
-        },
+      if (!userAuthToken) {
+        toast.warning("Authentication token is not available. Please log in.");
+        return;
       }
-    );
 
-    // Validate and update the cart data
-    const wishlist = response.data.wishlist_items || []; // Fallback to an empty array if 'wishlist' is undefined
-    setFormData((prevState) => ({
-      ...prevState,
-      wishlist,
-      wishlistNo: wishlist.length, // Optional: Update the wishlist count
-    }));
+      // Make the API request to fetch the cart data
+      const response = await axios.get(
+        "https://isans.pythonanywhere.com/shop/wishlist/",
+        {
+          headers: {
+            Authorization: `Bearer ${userAuthToken}`,
+          },
+        }
+      );
 
-    console.log("Cart data retrieved:", wishlist);
-  } catch (error) {
-    console.error("Error fetching wishlist data:", error.message || error);
-    const errorMessage = error.response?.data?.message || "Unable to fetch wishlist data.";
-    toast.error(errorMessage);
-  }
-}, []
-  )
+      // Validate and update the cart data
+      const wishlist = response.data.wishlist_items || []; // Fallback to an empty array if 'wishlist' is undefined
+      setFormData((prevState) => ({
+        ...prevState,
+        wishlist,
+        wishlistNo: wishlist.length, // Optional: Update the wishlist count
+      }));
 
+      console.log("Cart data retrieved:", wishlist);
+    } catch (error) {
+      console.error("Error fetching wishlist data:", error.message || error);
+      const errorMessage =
+        error.response?.data?.message || "Unable to fetch wishlist data.";
+      toast.error(errorMessage);
+    }
+  }, []);
 
   // Fetch products
   const fetchProducts = useCallback(async () => {
@@ -267,7 +263,7 @@ const addToEndpoint = async ({ productId, endpoint, action, quantity }) => {
       );
 
       if (response.status === 200 || response.status === 201) {
-        const barcodes = response.data || [];// Assuming response contains an array of barcode objects
+        const barcodes = response.data || []; // Assuming response contains an array of barcode objects
         setFormData((prevState) => ({
           ...prevState,
           barcodes, // Store the barcodes in the state
@@ -281,14 +277,24 @@ const addToEndpoint = async ({ productId, endpoint, action, quantity }) => {
     }
   }, []);
 
-  // Fetch data on page load
-  useEffect(() => {
-    fetchUserData();
-    fetchProducts();
-    fetchBarcodes(); // Fetch barcodes on page load
-  }, [fetchUserData, fetchProducts, fetchBarcodes]);
+ 
 
-   
+  useEffect(() => {
+    const userAuthToken =
+      localStorage.getItem("userAuthToken") ||
+      sessionStorage.getItem("userAuthToken");
+    const adminAuthToken =
+      localStorage.getItem("AdminAuthToken") ||
+      sessionStorage.getItem("AdminAuthToken");
+
+    if (userAuthToken || adminAuthToken) {
+      fetchUserData();
+      fetchBarcodes(); // Fetch barcodes on component mount if the token exists
+    }
+  }, []); // Dependency array is empty to ensure it runs only on mount
+  useEffect(() => {
+      fetchProducts();
+  }, []);
 
   return (
     <>
@@ -298,9 +304,9 @@ const addToEndpoint = async ({ productId, endpoint, action, quantity }) => {
           formData,
           setFormData,
           formatBalance,
-         addToEndpoint,
-         fetchCart,
-         fetchWishlist,
+          addToEndpoint,
+          fetchCart,
+          fetchWishlist,
           fetchBarcodes, // Provide the function to access barcodes
         }}
       >
