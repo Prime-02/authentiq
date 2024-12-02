@@ -1,25 +1,31 @@
 "use client";
 import { useGlobalState } from "@/app/GlobalStateProvider";
+import BarcodeDropdown from "@/components/inputs/BarcodeDropdown";
+import { CategoryDropdown } from "@/components/inputs/CategoryDropdown";
 import { CheckBoxList } from "@/components/inputs/CheckBox";
 import { FileInput } from "@/components/inputs/FIleInput";
-import {
-  TextArea,
-  Textinput,
-} from "@/components/inputs/Textinput";
+import { TextArea, Textinput } from "@/components/inputs/Textinput";
 import Modal from "@/components/Modal/Modal";
 import { Button } from "@/components/reusables/buttons/Buttons";
 import Link from "next/link";
 import React, { useState } from "react";
+import axios from "axios";
+import { toast } from "react-toastify";
+
 
 const Layout = ({ children }) => {
-  const {formData, setFormData} = useGlobalState()
+  const { formData } = useGlobalState();
   const [products, setProducts] = useState([]);
   const [prodModal, setProdModal] = useState(false);
+  const [prodCategory, setProdCategory] = useState("");
   const [prodName, setProdName] = useState("");
-  const [prodPrice, setProdPrice] = useState('');
+  const [prodPrice, setProdPrice] = useState("");
   const [prodDesc, setProdDesc] = useState("");
   const [prodImg, setProdImg] = useState(null);
-  const [prodQuantity, setProdQuantity] = useState('')
+  const [convertedImg, setConvertedImg] = useState(null); // Store WebP image
+  const [prodQuantity, setProdQuantity] = useState("");
+  const [selectedBarcode, setSelectedBarcode] = useState(null);
+  const [loading, setLoading] = useState(false);
   const [prodVariants, setProdVariants] = useState([
     { id: "sm", label: "S", value: "small", checked: false },
     { id: "md", label: "M", value: "medium", checked: false },
@@ -28,16 +34,43 @@ const Layout = ({ children }) => {
     { id: "xxl", label: "XXL", value: "extra-extra-large", checked: false },
   ]);
   const routeId = formData.adminFirstName.replace(/\s+/g, "_");
+  const Barcodes = formData?.barcodes || [];
 
-  // Handle checkbox state toggle
-  const handleCheckboxChange = (item) => {
-    setProdVariants((prev) =>
-      prev.map((variant) =>
-        variant.id === item.id
-          ? { ...variant, checked: !variant.checked }
-          : variant
-      )
-    );
+  const handleBarcodeSelect = (barcode) => {
+    setSelectedBarcode(barcode);
+  };
+
+  // Convert the selected image to WebP format
+  const convertToWebP = (file) => {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      const reader = new FileReader();
+
+      reader.onload = (e) => {
+        img.onload = () => {
+          const canvas = document.createElement("canvas");
+          const ctx = canvas.getContext("2d");
+          canvas.width = img.width;
+          canvas.height = img.height;
+          ctx.drawImage(img, 0, 0);
+          const webpDataUrl = canvas.toDataURL("image/webp", 0.8);
+          resolve(webpDataUrl);
+        };
+        img.src = e.target.result;
+      };
+      reader.onerror = (err) => reject(err);
+      reader.readAsDataURL(file);
+    });
+  };
+
+  // Handle file input change
+  const handleFileChange = async (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setProdImg(file); // Save the original file
+      const webpImage = await convertToWebP(file);
+      setConvertedImg(webpImage); // Save the converted WebP image
+    }
   };
 
   // Toggle Modal
@@ -45,34 +78,94 @@ const Layout = ({ children }) => {
     setProdModal(!prodModal);
   };
 
-  // Add Product
-  const addProduct = (e) => {
-    e.preventDefault();
 
-    // Create new product object
-    const newProduct = {
-      name: prodName,
-      price: prodPrice,
-      description: prodDesc,
-      image: prodImg,
-      variants: prodVariants.filter((variant) => variant.checked), // Only include checked variants
-    };
+const addProduct = async (e) => {
+  e.preventDefault();
+  setLoading(true);
 
-    // Update products array and reset form
-    setProducts((prevProducts) => [...prevProducts, newProduct]);
-    console.log("New Product Added:", newProduct);
+  // Validate mandatory fields
+  if (
+    !prodName ||
+    !prodPrice ||
+    !prodDesc ||
+    !prodQuantity ||
+    !prodCategory ||
+    !selectedBarcode
+  ) {
+    toast.warning("Please fill in all required fields.");
+    setLoading(false);
+    return;
+  }
 
-    // Reset state
+  try {
+    // Create FormData object
+    const formData = new FormData();
+    formData.append("name", prodName);
+    formData.append("price", prodPrice);
+    formData.append("description", prodDesc);
+    if (prodImg) {
+      formData.append("image", prodImg); // Only append if image is provided
+    }
+    formData.append("category", prodCategory);
+    formData.append("quantity", prodQuantity);
+    formData.append("barcode", selectedBarcode);
+    formData.append(
+      "size",
+      JSON.stringify(prodVariants.filter((variant) => variant.checked))
+    );
+
+    const adminAuthToken =
+      localStorage.getItem("adminAuthToken") ||
+      sessionStorage.getItem("adminAuthToken");
+
+    // Make the API request using Axios
+    const response = await axios.post(
+      "https://isans.pythonanywhere.com/shop/products/",
+      formData,
+      {
+        headers: {
+          Authorization: `Bearer ${adminAuthToken}`,
+          "Content-Type": "multipart/form-data",
+        },
+      }
+    );
+
+    // Log the response to the console
+    console.log("API Response:", response.data);
+
+    // Show a success toast
+    if (prodImg) {
+      toast.success("Product with image added successfully!");
+    } else {
+      toast.success("Product added successfully!");
+    }
+
+    // Update the UI with the new product
+    setProducts((prevProducts) => [...prevProducts, response.data]);
+
+    // Reset form fields
     setProdName("");
     setProdPrice("");
     setProdDesc("");
+    setProdQuantity("");
     setProdImg(null);
+    setConvertedImg(null);
+    setSelectedBarcode(null);
+    setProdCategory("");
     setProdVariants((prev) =>
       prev.map((variant) => ({ ...variant, checked: false }))
     );
 
     ToggleModal();
-  };
+  } catch (error) {
+    console.error("Error adding product:", error);
+    toast.error("Failed to add the product. Please try again.");
+  } finally {
+    setLoading(false);
+  }
+};
+
+
 
   return (
     <>
@@ -112,6 +205,8 @@ const Layout = ({ children }) => {
         {children}
       </div>
       <Modal
+        loading={loading}
+        disabled={loading}
         isOpen={prodModal}
         onClose={() => setProdModal(!prodModal)}
         title={`Add New Product`}
@@ -122,76 +217,73 @@ const Layout = ({ children }) => {
           <section className="flex items-center gap-x-3 justify-between">
             <span>
               <Textinput
-                type={`text`}
-                label={`Name`}
+                type="text"
+                label="Name"
                 value={prodName}
                 changed={(e) => setProdName(e.target.value)}
-                className={`border-b border-blue-600`}
+                className="border-b border-blue-600"
               />
             </span>
             <span>
               <FileInput
-                changed={(e) => setProdImg(e.target.files[0])} // Use `files` for file input
-                type={`file`}
-                accept={`image/*`}
+                changed={handleFileChange} // Handle file input change
+                type="file"
+                accept="image/*"
               />
             </span>
           </section>
-          <section className="flex items-center justify-between ">
+          <section className="flex items-center justify-between">
             <span>
               <Textinput
-                label={`Price ($)`}
-                type={`text`}
+                label="Price ($)"
+                type="text"
                 value={prodPrice}
                 changed={(e) => setProdPrice(e.target.value)}
-                className={`border-b border-blue-600`}
+                className="border-b border-blue-600"
               />
             </span>
             <div className="col-span-2 sm:col-span-1">
-              <select
-                id="category"
-                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-              >
-                <option defaultValue="">Select category</option>
-                <option value="tees">Tees</option>
-                <option value="accessories">Accessories</option>
-              </select>
+              <BarcodeDropdown
+                products={Barcodes}
+                onSelectBarcode={handleBarcodeSelect}
+              />
             </div>
           </section>
-          <section className="flex items-center justify-between ">
+          <section className="flex items-center justify-between">
             <span>
               <Textinput
-                label={`Quantity`}
-                type={`text`}
-                value={prodPrice}
-                changed={(e) => setProdPrice(e.target.value)}
-                className={`border-b border-blue-600`}
+                label="Quantity"
+                type="text"
+                value={prodQuantity}
+                changed={(e) => setProdQuantity(e.target.value)}
+                className="border-b border-blue-600"
               />
             </span>
             <div className="col-span-2 sm:col-span-1">
-              <select
-                id="category"
-                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-              >
-                <option defaultValue="">Select Barcode</option>
-                <option value="tees">Tees</option>
-                <option value="accessories">Accessories</option>
-              </select>
+              <CategoryDropdown onCategorySelect={setProdCategory} />
             </div>
           </section>
           <section>
             <TextArea
-              label={`Description`}
+              label="Description"
               value={prodDesc}
               changed={(e) => setProdDesc(e.target.value)}
-              className={`border-b border-blue-600`}
+              className="border-b border-blue-600"
             />
           </section>
           <section>
             <div className="px-5">
               <CheckBoxList
                 items={prodVariants}
-                onChange={handleCheckboxChange}
+                onChange={(item) =>
+                  setProdVariants((prev) =>
+                    prev.map((variant) =>
+                      variant.id === item.id
+                        ? { ...variant, checked: !variant.checked }
+                        : variant
+                    )
+                  )
+                }
               />
             </div>
           </section>

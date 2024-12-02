@@ -1,33 +1,40 @@
 "use client";
-import React from "react";
+import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import axios from "axios";
 import { useGlobalState } from "@/app/GlobalStateProvider";
 import { toast } from "react-toastify";
-import { Textinput } from "@/components/inputs/Textinput";
+import { LoaderStyle5Component } from "@/components/Loader/Loader";
+import { useRouter } from "next/navigation";
 
 const Settings = () => {
+  const back = useRouter();
   const { formData, setFormData } = useGlobalState();
   const {
     register,
     handleSubmit,
     reset,
     formState: { errors, isSubmitting },
-  } = useForm({
-    defaultValues: {
-      first_name: formData?.userFirstName || "",
-      last_name: formData?.userLastName || "",
-      email: formData?.email || "",
-      phone: formData?.phone || "",
-      location: formData?.location || "",
-      shipping_address: formData?.shippingAddress || "",
-      country: formData?.country || "",
-      street_address: formData?.streetAddress || "",
-      city: formData?.city || "",
-      state: formData?.state || "",
-      zip_code: formData?.zipCode || "",
-    },
-  });
+  } = useForm();
+
+  useEffect(() => {
+    if (formData) {
+      reset({
+        first_name: formData?.userFirstName || "",
+        last_name: formData?.userLastName || "",
+        email: formData?.email || "",
+        phone: formData?.phone || "",
+        location: formData?.location || "",
+        shipping_address: formData?.shippingAddress || "",
+        country: formData?.country || "",
+        street_address: formData?.streetAddress || "",
+        city: formData?.city || "",
+        state: formData?.state || "",
+        zip_code: formData?.zipCode || "",
+        gender: formData?.gender || "",
+      });
+    }
+  }, [formData, reset]);
 
   const onSubmit = async (data) => {
     const token =
@@ -60,64 +67,83 @@ const Settings = () => {
         error.response?.data || error.message
       );
       toast.error("Failed to update profile.");
+    } finally {
+      back.push(`/profile/profile`);
     }
   };
 
   return (
-    <div className="max-w-3xl mx-auto py-8">
-      <h1 className="text-2xl font-bold mb-6">Edit Profile</h1>
+    <div className="max-w-3xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+      <h1 className="text-3xl font-semibold text-center mb-6">Edit Profile</h1>
       <form
         onSubmit={handleSubmit(onSubmit)}
-        className="space-y-4 card shadow-md rounded p-6"
+        className="space-y-6 card p-6 rounded-lg shadow-lg"
       >
-        {/* First Name */}
-        <div>
-          <Textinput
-            label="First Name"
-            type="text"
-            value={formData.userFirstName} // Prefilled value
-            changed={(e) => {}}
-            className={`${
-              errors.first_name ? "border-red-500" : "border-gray-300"
-            }`}
-            placeholder="Enter your first name"
-            {...register("first_name", { required: "First Name is required" })}
-          />
-          {errors.first_name && (
-            <span className="text-red-500 text-sm">
-              {errors.first_name.message}
-            </span>
-          )}
-        </div>
+        {/* First Name and Last Name */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <label
+              htmlFor="first_name"
+              className="block text-lg font-medium "
+            >
+              First Name
+            </label>
+            <input
+              id="first_name"
+              type="text"
+              className={`mt-1 block w-full bg-transparent p-3 border rounded-lg shadow-sm ${
+                errors.first_name ? "border-red-500" : "border-gray-300"
+              }`}
+              placeholder="Enter your first name"
+              {...register("first_name", {
+                required: "First Name is required",
+              })}
+            />
+            {errors.first_name && (
+              <span className="text-red-500 text-sm">
+                {errors.first_name.message}
+              </span>
+            )}
+          </div>
 
-        {/* Last Name */}
-        <div>
-          <Textinput
-            label="Last Name"
-            type="text"
-            value={formData.userLastName} // Prefilled value
-            changed={(e) => {}}
-            className={`${
-              errors.last_name ? "border-red-500" : "border-gray-300"
-            }`}
-            placeholder="Enter your last name"
-            {...register("last_name", { required: "Last Name is required" })}
-          />
-          {errors.last_name && (
-            <span className="text-red-500 text-sm">
-              {errors.last_name.message}
-            </span>
-          )}
+          <div>
+            <label
+              htmlFor="last_name"
+              className="block text-lg font-medium "
+            >
+              Last Name
+            </label>
+            <input
+              id="last_name"
+              type="text"
+              className={`mt-1 block w-full bg-transparent p-3 border rounded-lg shadow-sm ${
+                errors.last_name ? "border-red-500" : "border-gray-300"
+              }`}
+              placeholder="Enter your last name"
+              {...register("last_name", { required: "Last Name is required" })}
+            />
+            {errors.last_name && (
+              <span className="text-red-500 text-sm">
+                {errors.last_name.message}
+              </span>
+            )}
+          </div>
         </div>
 
         {/* Email */}
         <div>
-          <Textinput
-            label="Email"
+          <label
+            htmlFor="email"
+            className="block text-lg font-medium "
+          >
+            Email
+          </label>
+          <input
+            id="email"
             type="email"
-            value={formData.email} // Prefilled value
-            changed={(e) => {}}
-            className={`${errors.email ? "border-red-500" : "border-gray-300"}`}
+            className={`mt-1 block w-full bg-transparent p-3 border rounded-lg shadow-sm ${
+              errors.email ? "border-red-500" : "border-gray-300"
+            }`}
             placeholder="Enter your email"
             {...register("email", {
               required: "Email is required",
@@ -132,14 +158,48 @@ const Settings = () => {
           )}
         </div>
 
+        {/* Gender Dropdown */}
+        {/* Gender Dropdown */}
+        <div>
+          <label
+            htmlFor="gender"
+            className="block text-lg font-medium "
+          >
+            Gender
+          </label>
+          <select
+            id="gender"
+            className={`mt-1 block w-full bg-transparent p-3 border rounded-lg shadow-sm ${
+              errors.gender ? "border-red-500" : "border-gray-300"
+            }`}
+            {...register("gender")}
+          >
+            <option value="">Select Gender</option>
+            <option value="male">Male</option>
+            <option value="female">Female</option>
+            <option value="other">Other</option>
+          </select>
+          {errors.gender && (
+            <span className="text-red-500 text-sm">
+              {errors.gender.message}
+            </span>
+          )}
+        </div>
+
         {/* Phone */}
         <div>
-          <Textinput
-            label="Phone"
+          <label
+            htmlFor="phone"
+            className="block text-lg font-medium "
+          >
+            Phone
+          </label>
+          <input
+            id="phone"
             type="text"
-            value={formData.phone} // Prefilled value
-            changed={(e) => {}}
-            className={`${errors.phone ? "border-red-500" : "border-gray-300"}`}
+            className={`mt-1 block w-full bg-transparent p-3 border rounded-lg shadow-sm ${
+              errors.phone ? "border-red-500" : "border-gray-300"
+            }`}
             placeholder="Enter your phone number"
             {...register("phone", {
               required: "Phone number is required",
@@ -154,150 +214,192 @@ const Settings = () => {
           )}
         </div>
 
-        {/* Location */}
-        <div>
-          <Textinput
-            label="Location"
-            type="text"
-            value={formData.location} // Prefilled value
-            changed={(e) => {}}
-            className={`${
-              errors.location ? "border-red-500" : "border-gray-300"
-            }`}
-            placeholder="Enter your location"
-            {...register("location", { required: "Location is required" })}
-          />
-          {errors.location && (
-            <span className="text-red-500 text-sm">
-              {errors.location.message}
-            </span>
-          )}
+        {/* Address Fields */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <label
+              htmlFor="location"
+              className="block text-lg font-medium "
+            >
+              Location
+            </label>
+            <input
+              id="location"
+              type="text"
+              className={`mt-1 block w-full bg-transparent p-3 border rounded-lg shadow-sm ${
+                errors.location ? "border-red-500" : "border-gray-300"
+              }`}
+              placeholder="Enter your location"
+              {...register("location", { required: "Location is required" })}
+            />
+            {errors.location && (
+              <span className="text-red-500 text-sm">
+                {errors.location.message}
+              </span>
+            )}
+          </div>
+
+          <div>
+            <label
+              htmlFor="shipping_address"
+              className="block text-lg font-medium "
+            >
+              Shipping Address
+            </label>
+            <input
+              id="shipping_address"
+              type="text"
+              className={`mt-1 block w-full bg-transparent p-3 border rounded-lg shadow-sm ${
+                errors.shipping_address ? "border-red-500" : "border-gray-300"
+              }`}
+              placeholder="Enter your shipping address"
+              {...register("shipping_address", {
+                required: "Shipping Address is required",
+              })}
+            />
+            {errors.shipping_address && (
+              <span className="text-red-500 text-sm">
+                {errors.shipping_address.message}
+              </span>
+            )}
+          </div>
         </div>
 
-        {/* Shipping Address */}
-        <div>
-          <Textinput
-            label="Shipping Address"
-            type="text"
-            value={formData.shippingAddress} // Prefilled value
-            changed={(e) => {}}
-            className={`${
-              errors.shipping_address ? "border-red-500" : "border-gray-300"
-            }`}
-            placeholder="Enter your shipping address"
-            {...register("shipping_address", {
-              required: "Shipping Address is required",
-            })}
-          />
-          {errors.shipping_address && (
-            <span className="text-red-500 text-sm">
-              {errors.shipping_address.message}
-            </span>
-          )}
+        {/* Country and Street Address */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <label
+              htmlFor="country"
+              className="block text-lg font-medium "
+            >
+              Country
+            </label>
+            <input
+              id="country"
+              type="text"
+              className={`mt-1 block w-full bg-transparent p-3 border rounded-lg shadow-sm ${
+                errors.country ? "border-red-500" : "border-gray-300"
+              }`}
+              placeholder="Enter your country"
+              {...register("country", { required: "Country is required" })}
+            />
+            {errors.country && (
+              <span className="text-red-500 text-sm">
+                {errors.country.message}
+              </span>
+            )}
+          </div>
+
+          <div>
+            <label
+              htmlFor="street_address"
+              className="block text-lg font-medium "
+            >
+              Street Address
+            </label>
+            <input
+              id="street_address"
+              type="text"
+              className={`mt-1 block w-full bg-transparent p-3 border rounded-lg shadow-sm ${
+                errors.street_address ? "border-red-500" : "border-gray-300"
+              }`}
+              placeholder="Enter your street address"
+              {...register("street_address", {
+                required: "Street Address is required",
+              })}
+            />
+            {errors.street_address && (
+              <span className="text-red-500 text-sm">
+                {errors.street_address.message}
+              </span>
+            )}
+          </div>
         </div>
 
-        {/* Country */}
-        <div>
-          <Textinput
-            label="Country"
-            type="text"
-            value={formData.country} // Prefilled value
-            changed={(e) => {}}
-            className={`${
-              errors.country ? "border-red-500" : "border-gray-300"
-            }`}
-            placeholder="Enter your country"
-            {...register("country", { required: "Country is required" })}
-          />
-          {errors.country && (
-            <span className="text-red-500 text-sm">
-              {errors.country.message}
-            </span>
-          )}
-        </div>
+        {/* City, State, Zip */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div>
+            <label
+              htmlFor="city"
+              className="block text-lg font-medium "
+            >
+              City
+            </label>
+            <input
+              id="city"
+              type="text"
+              className={`mt-1 block w-full bg-transparent p-3 border rounded-lg shadow-sm ${
+                errors.city ? "border-red-500" : "border-gray-300"
+              }`}
+              placeholder="Enter your city"
+              {...register("city", { required: "City is required" })}
+            />
+            {errors.city && (
+              <span className="text-red-500 text-sm">
+                {errors.city.message}
+              </span>
+            )}
+          </div>
 
-        {/* Street Address */}
-        <div>
-          <Textinput
-            label="Street Address"
-            type="text"
-            value={formData.streetAddress} // Prefilled value
-            changed={(e) => {}}
-            className={`${
-              errors.street_address ? "border-red-500" : "border-gray-300"
-            }`}
-            placeholder="Enter your street address"
-            {...register("street_address", {
-              required: "Street Address is required",
-            })}
-          />
-          {errors.street_address && (
-            <span className="text-red-500 text-sm">
-              {errors.street_address.message}
-            </span>
-          )}
-        </div>
+          <div>
+            <label
+              htmlFor="state"
+              className="block text-lg font-medium "
+            >
+              State
+            </label>
+            <input
+              id="state"
+              type="text"
+              className={`mt-1 block w-full bg-transparent p-3 border rounded-lg shadow-sm ${
+                errors.state ? "border-red-500" : "border-gray-300"
+              }`}
+              placeholder="Enter your state"
+              {...register("state", { required: "State is required" })}
+            />
+            {errors.state && (
+              <span className="text-red-500 text-sm">
+                {errors.state.message}
+              </span>
+            )}
+          </div>
 
-        {/* City */}
-        <div>
-          <Textinput
-            label="City"
-            type="text"
-            value={formData.city} // Prefilled value
-            changed={(e) => {}}
-            className={`${errors.city ? "border-red-500" : "border-gray-300"}`}
-            placeholder="Enter your city"
-            {...register("city", { required: "City is required" })}
-          />
-          {errors.city && (
-            <span className="text-red-500 text-sm">{errors.city.message}</span>
-          )}
-        </div>
-
-        {/* State */}
-        <div>
-          <Textinput
-            label="State"
-            type="text"
-            value={formData.state} // Prefilled value
-            changed={(e) => {}}
-            className={`${errors.state ? "border-red-500" : "border-gray-300"}`}
-            placeholder="Enter your state"
-            {...register("state", { required: "State is required" })}
-          />
-          {errors.state && (
-            <span className="text-red-500 text-sm">{errors.state.message}</span>
-          )}
-        </div>
-
-        {/* Zip Code */}
-        <div>
-          <Textinput
-            label="Zip Code"
-            type="text"
-            value={formData.zipCode} // Prefilled value
-            changed={(e) => {}}
-            className={`${
-              errors.zip_code ? "border-red-500" : "border-gray-300"
-            }`}
-            placeholder="Enter your zip code"
-            {...register("zip_code", { required: "Zip Code is required" })}
-          />
-          {errors.zip_code && (
-            <span className="text-red-500 text-sm">
-              {errors.zip_code.message}
-            </span>
-          )}
+          <div>
+            <label
+              htmlFor="zip_code"
+              className="block text-lg font-medium "
+            >
+              Zip Code
+            </label>
+            <input
+              id="zip_code"
+              type="text"
+              className={`mt-1 block w-full bg-transparent p-3 border rounded-lg shadow-sm ${
+                errors.zip_code ? "border-red-500" : "border-gray-300"
+              }`}
+              placeholder="Enter your zip code"
+              {...register("zip_code", { required: "Zip Code is required" })}
+            />
+            {errors.zip_code && (
+              <span className="text-red-500 text-sm">
+                {errors.zip_code.message}
+              </span>
+            )}
+          </div>
         </div>
 
         {/* Submit Button */}
-        <div className="text-right">
+        <div className="text-center mt-6">
           <button
             type="submit"
             disabled={isSubmitting}
-            className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+            className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition flex items-center justify-center duration-200"
           >
-            {isSubmitting ? "Saving..." : "Save Changes"}
+            {isSubmitting ? (
+              <LoaderStyle5Component fill={`#ffffff`} />
+            ) : (
+              "Save Changes"
+            )}
           </button>
         </div>
       </form>

@@ -1,17 +1,22 @@
-'use server'
+"use server";
 
 // app/product/[id]/page.js
-import { Products } from "@/components/index";
+
 import SizeSelector from "@/components/reusables/Selectors/SizeSelector";
 import Image from "next/image";
+import axios from "axios";
 
 // This will be used to generate paths for the dynamic route
 export async function generateStaticParams() {
-  const paths = Products.flatMap((product) =>
-    Object.entries(product)[0][1].img.map((img) => ({
-      id: img.title.toLowerCase().replace(/\s+/g, "-"),
-    }))
+  // Fetch products from the API using Axios
+  const response = await axios.get(
+    "https://isans.pythonanywhere.com/shop/get-products/"
   );
+  const products = response.data;
+
+  const paths = products.flatMap((product) => ({
+    id: product.name.toLowerCase().replace(/\s+/g, "-"),
+  }));
 
   return paths;
 }
@@ -20,42 +25,35 @@ export async function generateStaticParams() {
 export default async function ProductPage({ params }) {
   const { id } = await params; // Await params to use id correctly
 
-  const allProducts = Products.flatMap((product) =>
-    Object.entries(product)[0][1].img.map((img) => ({
-      ...img,
-      category: Object.entries(product)[0][0],
-    }))
+  // Fetch products from the API using Axios
+  const response = await axios.get(
+    "https://isans.pythonanywhere.com/shop/get-products/"
   );
+  const products = response.data;
 
-  const product = allProducts.find(
-    (prod) => prod.title.toLowerCase().replace(/\s+/g, "-") === id
+  // Find the product by the dynamic ID
+  const product = products.find(
+    (prod) => prod.name.toLowerCase().replace(/\s+/g, "-") === id
   );
 
   if (!product) return <p>Product not found</p>;
+
   return (
-    <div className="w-[90%] sm:w-[70%] mx-auto min-h-screen flex items-center justify-center mt-24 sm:mt-0 ">
+    <div className="w-[90%] sm:w-[70%] mx-auto min-h-screen flex items-center justify-center mt-24 sm:mt-0">
       <div className="flex flex-col sm:flex-row items-center gap-x-10 w-full">
-      <div className="flex items-center justify-center rounded-lg shadow-2xl bg-blue-200 h-[50dvh] w-full sm:w-1/2">
-  <Image
-    src={product.img}
-    alt={product.title}
-    width={300}
-    height={300}
-    className="rounded-lg object-contain"
-  />
-</div>
+        <div className="flex items-center justify-center rounded-lg shadow-2xl bg-blue-200 h-[50dvh] w-full sm:w-1/2">
+          <Image
+            src={`https://isans.pythonanywhere.com${product.image}`} // Append base URL to image path
+            alt={product.name}
+            width={300}
+            height={300}
+            className="rounded-lg object-contain"
+          />
+        </div>
 
-
-       <div className="sm:mt-0 mb-10 flex flex-col w-full sm:w-1/2 gap-y-5 h-full items-start">
-  {/* <p className="mt-4  text-2xl sm:text-4xl">{product.title}</p>
-  <p className="text-lg ">${product.price}</p> */}
-  <SizeSelector sizes={product.sizes} product={product} />
-  {/* <p className="text-sm mt-2">{product.description}</p>
-  <p className="text-sm mt-2">
-    <ButtonTwo buttonValue={`Add to cart`} iconValue={<ShoppingCart size={20} />} />
-  </p> */}
-</div>
-
+        <div className="sm:mt-0 mb-10 flex flex-col w-full sm:w-1/2 gap-y-5 h-full items-start ">
+          <SizeSelector sizes={product.sizes.split(",")} product={product} />
+        </div>
       </div>
     </div>
   );

@@ -59,9 +59,7 @@ const Navbar = () => {
     sessionStorage.removeItem("userAuthToken");
     window.location.reload();
   };
-  console.log(localStorage.getItem(`userAuthToken`));
-  console.log(sessionStorage.getItem(`userAuthToken`));
-
+ 
   const openModal = (type) => {
     setModalType(type); // Set the type of modal to display
     setModal(true); // Open modal
@@ -188,11 +186,7 @@ const Navbar = () => {
     setLoading(true);
 
     // Log the email and password before sending the request
-    console.log("Sending login data:", {
-      email: adminEmail,
-      password: adminPassword,
-    });
-
+   
     try {
       // Start of the request
       console.log("Sending request to server...");

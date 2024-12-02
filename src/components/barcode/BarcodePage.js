@@ -1,4 +1,4 @@
-'use client'
+"use client";
 import { useEffect, useRef } from "react";
 import JsBarcode from "jsbarcode";
 
@@ -8,16 +8,21 @@ const Barcode = ({ value }) => {
   useEffect(() => {
     if (barcodeRef.current) {
       JsBarcode(barcodeRef.current, value, {
-        format: "CODE128", // Specify the barcode format (e.g., CODE128, CODE39, etc.)
+        format: "CODE128",
         lineColor: "#000",
         width: 2,
         height: 50,
-        displayValue: true, // Display the value below the barcode
+        displayValue: true,
       });
     }
   }, [value]);
 
-  return <svg ref={barcodeRef}></svg>;
+  return (
+    <svg
+      ref={barcodeRef}
+      // className="mx-auto" // Centers the barcode image horizontally
+    />
+  );
 };
 
 export default Barcode;

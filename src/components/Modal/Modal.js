@@ -18,16 +18,16 @@ const Modal = ({ isOpen, onClose, title, children, onSubmit, disabled, loading, 
       className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50 px-4 text-customGray"
       onClick={handleOutsideClick}
     >
-      <div className="bg-white rounded-lg p-6 shadow-lg w-full max-w-md relative">
+      <div className="card rounded-lg p-6 shadow-lg w-full max-w-md relative">
         <button
-          className="absolute top-4 right-4 text-gray-500 hover:text-gray-800 focus:outline-none"
+          className="absolute top-4 right-4  focus:outline-none"
           onClick={onClose}
           aria-label="Close modal"
         >
           <X />
         </button>
         {title && (
-          <h2 onClick={clickedTitle} className="text-2xl font-semibold mb-4 text-gray-900">{title}</h2>
+          <h2 onClick={clickedTitle} className="text-2xl font-semibold mb-4 ">{title}</h2>
         )}
         {onSubmit ? (
           <form onSubmit={onSubmit} className="flex flex-col gap-y-3">
