@@ -13,6 +13,7 @@ import {
 } from "@/components/inputs/CategoryDropdown";
 import { useGlobalState } from "@/app/GlobalStateProvider";
 import BarcodeDropdown from "@/components/inputs/BarcodeDropdown";
+import DynamicImage from "@/components/reusables/DynamicImage/DynamicImage";
 
 const ProductTable = () => {
   const [products, setProducts] = useState([]);
@@ -186,26 +187,24 @@ const ProductTable = () => {
       setProdImgPreview(imageUrl); // Store the preview URL
     }
   };
-    const validateFileSize = (file, maxSizeMB = 2) => {
-      if (!file) return false; // No file provided
-      const maxSizeBytes = maxSizeMB * 1024 * 1024;
-      return file.size <= maxSizeBytes;
-    };
+  const validateFileSize = (file, maxSizeMB = 2) => {
+    if (!file) return false; // No file provided
+    const maxSizeBytes = maxSizeMB * 1024 * 1024;
+    return file.size <= maxSizeBytes;
+  };
 
-
-const handleModalImageChange = (e) => {
-  const file = e.target.files[0];
-  if (file) {
-    if (!validateFileSize(file)) {
-      toast.error("File size exceeds 2MB. Please choose a smaller file.");
-      return;
+  const handleModalImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      if (!validateFileSize(file)) {
+        toast.error("File size exceeds 2MB. Please choose a smaller file.");
+        return;
+      }
+      const imageUrl = URL.createObjectURL(file);
+      setProdImg(file); // Store the actual file for uploading
+      setProdImgPreview(imageUrl); // Store the preview URL
     }
-    const imageUrl = URL.createObjectURL(file);
-    setProdImg(file); // Store the actual file for uploading
-    setProdImgPreview(imageUrl); // Store the preview URL
-  }
-};
-
+  };
 
   return (
     <div className="container mx-auto  p-4">
@@ -235,12 +234,12 @@ const handleModalImageChange = (e) => {
                 <td className="px-4 py-2">{product.id}</td>
                 <td className="px-4 py-2">{product.name}</td>
                 <td className="px-4 py-2">
-                  <Image
+                  <DynamicImage
+                    className={`w-20 h-20 object-cover rounded`}
                     width={500}
                     height={500}
-                    src={`https://isans.pythonanywhere.com${product.image}`}
-                    alt={product.name}
-                    className="w-20 h-20 object-cover rounded"
+                    prop={product.image}
+                    prod={product.name}
                   />
                 </td>
                 <td className="px-4 py-2">${product.price}</td>

@@ -7,17 +7,17 @@ const Wishlist = () => {
   useEffect(() => {
     fetchWishlist();
   }, [fetchWishlist]);
-  const cart = formData.cart;
+  const wishlist = formData.wishlist;
   return (
     <div className="flex p-12 w-full justify-between mx-auto flex-col md:flex-row gap-4 h-screen ">
       <section className="  w-1/2">
         <h1 className="text-2xl md:text-4xl ">Shopping Wishlist</h1>
         <ul>
-          {cart.map((cart, index) => (
+          {wishlist.map((wishlist, index) => (
             <li key={index}>
-              <span>{cart.id}</span>
-              <span>{cart.product_id}</span>
-              <span>{cart.product}</span>
+              <span>{wishlist.id}</span>
+              <span>{wishlist.product_id}</span>
+              <span>{wishlist.product}</span>
             </li>
           ))}
         </ul>

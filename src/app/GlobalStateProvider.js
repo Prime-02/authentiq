@@ -14,38 +14,42 @@ const GlobalStateContext = createContext();
 
 export const GlobalStateProvider = ({ children }) => {
   const [error, setError] = useState(null);
+    const [loading, setLoading] = useState(false);
+  const userToken =
+    localStorage.getItem("userAuthToken") ||
+    sessionStorage.getItem("userAuthToken"); 
+  const adminToken =
+    localStorage.getItem("adminAuthToken") ||
+    sessionStorage.getItem("adminAuthToken"); 
 
   const [formData, setFormData] = useState({
     userId: "",
     userFirstName: "",
     userLastName: "",
-    email: "",
-    password: "",
-    gender: "",
-    phone: "",
-    notification: [],
-    location: "",
-    shippingAddress: "",
-    country: "",
-    streetAddress: "",
-    city: "",
-    state: "",
-    zipCode: "",
-    dateJoined: "",
-    cart: [],
-    cartNo: 0,
+    userEmail: "",
+    userGender: "",
+    userPhone: "",
+    userNotification: [],
+    userLocation: "",
+    userShippingAddress: "",
+    userCountry: "",
+    userStreetAddress: "",
+    userCity: "",
+    userState: "",
+    userZipCode: "",
+    userDateJoined: "",
+    userCart: [],
+    wishlist: [],
+    wishlistNo: 0,
+    userCartNo: 0,
 
     // Admin-specific fields
+    adminId: '',
     adminFirstName: "",
     adminLastName: "",
     adminEmail: "",
-    adminPassword: "",
-    adminDateJoined: "",
     adminGender: "",
-    adminIP: "",
-    adminLastLogin: "",
-    adminReferralCode: "",
-    adminReferredBy: "",
+    adminPhone: '',
     adminNotification: [],
     products: [],
     barcodes: [], // Add barcodes field
@@ -63,6 +67,7 @@ export const GlobalStateProvider = ({ children }) => {
   };
 
   const addToEndpoint = async ({ productId, endpoint, action, quantity }) => {
+    setLoading(true)
     if (!productId) {
       toast.error("Invalid product ID. Please try again.");
       return;
@@ -70,8 +75,7 @@ export const GlobalStateProvider = ({ children }) => {
 
     // Retrieve adminAuthToken from local or session storage
     const token =
-      localStorage.getItem("adminAuthToken") ||
-      sessionStorage.getItem("adminAuthToken");
+     adminToken
 
     if (!token) {
       toast.warning("You need to log in to perform this action.");
@@ -93,6 +97,7 @@ export const GlobalStateProvider = ({ children }) => {
         },
       });
 
+
       // Show success message
       if (response.status === 200 || response.status === 201) {
         toast.success(`Product successfully added to ${action}!`);
@@ -106,13 +111,15 @@ export const GlobalStateProvider = ({ children }) => {
         `Failed to add product to ${action}. Please try again.`;
       toast.error(errorMessage);
     }
+    finally {
+      setLoading(false)
+    }
   };
 
   // Fetch user data
   const fetchUserData = useCallback(async () => {
-    const token =
-      localStorage.getItem("userAuthToken") ||
-      sessionStorage.getItem("userAuthToken");
+    setLoading(true)
+    const token = userToken
     try {
       const response = await axios.get(
         "https://isans.pythonanywhere.com/users/profile/",
@@ -130,31 +137,31 @@ export const GlobalStateProvider = ({ children }) => {
         userId: userData.id || "",
         userFirstName: userData.first_name || "",
         userLastName: userData.last_name || "",
-        email: userData.email || "",
-        gender: userData.gender || "",
-        phone: userData.phone_number || "",
-        location: userData.location || "",
-        shippingAddress: userData.shipping_address || "",
-        country: userData.country || "",
-        streetAddress: userData.street_address || "",
-        city: userData.city || "",
-        state: userData.state || "",
-        zipCode: userData.zip_code || "",
-        dateJoined: userData.date_joined || "",
+        userEmail: userData.email || "",
+        userGender: userData.gender || "",
+        userPhone: userData.phone_number || "",
+        userLocation: userData.location || "",
+        userShippingAddress: userData.shipping_address || "",
+        userCountry: userData.country || "",
+        userStreetAddress: userData.street_address || "",
+        userCity: userData.city || "",
+        userState: userData.state || "",
+        userZipCode: userData.zip_code || "",
+        userDateJoined: userData.date_joined || "",
       }));
     } catch (err) {
       setError("Failed to fetch user data.");
       toast.error("Unable to load user data. Please try again.");
+    } finally {
+      setLoading(false);
     }
   }, []);
 
   const fetchCart = useCallback(async () => {
+    setLoading(true)
     try {
       // Retrieve the user authentication token
-      const userAuthToken =
-        localStorage.getItem("userAuthToken") ||
-        sessionStorage.getItem("userAuthToken");
-
+      const userAuthToken = userToken;
       if (!userAuthToken) {
         toast.warning("Authentication token is not available. Please log in.");
         return;
@@ -184,15 +191,15 @@ export const GlobalStateProvider = ({ children }) => {
       const errorMessage =
         error.response?.data?.message || "Unable to fetch cart data.";
       toast.error(errorMessage);
+    } finally {
+      setLoading(false);
     }
   }, []);
   const fetchWishlist = useCallback(async () => {
+    setLoading(true)
     try {
       // Retrieve the user authentication token
-      const userAuthToken =
-        localStorage.getItem("userAuthToken") ||
-        sessionStorage.getItem("userAuthToken");
-
+      const userAuthToken = userToken;
       if (!userAuthToken) {
         toast.warning("Authentication token is not available. Please log in.");
         return;
@@ -222,11 +229,14 @@ export const GlobalStateProvider = ({ children }) => {
       const errorMessage =
         error.response?.data?.message || "Unable to fetch wishlist data.";
       toast.error(errorMessage);
+    } finally {
+      setLoading(false);
     }
   }, []);
 
   // Fetch products
   const fetchProducts = useCallback(async () => {
+    setLoading(true)
     try {
       const response = await axios.get(
         "https://isans.pythonanywhere.com/shop/get-products/"
@@ -244,14 +254,16 @@ export const GlobalStateProvider = ({ children }) => {
     } catch (err) {
       setError("Failed to fetch products.");
       toast.error("Unable to load products. Please try again.");
+    } finally {
+      setLoading(false);
     }
   }, []);
 
   // Fetch barcodes
   const fetchBarcodes = useCallback(async () => {
+    setLoading(true)
     const token =
-      localStorage.getItem("adminAuthToken") ||
-      sessionStorage.getItem("adminAuthToken");
+      adminToken
     try {
       const response = await axios.get(
         "https://isans.pythonanywhere.com/shop/barcode/",
@@ -274,6 +286,8 @@ export const GlobalStateProvider = ({ children }) => {
     } catch (err) {
       setError("Failed to fetch barcodes.");
       toast.error("Unable to load barcodes. Please try again.");
+    } finally {
+      setLoading(false);
     }
   }, []);
 
@@ -281,20 +295,17 @@ export const GlobalStateProvider = ({ children }) => {
 
   useEffect(() => {
     const userAuthToken =
-      localStorage.getItem("userAuthToken") ||
-      sessionStorage.getItem("userAuthToken");
-    const adminAuthToken =
-      localStorage.getItem("AdminAuthToken") ||
-      sessionStorage.getItem("AdminAuthToken");
+     userToken
+   
 
-    if (userAuthToken || adminAuthToken) {
-      fetchUserData();
+    if (userAuthToken ) {
+      fetchUserData(userToken);
       fetchBarcodes(); // Fetch barcodes on component mount if the token exists
     }
   }, []); // Dependency array is empty to ensure it runs only on mount
   useEffect(() => {
-      fetchProducts();
-  }, []);
+    fetchProducts();
+  }, [fetchProducts]);
 
   return (
     <>
@@ -302,6 +313,10 @@ export const GlobalStateProvider = ({ children }) => {
       <GlobalStateContext.Provider
         value={{
           formData,
+          loading,
+          fetchProducts,
+          userToken,
+          adminToken,
           setFormData,
           formatBalance,
           addToEndpoint,

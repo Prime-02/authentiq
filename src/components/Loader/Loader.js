@@ -156,14 +156,14 @@ const LoaderContainer = styled.div`
  
 `;
 
-// Styled Spinner Icon
-const Spinner = styled(FaSpinner)`
-  animation: ${spin} 0.6s linear infinite;
-  color: ${(props) => props.fill}; /* Change this to your desired color */
-  font-size: 30px; /* Size of the spinner */
-`;
 
-export const Loader = ({fill}) => {
+export const Loader = ({fill, smaillerSize = `30px`}) => {
+  // Styled Spinner Icon
+  const Spinner = styled(FaSpinner)`
+    animation: ${spin} 0.6s linear infinite;
+    color: ${(props) => props.fill}; /* Change this to your desired color */
+    font-size: ${smaillerSize}; /* Size of the spinner */
+  `;
   return (
     <LoaderContainer>
       <Spinner  fill={fill}/>

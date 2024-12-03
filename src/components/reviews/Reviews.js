@@ -7,42 +7,99 @@ const Reviews = ({ id }) => {
   const [reviews, setReviews] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [newReview, setNewReview] = useState({ rating: "", comment: "" });
 
   useEffect(() => {
     const fetchReviews = async () => {
+      console.log("Fetching reviews started...");
+      console.log(`Product ID: ${id}`);
+
       try {
-        // Update the URL to fetch reviews for the specific product using the `id` prop
+        console.log("Sending GET request to fetch reviews...");
         const response = await axios.get(
           `https://isans.pythonanywhere.com/shop/see-reviews/${id}`
         );
 
-        if (response.status === 200 || response.status === 200) {
+        console.log("Response received:", response);
+        if (response.status === 200) {
+          console.log("Successfully fetched reviews.");
           setReviews(response.data.reviews || []);
         } else {
+          console.error("Unexpected response status:", response.status);
           setError("Failed to fetch reviews.");
           toast.error("Failed to fetch reviews. Please try again.");
         }
       } catch (err) {
+        console.error("Error occurred while fetching reviews:", err);
         setError("Failed to fetch reviews.");
         toast.error("Unable to load reviews. Please try again.");
       } finally {
+        console.log("Fetching reviews process completed.");
         setLoading(false);
       }
     };
 
+    console.log("useEffect triggered. Calling fetchReviews...");
     fetchReviews();
-  }, [id]); // Dependency array ensures fetching happens when `id` changes
+  }, [id]);
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setNewReview((prev) => ({
+      ...prev,
+      [name]: name === "rating" ? parseInt(value, 10) : value, // Convert rating to integer
+    }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    console.log("Submitting new review...", newReview);
+
+    const userAuthToken =
+      localStorage.getItem("userAuthToken") ||
+      sessionStorage.getItem("userAuthToken");
+
+    if (!userAuthToken) {
+      console.error("User authorization token not found.");
+      toast.error("You must be logged in to submit a review.");
+      return;
+    }
+
+    try {
+      const response = await axios.post(
+        `https://isans.pythonanywhere.com/shop/add-reviews/${id}/`,
+        newReview,
+        {
+          headers: {
+            Authorization: `Bearer ${userAuthToken}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      console.log("Response from adding review:", response);
+      if (response.status === 201) {
+        toast.success("Review added successfully!");
+        setReviews((prev) => [...prev, response.data]);
+        setNewReview({ rating: "", comment: "" }); // Reset form
+      } else {
+        toast.error("Failed to add review. Please try again.");
+      }
+    } catch (err) {
+      console.error("Error while submitting review:", err);
+      toast.error("Unable to submit review. Please try again.");
+    }
+  };
 
   if (loading) {
     return <div>Loading...</div>;
   }
 
   if (error) {
-    return <div>Error: {error}</div>;
   }
 
   return (
-    <div>
+    <div className="w-full h-screen">
       <h3>Product Reviews</h3>
       <div>Total Reviews: {reviews.length}</div>
       <ul>
@@ -54,6 +111,42 @@ const Reviews = ({ id }) => {
           </li>
         ))}
       </ul>
+
+      <h4>Add a Review</h4>
+      <form onSubmit={handleSubmit} className="border">
+        <div>
+          <label>
+            Rating:
+            <select
+              name="rating"
+              value={newReview.rating}
+              onChange={handleInputChange}
+              required
+            >
+              <option value="" disabled>
+                Select Rating
+              </option>
+              {[1, 2, 3, 4, 5].map((num) => (
+                <option key={num} value={num}>
+                  {num}
+                </option>
+              ))}
+            </select>
+          </label>
+        </div>
+        <div>
+          <label>
+            Comment:
+            <textarea
+              name="comment"
+              value={newReview.comment}
+              onChange={handleInputChange}
+              required
+            />
+          </label>
+        </div>
+        <button type="submit">Submit Review</button>
+      </form>
     </div>
   );
 };

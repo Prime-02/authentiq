@@ -245,7 +245,7 @@ const Navbar = () => {
   const profileRef = useRef(null);
   const handleClickOutside = (event) => {
     if (profileRef.current && !profileRef.current.contains(event.target)) {
-      setProfile(false);
+      !isDropdownOpen && setProfile(false);
     }
   };
 
@@ -366,7 +366,7 @@ const Navbar = () => {
           </span>
         </div>
         {isDropdownOpen && (
-          <div className="absolute top-full left-0 w-full bg-white text-customGray border-t shadow-lg md:hidden h-auto">
+          <div className="absolute top-full left-0 w-full card border-t shadow-lg md:hidden h-auto">
             <div className="flex flex-col px-5 py-4">
               <span className="cursor-pointer py-2">
                 <Search category={cat} />
@@ -401,21 +401,30 @@ const Navbar = () => {
                       <span>{nav.nav}</span>
                     </Link>
                   ))}
+
+                  <ButtonTwo
+                    buttonValue={`Sign Out`}
+                    iconValue={<FaSignOutAlt size={15} />}
+                    Clicked={SignOut}
+                    className={`w-32`}
+                  />
                 </div>
               ) : (
                 profile && (
                   <span className="flex flex-col gap-y-3">
-                    <span>
-                      <ButtonOne
-                        buttonValue={`Login`}
-                        Clicked={() => openModal("login")}
-                      />
-                    </span>
-                    <span>
-                      <ButtonTwo
-                        buttonValue={`Sign Up`}
-                        Clicked={() => openModal("signup")}
-                      />
+                    <span className="flex gap-x-3">
+                      <span>
+                        <ButtonOne
+                          buttonValue={`Login`}
+                          Clicked={() => openModal("login")}
+                        />
+                      </span>
+                      <span>
+                        <ButtonTwo
+                          buttonValue={`Sign up`}
+                          Clicked={() => openModal("signup")}
+                        />
+                      </span>
                     </span>
                   </span>
                 )
@@ -502,6 +511,7 @@ const Navbar = () => {
         {modalType === "login" && (
           <>
             <Textinput
+              id="loginEmail"
               label="Email"
               className="border-b"
               type="email"
@@ -509,13 +519,14 @@ const Navbar = () => {
               changed={(e) => setLoginEmail(e.target.value)}
             />
             <Textinput
+              id="loginPassword"
               label="Password"
               className="border-b my-5"
               type="password"
               value={loginPassword}
               changed={(e) => setLoginPassword(e.target.value)}
             />
-            <span className="w-full flex justify-between text-blue-600 text-xs">
+            <span className="w-full flex justify-between  text-xs">
               <div className="flex items-center">
                 <input
                   type="checkbox"
@@ -524,13 +535,13 @@ const Navbar = () => {
                   onChange={() => setRememberMe(!rememberMe)}
                   className="accent-blue-600"
                 />
-                <label htmlFor="rememberMe" className="ml-2 text-black">
+                <label htmlFor="rememberMe" className="ml-2 ">
                   Remember Me
                 </label>
               </div>
               <span
                 onClick={() => openModal("forgotPassword")}
-                className="cursor-pointer"
+                className="cursor-pointer text-blue-600"
               >
                 Forgot password?
               </span>
@@ -541,6 +552,7 @@ const Navbar = () => {
         {modalType === "admin" && (
           <>
             <Textinput
+              id="adminEmail"
               label="Email"
               className="border-b"
               type="email"
@@ -551,6 +563,7 @@ const Navbar = () => {
               label="Password"
               className="border-b my-5"
               type="password"
+              id="adminPassword"
               value={adminPassword}
               changed={(e) => setAdminPassword(e.target.value)}
             />
@@ -577,10 +590,12 @@ const Navbar = () => {
               label="First Name"
               className="border-b my-5"
               type="text"
+              id="firstName"
               value={firstName}
               changed={(e) => setFirstName(e.target.value)}
             />
             <Textinput
+              id="lastName"
               label="Last Name"
               className="border-b my-5"
               type="text"
@@ -589,6 +604,7 @@ const Navbar = () => {
             />
             <Textinput
               label="Email"
+              id="signUpEmail"
               className="border-b my-5"
               type="email"
               value={signUpEmail}
@@ -596,12 +612,14 @@ const Navbar = () => {
             />
             <Textinput
               label="Password"
+              id="signUpPassword"
               className="border-b my-5"
               type="password"
               value={signUpPassword}
               changed={(e) => setSignUpPassword(e.target.value)}
             />
             <Textinput
+              id="confirmPassword"
               label="Confirm Password"
               className="border-b my-5"
               type="password"
@@ -615,6 +633,7 @@ const Navbar = () => {
           <>
             <p>Please enter your email</p>
             <Textinput
+              id="forgotPasswordEmail"
               label="Email"
               className="border-b my-5"
               type="email"

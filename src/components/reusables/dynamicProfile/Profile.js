@@ -5,63 +5,67 @@ import { Edit } from "lucide-react";
 import Link from "next/link";
 import React from "react";
 
-const ProfilePage = () => {
+const ProfilePage = ({ prop, route = `/profile/settings` }) => {
   const { formData } = useGlobalState();
 
+  // Helper function to get the dynamically replaced property
+  const getDynamicProp = (key) => formData[`${prop}${key}`] || "N/A";
+
   return (
-    <div className="min-h-screen  py-20 px-4">
+    <div className="min-h-screen py-20 px-4">
       {/* Header Section */}
       <div className="card relative rounded-lg shadow-lg p-6 flex flex-col items-center">
         <div className="w-32 h-32 rounded-full overflow-hidden flex items-center justify-center text-5xl font-extrabold border-4 mb-4">
           {/* Placeholder Profile Picture */}
-          <h1>{`${formData.userFirstName
+          <h1>{`${getDynamicProp("FirstName")
             .charAt(0)
-            .toUpperCase()}.${formData.userLastName
+            .toUpperCase()}.${getDynamicProp("LastName")
             .charAt(0)
             .toUpperCase()}`}</h1>
         </div>
         <h1 className="text-2xl font-semibold ">
-          {formData.userFirstName} {formData.userLastName}
+          {getDynamicProp("FirstName")} {getDynamicProp("LastName")}
         </h1>
         <p className="">
           Joined:{" "}
-          {formData.dateJoined
-            ? new Date(formData.dateJoined).toLocaleDateString("en-US")
+          {getDynamicProp("DateJoined") !== "N/A"
+            ? new Date(getDynamicProp("DateJoined")).toLocaleDateString("en-US")
             : "N/A"}
         </p>
-        <p className="">ID: {formData.userId ? formData.userId : "N/A"}</p>
+        <p className="">ID: {getDynamicProp("Id")}</p>
 
-        <Link href={`/profile/settings`} className="absolute right-2 top-2">
+        <Link href={route} className="absolute right-2 top-2">
           <Edit />
         </Link>
       </div>
+
       {/* Personal Information Section */}
       <div className="mt-8 card rounded-lg shadow-lg p-6">
         <h2 className="text-xl font-semibold ">Personal Information</h2>
         <div className="mt-4 space-y-2">
           <p className="">
             <span className="font-semibold">Email:</span>{" "}
-            {formData.email || "N/A"}
+            {getDynamicProp("Email")}
           </p>
           <p className="">
             <span className="font-semibold">Phone:</span>{" "}
-            {formData.phone || "N/A"}
+            {getDynamicProp("Phone")}
           </p>
           <p className="">
             <span className="font-semibold">Gender:</span>{" "}
-            {formData.gender || "N/A"}
+            {getDynamicProp("Gender")}
           </p>
           <p className="">
             <span className="font-semibold">Country:</span>{" "}
-            {formData.location ? formData.location : "N/A"}
+            {getDynamicProp("Location")}
           </p>
           <p className="">
             <span className="font-semibold">State:</span>{" "}
-            {formData.state ? formData.state : "N/A"}
+            {getDynamicProp("State")}
           </p>
           <p className="">
             <span className="font-semibold">City:</span>{" "}
-            {formData.city ? `${formData.city}, ` : "N/A"}
+            {getDynamicProp("City")}
           </p>
         </div>
       </div>
@@ -72,15 +76,15 @@ const ProfilePage = () => {
         <div className="mt-4 space-y-2">
           <p className="">
             <span className="font-semibold">Shipping Address:</span>{" "}
-            {formData.shippingAddress || "N/A"}
+            {getDynamicProp("ShippingAddress")}
           </p>
           <p className="">
             <span className="font-semibold">Street Address:</span>{" "}
-            {formData.streetAddress || "N/A"}
+            {getDynamicProp("StreetAddress")}
           </p>
           <p className="">
             <span className="font-semibold">Zip Code:</span>{" "}
-            {formData.zipCode || "N/A"}
+            {getDynamicProp("ZipCode")}
           </p>
         </div>
       </div>

@@ -6,7 +6,7 @@ import SizeSelector from "@/components/reusables/Selectors/SizeSelector";
 import Image from "next/image";
 import axios from "axios";
 import Reviews from "@/components/reviews/Reviews";
-import DynamicImage from "./DynamicImage";
+import DynamicImage from "@/components/reusables/DynamicImage/DynamicImage";
 
 // This will be used to generate paths for the dynamic route
 export async function generateStaticParams() {
@@ -43,6 +43,7 @@ export default async function ProductPage({ params }) {
   
 
   return (
+    <>
     <div className="w-[90%] sm:w-[70%] mx-auto min-h-screen flex flex-col items-center justify-center mt-24 sm:mt-0">
       <div className="flex flex-col sm:flex-row items-center gap-x-10 w-full">
         <div className="flex items-center justify-center rounded-lg shadow-2xl bg-blue-200 h-[50dvh] w-full sm:w-1/2">
@@ -53,9 +54,10 @@ export default async function ProductPage({ params }) {
           <SizeSelector sizes={product.sizes.split(",")} product={product} />
         </div>
       </div>
+    </div>
       <section>
         <Reviews id={product.id}/>
       </section>
-    </div>
+    </>
   );
 }

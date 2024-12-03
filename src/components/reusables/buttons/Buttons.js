@@ -8,11 +8,12 @@ export const ButtonOne = ({
   IconButton,
   Clicked,
   disabled,
+  className,
 }) => (
   <button
     disabled={disabled}
     onClick={Clicked}
-    className={`flex items-center justify-center text-sm transition-all duration-300 cursor-pointer shadow-md active:translate-y-1 ${
+    className={`${className} flex items-center justify-center text-sm transition-all duration-300 cursor-pointer shadow-md active:translate-y-1 ${
       IconButton
         ? "w-9 h-9 rounded-full bg-white text-[#1a1a1a] border border-white"
         : "py-2 px-4 rounded-full bg-white text-[#1a1a1a] border border-white"
@@ -22,8 +23,14 @@ export const ButtonOne = ({
         : ""
     }`}
   >
-    {buttonValue && <span>{buttonValue}</span>}
-    {iconValue && <span className="ml-2">{iconValue}</span>}
+    {
+      disabled ? <Loader/> : (
+        <>
+        {buttonValue && <p>{buttonValue}</p>}
+    {iconValue && <p className="ml-2">{iconValue}</p>}
+        </>
+      )
+    }
   </button>
 );
 
@@ -33,11 +40,12 @@ export const ButtonTwo = ({
   IconButton,
   Clicked,
   disabled,
+  className,
 }) => (
   <button
     disabled={disabled}
     onClick={Clicked}
-    className={`flex items-center justify-center text-sm transition-all duration-300 cursor-pointer shadow-md active:translate-y-1 ${
+    className={`${className} flex items-center justify-center text-sm transition-all duration-300 cursor-pointer shadow-md active:translate-y-1 ${
       IconButton
         ? "w-9 h-9 rounded-full border border-white text-white bg-[#1a1a1a]"
         : "py-2 px-4 rounded-full border border-white text-white bg-[#1a1a1a]"
@@ -47,8 +55,14 @@ export const ButtonTwo = ({
         : ""
     }`}
   >
-    {buttonValue && <p>{buttonValue}</p>}
+    {
+      disabled ? <Loader fill={`#ffffff`} smaillerSize="15px"/> : (
+        <>
+        {buttonValue && <p>{buttonValue}</p>}
     {iconValue && <p className="ml-2">{iconValue}</p>}
+        </>
+      )
+    }
   </button>
 );
 
@@ -58,12 +72,13 @@ export const DBButtonOne = ({
   IconButton,
   Clicked,
   disabled,
+  className,
 }) => (
   <button
     disabled={disabled}
     type="submit"
     onClick={Clicked}
-    className={`flex items-center justify-center text-sm transition-all duration-300 cursor-pointer shadow-md active:translate-y-1 ${
+    className={`${className} flex items-center justify-center text-sm transition-all duration-300 cursor-pointer shadow-md active:translate-y-1 ${
       IconButton
         ? "w-9 h-9 rounded-full bg-blue-600 text-white border border-blue-600"
         : "py-2 px-4 rounded-full bg-blue-600 text-white border border-blue-600"
@@ -73,8 +88,14 @@ export const DBButtonOne = ({
         : ""
     }`}
   >
-    {buttonValue && <span>{buttonValue}</span>}
-    {iconValue && <span className="ml-2">{iconValue}</span>}
+    {
+      disabled ? <Loader/> : (
+        <>
+        {buttonValue && <p>{buttonValue}</p>}
+    {iconValue && <p className="ml-2">{iconValue}</p>}
+        </>
+      )
+    }
   </button>
 );
 
@@ -84,11 +105,12 @@ export const DBButtonTwo = ({
   IconButton,
   Clicked,
   disabled,
+  className,
 }) => (
   <button
     disabled={disabled}
     onClick={Clicked}
-    className={`flex items-center justify-center text-sm transition-all duration-300 cursor-pointer shadow-md active:translate-y-1 ${
+    className={`${className} flex items-center justify-center text-sm transition-all duration-300 cursor-pointer shadow-md active:translate-y-1 ${
       IconButton
         ? "w-9 h-9 rounded-full border border-blue-600 text-blue-600 bg-[#1a1a1a]"
         : "py-2 px-4 rounded-full border border-blue-600 text-blue-600 bg-[#1a1a1a]"
@@ -98,8 +120,14 @@ export const DBButtonTwo = ({
         : ""
     }`}
   >
-    {buttonValue && <span>{buttonValue}</span>}
-    {iconValue && <span className="ml-2">{iconValue}</span>}
+    {
+      disabled ? <Loader/> : (
+        <>
+        {buttonValue && <p>{buttonValue}</p>}
+    {iconValue && <p className="ml-2">{iconValue}</p>}
+        </>
+      )
+    }
   </button>
 );
 
@@ -110,17 +138,15 @@ export const Button = ({ clicked, value }) => {
       className="text-white flex items-center bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-3 py-1.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 justify-center gap-x-1"
     >
       <span>
-        <Plus/>
+        <Plus />
       </span>
-      {value && <span className="hidden md:flex">
-        {value}
-        </span>}
+      {value && <span className="hidden md:flex">{value}</span>}
     </button>
   );
 };
 
-
 import { useRouter } from "next/router";
+import { Loader } from "@/components/Loader/Loader";
 
 export const LanguageSwitcher = () => {
   const { locale, locales, asPath } = useRouter();
@@ -147,4 +173,3 @@ export const LanguageSwitcher = () => {
     </div>
   );
 };
-

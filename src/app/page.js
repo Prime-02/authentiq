@@ -1,12 +1,14 @@
 "use client";
+import DynamicImage from "@/components/reusables/DynamicImage/DynamicImage";
 import { useGlobalState } from "./GlobalStateProvider";
 import { ButtonOne, ButtonTwo } from "@/components/reusables/buttons/Buttons";
 import { Heart, ShoppingCart } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { Loader } from "@/components/Loader/Loader";
 
 export default function Home() {
-  const { formData, addToEndpoint } = useGlobalState(); // Access global state
+  const { formData, addToEndpoint, loading, fetchProducts } = useGlobalState(); // Access global state
   const { products } = formData; // Extract the products array
 
   // Helper function to group products by category
@@ -41,9 +43,12 @@ export default function Home() {
   return (
     <main className="my-32 w-[90%] mx-auto">
       <div className="w-full md:w-full mx-auto h-auto flex flex-col gap-y-8">
-        <h1 className="font-extrabold text-3xl md:text-5xl">
-          {"What would you like to buy from us?"}
-        </h1>
+          <h1
+            onClick={() => fetchProducts()}
+            className="font-extrabold text-3xl md:text-5xl cursor-pointer"
+          >
+            {"What would you like to buy from us?"}
+          </h1>
 
         {/* Iterate over grouped products */}
         {Object.entries(groupedProducts).map(([category, items], ind) => (
@@ -53,25 +58,31 @@ export default function Home() {
               {items.map((product) => (
                 <div
                   key={product.id}
-                  className="flex-shrink-0 flex flex-col min-h-full items-center justify-between p-5 bg-white shadow-2xl overflow-hidden rounded-lg scroll-snap-align-start"
+                  className="flex-shrink-0 flex flex-col min-h-full items-center justify-between p-5 card relative shadow-2xl overflow-hidden rounded-lg scroll-snap-align-start"
                 >
+                  <Heart
+                    className="absolute top-2 right-2 cursor-pointer"
+                    size={20}
+                    onClick={() => handleAddToWishlist(product.id)}
+                  />
+
                   {/* Image */}
                   <Link
                     href={`/product/${product.name
                       .toLowerCase()
                       .replace(/\s+/g, "-")}`}
                     passHref
-                    className="rounded-lg mx-16 flex items-center justify-center flex-1"
+                    className="rounded-lg  flex items-center justify-center flex-1"
                   >
-                    <Image
-                      src={`https://isans.pythonanywhere.com${product.image}`} // Append base URL to image path
-                      alt={product.name}
+                    <DynamicImage
+                      className={`object-cover drop-shadow-2xl hover:scale-90 transition w-auto h-auto`}
                       width={250}
                       height={250}
-                      className="object-cover drop-shadow-2xl hover:scale-125 transition w-auto h-auto"
+                      prod={product.name}
+                      prop={product.image}
                     />
                   </Link>
-                  <div className="w-full flex flex-row items-center justify-between">
+                  <div className="w-full flex flex-col items-start justify-between">
                     <Link
                       href={`/product/${product.name
                         .toLowerCase()
@@ -80,22 +91,21 @@ export default function Home() {
                       className="flex text-start flex-col "
                     >
                       {/* Title */}
-                      <figcaption className="mt-4 text-lg font-bold text-customGray">
+                      <figcaption className="mt-4 text-lg font-bold">
                         {product.name}
                       </figcaption>
+                    </Link>
 
-                      {/* Price */}
-                      <p className="text-lg font-semibold text-customGray">
+                    {/* Price */}
+                    <span className="flex justify-between w-full items-end mt-8">
+                      <p className="text-base font-semibold">
                         ${product.price}
                       </p>
-                    </Link>
-                    <span>
-                      <ButtonOne
-                        iconValue={<Heart size={20} />}
-                        Clicked={() => handleAddToWishlist(product.id)}
-                      />
                       <ButtonTwo
-                        iconValue={<ShoppingCart size={20} />}
+                        disabled={loading}
+                        className={`rounded-md`}
+                        iconValue={<ShoppingCart size={15} />}
+                        buttonValue={`Add to Cart`}
                         Clicked={() => handleAddToCart(product.id)}
                       />
                     </span>

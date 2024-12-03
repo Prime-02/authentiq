@@ -1,16 +1,22 @@
 "use client";
 import React from "react";
 import { usePathname } from "next/navigation";
-import Profile from "../_pages/Profile";
+import Profile from "../../../components/reusables/dynamicProfile/Profile";
 import Wishlist from "../_pages/Wishlist";
-import Settings from "../_pages/Settings";
+import Settings from "../../../components/reusables/dynamicSettings/Settings";
+import { useGlobalState } from "@/app/GlobalStateProvider";
 
 const Page = () => {
+  const {userToken} = useGlobalState()
   const pathname = usePathname(); // Get the current path
+  const user = 'user'
   const pages = [
-    { link: "profile", component: <Profile /> },
+    { link: "profile", component: <Profile prop={user} /> },
     { link: "wish-list", component: <Wishlist /> },
-    { link: "settings", component: <Settings /> },
+    {
+      link: "settings",
+      component: <Settings prop="user"  token={userToken}/>,
+    },
   ];
 
   // Get the dynamic segment of the pathname (after '/profile/')
