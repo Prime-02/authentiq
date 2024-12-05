@@ -1,7 +1,15 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
-import { Heart, icons, Menu, Settings, ShoppingBag, User, X } from "lucide-react";
+import {
+  Heart,
+  icons,
+  Menu,
+  Settings,
+  ShoppingBag,
+  User,
+  X,
+} from "lucide-react";
 import { ButtonOne, ButtonTwo } from "../reusables/buttons/Buttons";
 import { Search, SearchTwo } from "../inputs/SearchInputs";
 import Modal from "../Modal/Modal";
@@ -12,6 +20,7 @@ import { useGlobalState } from "@/app/GlobalStateProvider";
 import { FaSignOutAlt } from "react-icons/fa";
 import { toast } from "react-toastify";
 import axios from "axios";
+import { PopOver } from "../reusables/popover/PopOver";
 
 const Navbar = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -33,13 +42,23 @@ const Navbar = () => {
   const [loading, setLoading] = useState(false);
   const { formData } = useGlobalState(); // Access global state
   const userFirstName = formData.userFirstName ? formData.userFirstName : "";
+    const wishlistItems = formData.wishlist || [];
+    const cartItems = formData.cart || [];
   const profileNav = {
     profileName: `${userFirstName} ${formData.userLastName}.`,
     navigations: [
-      {nav: 'Profile', href: '/profile/profile', icon: <User size={15}/>},
-      {nav: 'Wish List', href: '/profile/wish-list', icon: <Heart size={15}/>},
-      {nav: 'Setting', href: '/profile/settings', icon:<Settings size={15}/>},
-    ]
+      { nav: "Profile", href: "/profile/profile", icon: <User size={15} /> },
+      {
+        nav: "Wish List",
+        href: "/profile/wish-list",
+        icon: <Heart size={15} />,
+      },
+      {
+        nav: "Setting",
+        href: "/profile/settings",
+        icon: <Settings size={15} />,
+      },
+    ],
   };
 
   const nav = useRouter();
@@ -59,7 +78,7 @@ const Navbar = () => {
     sessionStorage.removeItem("userAuthToken");
     window.location.reload();
   };
- 
+
   const openModal = (type) => {
     setModalType(type); // Set the type of modal to display
     setModal(true); // Open modal
@@ -186,7 +205,7 @@ const Navbar = () => {
     setLoading(true);
 
     // Log the email and password before sending the request
-   
+
     try {
       // Start of the request
       console.log("Sending request to server...");
@@ -242,23 +261,6 @@ const Navbar = () => {
     }
   };
 
-  const profileRef = useRef(null);
-  const handleClickOutside = (event) => {
-    if (profileRef.current && !profileRef.current.contains(event.target)) {
-      !isDropdownOpen && setProfile(false);
-    }
-  };
-
-  useEffect(() => {
-    if (profile) {
-      document.addEventListener("mousedown", handleClickOutside);
-    } else {
-      document.removeEventListener("mousedown", handleClickOutside);
-    }
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [profile]);
 
   useEffect(() => {
     // Check if 'userAuthToken' exists in localStorage
@@ -289,71 +291,92 @@ const Navbar = () => {
             <span>
               <SearchTwo />
             </span>
-            <span
-              className="text- rounded-full text-2xl h-10 w-10 flex items-center justify-center cursor-pointer"
-              onClick={() => setProfile(!profile)}
-            >
-              {userFirstName ? (
-                <strong>{userFirstName.charAt(0).toUpperCase()}</strong>
-              ) : (
-                <User />
-              )}
-              <span
-                ref={profileRef}
-                className={`absolute  right-0 top-2 card  px-2  ${
-                  auth ? "h-screen w-44" : "h-auto w-auto"
-                } py-2  rounded-lg flex flex-col gap-y-1 transition duration-300 ${
-                  !profile ? "translate-x-full" : "translate-x-0"
-                }`}
-              >
-                {auth ? (
-                  <div className="flex flex-col text-base  space-y-10 gap-y-3 mt-2">
-                    <h1 className="font-bold text">{profileNav.profileName}</h1>
-                    {profileNav.navigations.map((nav, ind) => (
-                      <Link
-                        href={nav.href}
-                        key={ind}
-                        className="flex gap-x-2 items-center"
-                      >
-                        <span>{nav.icon}</span>
-                        <span>{nav.nav}</span>
-                      </Link>
-                    ))}
-                  </div>
-                ) : (
-                  ""
-                )}
-                {!auth ? (
-                  <span className="flex gap-x-3">
-                    <span>
-                      <ButtonOne
-                        buttonValue={`Login`}
-                        Clicked={() => openModal("login")}
-                      />
-                    </span>
-                    <span>
-                      <ButtonTwo
-                        buttonValue={`Sign up`}
-                        Clicked={() => openModal("signup")}
-                      />
-                    </span>
-                  </span>
-                ) : (
-                  <span className="absolute bottom-5 ">
-                    <ButtonTwo
-                      buttonValue={`Sign Out`}
-                      iconValue={<FaSignOutAlt size={15} />}
-                      Clicked={SignOut}
-                    />
-                  </span>
-                )}
-              </span>
+            <span className="text- rounded-full text-2xl h-10 w-10 flex items-center justify-center cursor-pointer">
+              <div>
+                <PopOver
+                  placement="bottom"
+                  button={
+                    userFirstName ? (
+                      <strong>{userFirstName.charAt(0).toUpperCase()}</strong>
+                    ) : (
+                      <User />
+                    )
+                  }
+                  heading={
+                    auth ? (
+                      <h2 className="font-bold text">
+                        {profileNav.profileName}
+                      </h2>
+                    ) : (
+                      "Not Logged In"
+                    )
+                  }
+                  content={
+                    auth ? (
+                      <>
+                        <div className="flex flex-col text-base  space-y-5 mb-3">
+                          {profileNav.navigations.map((nav, ind) => (
+                            <Link
+                              href={nav.href}
+                              key={ind}
+                              className="flex gap-x-2 items-center hover:underline"
+                            >
+                              <span>{nav.icon}</span>
+                              <span>{nav.nav}</span>
+                            </Link>
+                          ))}
+                        </div>
+                        <span className="my-5">
+                          <ButtonTwo
+                            buttonValue={`Sign Out`}
+                            iconValue={<FaSignOutAlt size={15} />}
+                            Clicked={SignOut}
+                          />
+                        </span>
+                      </>
+                    ) : (
+                      !auth && (
+                        <span className="flex gap-x-3">
+                          <span>
+                            <ButtonOne
+                              buttonValue={`Login`}
+                              Clicked={() => openModal("login")}
+                            />
+                          </span>
+                          <span>
+                            <ButtonTwo
+                              buttonValue={`Sign up`}
+                              Clicked={() => openModal("signup")}
+                            />
+                          </span>
+                        </span>
+                      )
+                    )
+                  }
+                />
+              </div>
             </span>
             <Link
               href={`/cart`}
-              className="cursor-pointer py-2 flex items-center gap-x-2"
+              className="cursor-pointer py-2 flex items-center relative gap-x-2"
             >
               <ShoppingBag />
+              <span className="absolute bottom-2 right-0 text-xs bg-blue-600 text-white flex items-center justify-center w-4 h-4 rounded-full">
+                <h2 className="text">
+                  {cartItems.length > 100 ? "100+" : cartItems.length}
+                </h2>
+              </span>
+            </Link>
+            <Link
+              href={`/wishlist`}
+              className="cursor-pointer relative py-2 flex items-center gap-x-2"
+            >
+              <Heart />
+              <span className="absolute bottom-2 right-0 text-xs bg-blue-600 text-white flex items-center justify-center w-4 h-4 rounded-full">
+                <h2 className="text">
+                  {wishlistItems.length > 100 ? "100+" : wishlistItems.length}
+                </h2>
+              </span>
             </Link>
           </section>
         </div>
@@ -374,23 +397,17 @@ const Navbar = () => {
               <hr className="my-2" />
               <span
                 onClick={() => setProfile(!profile)}
-                className="text-2xl rounded-full px-5 cursor-pointer h-10 w-10 flex items-center justify-center"
+                className="text-2xl rounded-full px-5 cursor-pointer h-10 w-10 flex items-center justify-center gap-x-2 ml-4"
               >
                 {userFirstName ? (
-                  <span className="flex items-center gap-x-2 ml-10">
-                    <strong>{userFirstName.charAt(0).toUpperCase()}</strong>
-                    <p className="font-normal text-base ">Profile</p>
-                  </span>
+                  <strong>{userFirstName.charAt(0).toUpperCase()}</strong>
                 ) : (
-                  <span className="flex ml-8">
-                    <User />
-                    <p className="font-normal text-base ">Profile</p>
-                  </span>
+                  <User />
                 )}
+                <p className="font-normal text-base ">Profile</p>
               </span>
               {profile && auth ? (
                 <div className="flex flex-col gap-y-3 mt-2">
-                  <h1 className="font-bold text">{profileNav.profileName}</h1>
                   {profileNav.navigations.map((nav, ind) => (
                     <Link
                       href={nav.href}
@@ -434,6 +451,15 @@ const Navbar = () => {
                 className="cursor-pointer py-2 flex items-center gap-x-2"
               >
                 <ShoppingBag size={15} /> Cart
+              </Link>
+              <Link
+                href={`/wishlist`}
+                className="cursor-pointer relative py-2 flex items-center gap-x-2"
+              >
+                <Heart size={15} /> Wishlist
+                <span>
+                  <h2 className="text">{wishlistItems.length}</h2>
+                </span>
               </Link>
             </div>
           </div>

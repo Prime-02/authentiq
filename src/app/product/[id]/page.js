@@ -51,7 +51,7 @@ export default async function ProductPage({ params }) {
         </div>
 
         <div className="sm:mt-0 mb-10 flex flex-col w-full sm:w-1/2 gap-y-5 h-full items-start ">
-          <SizeSelector sizes={product.sizes.split(",")} product={product} />
+          <SizeSelector sizes={product?.sizes} product={product} />
         </div>
       </div>
     </div>

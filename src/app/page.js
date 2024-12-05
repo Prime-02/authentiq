@@ -6,6 +6,7 @@ import { Heart, ShoppingCart } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { Loader } from "@/components/Loader/Loader";
+import { PopOver, PopOverFour } from "@/components/reusables/popover/PopOver";
 
 export default function Home() {
   const { formData, addToEndpoint, loading, fetchProducts } = useGlobalState(); // Access global state
@@ -37,18 +38,19 @@ export default function Home() {
       productId,
       endpoint: "https://isans.pythonanywhere.com/shop/wishlist/",
       action: "wishlist",
+      payloadID: "product",
     });
   };
 
   return (
     <main className="my-32 w-[90%] mx-auto">
       <div className="w-full md:w-full mx-auto h-auto flex flex-col gap-y-8">
-          <h1
-            onClick={() => fetchProducts()}
-            className="font-extrabold text-3xl md:text-5xl cursor-pointer"
-          >
-            {"What would you like to buy from us?"}
-          </h1>
+        <h1
+          onClick={() => fetchProducts()}
+          className="font-extrabold text-3xl md:text-5xl cursor-pointer"
+        >
+          {"What would you like to buy from us?"}
+        </h1>
 
         {/* Iterate over grouped products */}
         {Object.entries(groupedProducts).map(([category, items], ind) => (
@@ -60,11 +62,16 @@ export default function Home() {
                   key={product.id}
                   className="flex-shrink-0 flex flex-col min-h-full items-center justify-between p-5 card relative shadow-2xl overflow-hidden rounded-lg scroll-snap-align-start"
                 >
-                  <Heart
-                    className="absolute top-2 right-2 cursor-pointer"
-                    size={20}
-                    onClick={() => handleAddToWishlist(product.id)}
-                  />
+                  <span className="absolute top-2 right-2 cursor-pointer">
+                    {loading === `wishlist${product.id}` ? (
+                      <Loader smaillerSize={true} />
+                    ) : (
+                      <Heart
+                        size={20}
+                        onClick={() => handleAddToWishlist(product.id)}
+                      />
+                    )}
+                  </span>
 
                   {/* Image */}
                   <Link
@@ -96,13 +103,14 @@ export default function Home() {
                       </figcaption>
                     </Link>
 
-                    {/* Price */}
                     <span className="flex justify-between w-full items-end mt-8">
                       <p className="text-base font-semibold">
                         ${product.price}
                       </p>
                       <ButtonTwo
-                        disabled={loading}
+                        disabled={
+                          loading === `cart${product.id}` ? true : false
+                        }
                         className={`rounded-md`}
                         iconValue={<ShoppingCart size={15} />}
                         buttonValue={`Add to Cart`}

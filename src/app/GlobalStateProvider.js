@@ -14,7 +14,7 @@ const GlobalStateContext = createContext();
 
 export const GlobalStateProvider = ({ children }) => {
   const [error, setError] = useState(null);
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState(null);
   const userToken =
     localStorage.getItem("userAuthToken") ||
     sessionStorage.getItem("userAuthToken"); 
@@ -39,7 +39,7 @@ export const GlobalStateProvider = ({ children }) => {
     userZipCode: "",
     userDateJoined: "",
     userCart: [],
-    wishlist: [],
+    wishlist:[],
     wishlistNo: 0,
     userCartNo: 0,
 
@@ -66,59 +66,68 @@ export const GlobalStateProvider = ({ children }) => {
     return "0.00";
   };
 
-  const addToEndpoint = async ({ productId, endpoint, action, quantity }) => {
-    setLoading(true)
-    if (!productId) {
-      toast.error("Invalid product ID. Please try again.");
-      return;
-    }
+ const addToEndpoint = async ({
+   productId,
+   endpoint,
+   action,
+   quantity,
+   payloadID = "product_id",
+ }) => {
+   setLoading(`${action}${productId}`);
 
-    // Retrieve adminAuthToken from local or session storage
-    const token =
-     adminToken
+   if (!productId) {
+     toast.error("Invalid product ID. Please try again.");
+     setLoading(null); // Ensure loading state is reset
+     return;
+   }
 
-    if (!token) {
-      toast.warning("You need to log in to perform this action.");
-      return;
-    }
+   // Retrieve adminAuthToken from local or session storage
+   const token = userToken;
 
-    try {
-      // API request payload
-      const payload = {
-        product_id: productId,
-        quantity: quantity ? quantity : 1, // Fixed quantity for cart; adjust as needed for other endpoints
-      };
+   if (!token) {
+     toast.warning("You need to log in to perform this action.");
+     setLoading(null); // Ensure loading state is reset
+     return;
+   }
 
-      // Send POST request to the API
-      const response = await axios.post(endpoint, payload, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-      });
+   try {
+     // API request payload
+     const payload = {
+       [payloadID]: productId, // Dynamic key
+       quantity: quantity || 1, // Default to 1 if quantity is not provided
+     };
 
+     // Send POST request to the API
+     const response = await axios.post(endpoint, payload, {
+       headers: {
+         Authorization: `Bearer ${token}`,
+         "Content-Type": "application/json",
+       },
+     });
 
-      // Show success message
-      if (response.status === 200 || response.status === 201) {
-        toast.success(`Product successfully added to ${action}!`);
-      } else {
-        toast.warning(`Failed to add product to ${action}. Please try again.`);
-      }
-    } catch (error) {
-      console.error(`Error adding to ${action}:`, error);
-      const errorMessage =
-        error.response?.data?.message ||
-        `Failed to add product to ${action}. Please try again.`;
-      toast.error(errorMessage);
-    }
-    finally {
-      setLoading(false)
-    }
-  };
+     // Handle response
+     if (response.status === 200 || response.status === 201) {
+       toast.success(`Product successfully added to ${action}!`);
+     } else {
+       toast.warning(`Failed to add product to ${action}. Please try again.`);
+       fetchWishlist()
+       fetchCart()
+     }
+   } catch (error) {
+     console.error(`Error adding to ${action}:`, error);
+     const errorMessage =
+       error.response?.data?.message ||
+       `Failed to add product to ${action}. Please try again.`;
+     toast.error(errorMessage);
+   } finally {
+     setLoading(null); // Always reset loading state
+   }
+ };
+
 
   // Fetch user data
   const fetchUserData = useCallback(async () => {
-    setLoading(true)
+    setLoading(`userData`)
     const token = userToken
     try {
       const response = await axios.get(
@@ -153,12 +162,12 @@ export const GlobalStateProvider = ({ children }) => {
       setError("Failed to fetch user data.");
       toast.error("Unable to load user data. Please try again.");
     } finally {
-      setLoading(false);
+      setLoading(null);
     }
   }, []);
 
   const fetchCart = useCallback(async () => {
-    setLoading(true)
+    setLoading(`cart`)
     try {
       // Retrieve the user authentication token
       const userAuthToken = userToken;
@@ -192,11 +201,11 @@ export const GlobalStateProvider = ({ children }) => {
         error.response?.data?.message || "Unable to fetch cart data.";
       toast.error(errorMessage);
     } finally {
-      setLoading(false);
+      setLoading(null);
     }
   }, []);
   const fetchWishlist = useCallback(async () => {
-    setLoading(true)
+    setLoading(`wishlist`)
     try {
       // Retrieve the user authentication token
       const userAuthToken = userToken;
@@ -216,27 +225,27 @@ export const GlobalStateProvider = ({ children }) => {
       );
 
       // Validate and update the cart data
-      const wishlist = response.data.wishlist_items || []; // Fallback to an empty array if 'wishlist' is undefined
+      const wishlist = response.data.wishlist_items ||[]; // Fallback to an empty array if 'wishlist' is undefined
       setFormData((prevState) => ({
         ...prevState,
         wishlist,
         wishlistNo: wishlist.length, // Optional: Update the wishlist count
       }));
 
-      console.log("Cart data retrieved:", wishlist);
+      console.log("wishlist data retrieved:", wishlist);
     } catch (error) {
       console.error("Error fetching wishlist data:", error.message || error);
       const errorMessage =
         error.response?.data?.message || "Unable to fetch wishlist data.";
       toast.error(errorMessage);
     } finally {
-      setLoading(false);
+      setLoading(null);
     }
   }, []);
 
   // Fetch products
   const fetchProducts = useCallback(async () => {
-    setLoading(true)
+    setLoading(`products`)
     try {
       const response = await axios.get(
         "https://isans.pythonanywhere.com/shop/get-products/"
@@ -255,13 +264,13 @@ export const GlobalStateProvider = ({ children }) => {
       setError("Failed to fetch products.");
       toast.error("Unable to load products. Please try again.");
     } finally {
-      setLoading(false);
+      setLoading(null);
     }
   }, []);
 
   // Fetch barcodes
   const fetchBarcodes = useCallback(async () => {
-    setLoading(true)
+    setLoading(`barcode`)
     const token =
       adminToken
     try {
@@ -287,7 +296,7 @@ export const GlobalStateProvider = ({ children }) => {
       setError("Failed to fetch barcodes.");
       toast.error("Unable to load barcodes. Please try again.");
     } finally {
-      setLoading(false);
+      setLoading(null);
     }
   }, []);
 
@@ -296,16 +305,15 @@ export const GlobalStateProvider = ({ children }) => {
   useEffect(() => {
     const userAuthToken =
      userToken
-   
 
     if (userAuthToken ) {
       fetchUserData(userToken);
-      fetchBarcodes(); // Fetch barcodes on component mount if the token exists
+      fetchWishlist()
     }
   }, []); // Dependency array is empty to ensure it runs only on mount
   useEffect(() => {
     fetchProducts();
-  }, [fetchProducts]);
+  }, []);
 
   return (
     <>

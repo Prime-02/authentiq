@@ -4,7 +4,7 @@ import { useGlobalState } from "@/app/GlobalStateProvider";
 import Barcode from "@/components/barcode/BarcodePage";
 import JsBarcode from "jsbarcode";
 import { Download } from "lucide-react";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 
 const BarcodePage = () => {
@@ -75,6 +75,10 @@ const BarcodePage = () => {
       setLoading(false);
     }
   };
+
+  useEffect(()=>{
+    fetchBarcodes()
+  })
 
   return (
     <div className="container mx-auto p-4">

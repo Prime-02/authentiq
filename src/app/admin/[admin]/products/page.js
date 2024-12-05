@@ -39,7 +39,7 @@ const ProductTable = () => {
   };
 
   // Available sizes for checkboxes
-  const sizeOptions = ["S", "M", "FS", "L"];
+  const sizeOptions = ["XS","S", "M", "FS", "L", "XL"];
 
   // Fetch products from the API
   const fetchProducts = () => {
@@ -61,25 +61,25 @@ const ProductTable = () => {
   if (loading) return <p className="text-center">Loading...</p>;
   if (error) return <p className="text-center text-red-600">{error}</p>;
 
-  // Handle edit button click
-  const handleEdit = (product) => {
-    setProdId(product.id); // Store productId when editing
-    setProdName(product.name);
-    setProdImg(`https://isans.pythonanywhere.com${product.image}`);
-    setProdPrice(product.price);
-    setProdDesc(product.description);
-    setProdCategory(product.category);
-    setProdQuantity(product.quantity);
+ const handleEdit = (product) => {
+   setProdId(product.id); // Store productId when editing
+   setProdName(product.name);
+   setProdImg(`https://isans.pythonanywhere.com${product.image}`);
+   setProdPrice(product.price);
+   setProdDesc(product.description);
+   setProdCategory(product.category);
+   setProdQuantity(product.quantity);
 
-    // Create initial variant checkboxes, default to 'FS' if no size exists
-    const initialVariants = sizeOptions.map((size) => ({
-      size,
-      checked: product.variants?.includes(size) || size === "FS", // Default to FS if no sizes are provided
-    }));
+   // Create initial variant checkboxes
+   const initialVariants = sizeOptions.map((size) => ({
+     size,
+     checked: product.sizes?.includes(size) || false, // Mark as checked if the size exists in the product's sizes array
+   }));
 
-    setProdVariants(initialVariants);
-    setProdModal(true);
-  };
+   setProdVariants(initialVariants);
+   setProdModal(true);
+ };
+
 
   // Handle form submission (e.g., updating the product)
   const editProduct = (e) => {
@@ -113,19 +113,10 @@ const ProductTable = () => {
       return;
     }
 
-    // Get the selected size (either first checked size or default 'FS')
-    const selectedSize =
-      prodVariants.find((variant) => variant.checked)?.size || "FS";
-
-    const updatedProduct = {
-      name: prodName,
-      price: prodPrice,
-      description: prodDesc,
-      // category: prodCategory,
-      size: selectedSize, // Use a single size value instead of an array
-      quantity: prodQuantity,
-      // code: validBarcode, // Use barcode as the string primary key
-    };
+    // Extract selected sizes
+    const selectedSizes = prodVariants
+      .filter((variant) => variant.checked) // Get all checked sizes
+      .map((variant) => variant.size); // Extract size names
 
     // Create FormData object and append fields
     const formData = new FormData();
@@ -133,7 +124,7 @@ const ProductTable = () => {
     formData.append("price", prodPrice);
     formData.append("description", prodDesc);
     formData.append("category", prodCategory);
-    formData.append("size", selectedSize); // Append the single selected size
+    formData.append("sizes", selectedSizes); // Convert to JSON if API expects it this way
     formData.append("quantity", prodQuantity);
 
     if (prodImg && prodImg instanceof File) {
@@ -173,11 +164,12 @@ const ProductTable = () => {
       prevVariants.map(
         (variant) =>
           variant.size === updatedVariant.size
-            ? { ...variant, checked: true } // Select this size
-            : { ...variant, checked: false } // Uncheck others
+            ? { ...variant, checked: !variant.checked } // Toggle only the selected size
+            : variant // Keep other sizes unchanged
       )
     );
   };
+
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
