@@ -57,16 +57,16 @@ const Settings = ({ prop = "user", route = `/profile/profile`, token }) => {
 
     if (!form.first_name) newErrors.first_name = "First Name is required";
     if (!form.last_name) newErrors.last_name = "Last Name is required";
-    if (!form.email) {
-      newErrors.email = "Email is required";
-    } else if (!/^\S+@\S+$/i.test(form.email)) {
-      newErrors.email = "Invalid email address";
-    }
-    if (!form.phone) {
-      newErrors.phone = "Phone number is required";
-    } else if (!/^[0-9]{11}$/.test(form.phone)) {
-      newErrors.phone = "Invalid phone number";
-    }
+    // if (!form.email) {
+    //   newErrors.email = "Email is required";
+    // } else if (!/^\S+@\S+$/i.test(form.email)) {
+    //   newErrors.email = "Invalid email address";
+    // }
+    // if (!form.phone) {
+    //   newErrors.phone = "Phone number is required";
+    // } else if (!/^[0-9]{11}$/.test(form.phone)) {
+    //   newErrors.phone = "Invalid phone number";
+    // }
     if (!form.shipping_address)
       newErrors.shipping_address = "Shipping Address is required";
     if (!form.location) newErrors.location = "Location is required";

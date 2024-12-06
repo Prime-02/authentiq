@@ -119,7 +119,7 @@ const ProductTable = () => {
     formData.append("price", prodPrice);
     formData.append("description", prodDesc);
     formData.append("category", prodCategory);
-    formData.append("sizes", selectedSizes.join(`, `)); // Convert to JSON if API expects it this way
+    formData.append("sizes", selectedSizes); // Convert to JSON if API expects it this way
     formData.append("quantity", prodQuantity);
 
     if (prodImg && prodImg instanceof File) {

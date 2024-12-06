@@ -8,13 +8,14 @@ import { TextArea, Textinput } from "@/components/inputs/Textinput";
 import Modal from "@/components/Modal/Modal";
 import { Button } from "@/components/reusables/buttons/Buttons";
 import Link from "next/link";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
 
 
 const Layout = ({ children }) => {
-  const { formData, adminToken } = useGlobalState();
+  const { formData, adminToken, fetchProducts, fetchBarcodes } =
+    useGlobalState();
   const [products, setProducts] = useState([]);
   const [prodModal, setProdModal] = useState(false);
   const [prodCategory, setProdCategory] = useState("");
@@ -160,8 +161,13 @@ const addProduct = async (e) => {
     toast.error("Failed to add the product. Please try again.");
   } finally {
     setLoading(false);
+    fetchProducts()
   }
 };
+
+useEffect(()=>{
+  fetchProducts()
+})
 
 
 

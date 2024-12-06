@@ -10,10 +10,11 @@ const ProfilePage = ({ prop, route = `/profile/settings` }) => {
   const { formData } = useGlobalState();
 
   // Helper function to get the dynamically replaced property
-  const getDynamicProp = (key) => formData[`${prop}${key}`] || "Loading...";
+  const getDynamicProp = (key) => formData[`${prop}${key}`] || "...";
 
   return (
     <div className="min-h-screen py-20 px-4 ">
+      <h2 className="text-2xl my-4 font-semibold text-center">User Profile</h2>
       {/* Header Section */}
       <div className="card relative rounded-lg shadow-lg p-6 flex flex-col items-center">
         <div className="w-32 h-32 rounded-full overflow-hidden flex items-center justify-center text-5xl font-extrabold border-4 mb-4">
@@ -39,13 +40,12 @@ const ProfilePage = ({ prop, route = `/profile/settings` }) => {
         </section>
         <span className="absolute top-3 border-b hover:text-blue-500 cursor-pointer font-light right-3 flex items-center gap-x-1">
           <p>Logout</p>
-  
         </span>
       </div>
 
       {/* Personal Information Section */}
-      <div className="mt-8 card rounded-lg shadow-lg p-6">
-        <h2 className="text-xl font-semibold ">Personal Information</h2>
+      <h2 className="text-xl my-4 font-semibold ">Personal Information</h2>
+      <div className=" card rounded-lg shadow-lg p-6">
         <div className="mt-4 space-y-2">
           <p className="hidden">
             <span className="font-semibold">Phone:</span>{" "}
@@ -64,27 +64,14 @@ const ProfilePage = ({ prop, route = `/profile/settings` }) => {
             {getDynamicProp("State")}
           </p>
           <p className="">
-            <span className="font-semibold">City:</span>{" "}
-            {getDynamicProp("City")}
-          </p>
-          <p className="">
-            <span className="font-semibold">UID:</span>{" "}
-            <strong className="">{getDynamicProp("Id")}</strong>
-          </p>
-          <p className="">
-            Joined:{" "}
-            {getDynamicProp("DateJoined") !== "N/A"
-              ? new Date(getDynamicProp("DateJoined")).toLocaleDateString(
-                  "en-US"
-                )
-              : "N/A"}
+            <span className="font-semibold">City</span> {getDynamicProp("City")}
           </p>
         </div>
       </div>
 
       {/* Address Section */}
-      <div className="mt-8 card rounded-lg shadow-lg p-6">
-        <h2 className="text-xl font-semibold ">Address</h2>
+      <h2 className="text-xl font-semibold my-4 ">Addresses</h2>
+      <div className=" card rounded-lg shadow-lg p-6">
         <div className="mt-4 space-y-2">
           <p className="">
             <span className="font-semibold">Shipping Address:</span>{" "}
@@ -96,10 +83,31 @@ const ProfilePage = ({ prop, route = `/profile/settings` }) => {
           </p>
           <p className="">
             <span className="font-semibold">Zip Code:</span>{" "}
-            {getDynamicProp("ZipCode")}
+            <span>{getDynamicProp("ZipCode")}</span>
           </p>
         </div>
       </div>
+
+      <h2 className="text-xl font-semibold my-4 ">Others</h2>
+      <section className="card rounded-lg py-4 flex flex-col items-center space-y-2 text-center text-xs">
+        {/* Joined Date */}
+        <div className="flex flex-col items-center space-y-1">
+          <span className="text-gray-500">Joined</span>
+          <span className="text-sm font-medium">
+            {getDynamicProp("DateJoined") !== "N/A"
+              ? new Date(getDynamicProp("DateJoined")).toLocaleDateString(
+                  "en-US"
+                )
+              : "N/A"}
+          </span>
+        </div>
+
+        {/* UID Section */}
+        <div className="flex flex-col items-center space-y-1">
+          <span className="text-gray-500 font-semibold">Your UID</span>
+          <strong className="text-sm">{getDynamicProp("Id")}</strong>
+        </div>
+      </section>
     </div>
   );
 };

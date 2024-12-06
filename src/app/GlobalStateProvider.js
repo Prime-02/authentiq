@@ -13,6 +13,7 @@ import { useRouter } from "next/router";
 
 const GlobalStateContext = createContext();
 
+
 export const GlobalStateProvider = ({ children }) => {
   
   const [error, setError] = useState(null);
@@ -98,7 +99,6 @@ export const GlobalStateProvider = ({ children }) => {
    endpoint,
    action,
    quantity,
-   payloadID = "product_id",
  }) => {
    setLoading(`${action}${productId}`);
 
@@ -120,7 +120,7 @@ export const GlobalStateProvider = ({ children }) => {
    try {
      // API request payload
      const payload = {
-       [payloadID]: productId, // Dynamic key
+       product_id: productId, // Dynamic key
        quantity: quantity || 1, // Default to 1 if quantity is not provided
      };
 
@@ -135,15 +135,15 @@ export const GlobalStateProvider = ({ children }) => {
      // Handle response
      if (response.status === 200 || response.status === 201) {
        toast.success(`Product successfully added to ${action}!`);
-     } else {
-       toast.warning(`Failed to add product to ${action}. Please try again.`);
        fetchWishlist()
        fetchCart()
+     } else {
+       toast.warning(`Failed to add product to ${action}. Please try again.`);
      }
    } catch (error) {
      console.error(`Error adding to ${action}:`, error);
      const errorMessage =
-       error.response?.data?.message ||
+       error.response?.data.error ||
        `Failed to add product to ${action}. Please try again.`;
      toast.error(errorMessage);
    } finally {
@@ -320,6 +320,57 @@ export const GlobalStateProvider = ({ children }) => {
 
  
 
+  
+  const deleteItem = async (Id, action) => {
+    setLoading(`deleting_${action}_${Id}`);
+    const token = getToken("user"); // Retrieve user token
+
+    if (!Id) {
+      toast.error(`Invalid ${action} ID. Please try again.`);
+      return;
+    }
+
+    if (!token) {
+      toast.warning("You must be logged in to perform this action.");
+      return;
+    }
+
+    try {
+      // Make the DELETE request
+      const response = await axios.delete(
+        `https://isans.pythonanywhere.com/shop/${action}/${Id}/`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      
+      // Handle success
+      if (response.status === 200 || response.status === 204) {
+        toast.success(
+          `${
+            action.charAt(0).toUpperCase() + action.slice(1)
+          } item successfully deleted.`
+        );
+        if (action === "wishlist") {
+          fetchWishlist(); // Refresh wishlist
+        } else if (action === "cart") {
+          fetchCart(); // Refresh cart
+        }
+      } else {
+        toast.error(`Failed to delete the ${action} item. Please try again.`);
+      }
+    } catch (error) {
+      console.error(`Error deleting ${action} item:`, error.message || error);
+      const errorMessage =
+        error.response?.data?.message || `Unable to delete the ${action} item.`;
+      toast.error(errorMessage);
+    } finally{
+      setLoading(null)
+    }
+  };
+
   useEffect(() => {
     const userAuthToken =
      getToken(`user`)
@@ -352,7 +403,8 @@ export const GlobalStateProvider = ({ children }) => {
           Clear,
           SignOut,
           getToken,
-          fetchUserData
+          fetchUserData,
+          deleteItem,
         }}
       >
         {children}

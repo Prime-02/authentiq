@@ -1,12 +1,14 @@
 "use client";
 import { useGlobalState } from "@/app/GlobalStateProvider";
+import { Loader } from "@/components/Loader/Loader";
 import { ButtonOne, ButtonTwo } from "@/components/reusables/buttons/Buttons";
 import DynamicImage from "@/components/reusables/DynamicImage/DynamicImage";
-import { ShoppingCart } from "lucide-react";
+import { ShoppingCart, Trash } from "lucide-react";
 import React, { useEffect } from "react";
 
 const Wishlist = () => {
-  const { formData, fetchWishlist, addToEndpoint, loading } = useGlobalState();
+  const { formData, fetchWishlist, addToEndpoint, loading, deleteItem } =
+    useGlobalState();
   const handleAddToCart = (productId) => {
     addToEndpoint({
       productId,
@@ -26,19 +28,19 @@ const Wishlist = () => {
       {/* Wishlist Section */}
       <h1 className="text-2xl md:text-4xl mb-10 ">Wishlist</h1>
       <ul>
-        {wishlistItems.map((item, index) => (
+        {wishlistItems.length > 0 ? wishlistItems.map((item, index) => (
           <li
             key={index}
-            className="flex flex-row w-full justify-start gap-x-5 border-b border-gray-400 py-5"
+            className="flex relative flex-row w-full justify-start gap-x-12   mx-auto border-b border-gray-400 py-5"
           >
-            <div className=" w-44 h-72 flex items-center justify-center card rounded-lg">
+            <div className=" w-1/2 h-72 flex items-center justify-center card rounded-lg">
               <DynamicImage
                 prop={item.product.image}
                 prod={item.product.name}
                 className=" object-cover"
               />
             </div>
-            <div className="relative w-64">
+            <div className="relative w-64 flex flex-col ">
               <h3>{item.product.name}</h3>
               <span className="flex items-center gap-x-2 text-gray-500">
                 <p> {item.product.category}</p>
@@ -56,8 +58,21 @@ const Wishlist = () => {
                 />
               </span>
             </div>
+            <span className="absolute right-3 top-7 cursor-pointer">
+              {loading === `deleting_wishlist_${item.id}` ? (
+                <Loader smaillerSize={true} />
+              ) : (
+                <Trash onClick={() => deleteItem(item.id, `wishlist`)} size={15}/>
+              )}
+            </span>
           </li>
-        ))}
+        ))
+      : <section>
+        <h1>
+          No item added to your wish list
+        </h1>
+      </section>
+      } 
       </ul>
     </div>
   );

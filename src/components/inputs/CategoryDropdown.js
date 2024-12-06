@@ -4,19 +4,15 @@ import axios from "axios";
 
 export const CategoryDropdown = ({ onCategorySelect }) => {
   const [categories, setCategories] = useState([]);
-  const {adminToken} = useGlobalState()
+  const { getToken} = useGlobalState()
   const [selectedCategory, setSelectedCategory] = useState("");
 
-  // Get adminAuthToken from storage
-  const getAuthToken = () => {
-    return adminToken;
-  };
 
   // Fetch categories from the API
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const token = getAuthToken();
+        const token = getToken(`admin`);
         const response = await axios.get(
           "https://isans.pythonanywhere.com/shop/category/",
           {
