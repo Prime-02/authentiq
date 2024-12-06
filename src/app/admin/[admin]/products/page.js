@@ -10,13 +10,14 @@ import { AddCategory, CategoryDropdown } from "@/components/inputs/CategoryDropd
 import { useGlobalState } from "@/app/GlobalStateProvider";
 import DynamicImage from "@/components/reusables/DynamicImage/DynamicImage";
 import BarcodeDropdown from "@/components/inputs/BarcodeDropdown";
-import { LoaderStyle5Component } from "@/components/Loader/Loader";
+import { Loader, LoaderStyle5Component } from "@/components/Loader/Loader";
+import { Pen, Trash } from "lucide-react";
 
 const ProductTable = () => {
   const [products, setProducts] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [Prodloading, setProdLoading] = useState(null);
   const [error, setError] = useState("");
-  const { formData, getToken } = useGlobalState();
+  const { formData, getToken, DeleteProduct, loading } = useGlobalState();
 
   // Modal state and product data for editing
   const [prodModal, setProdModal] = useState(false);
@@ -40,24 +41,23 @@ const ProductTable = () => {
 
   // Fetch products from the API
   const fetchProducts = () => {
+        setProdLoading(`fetch`);
     axios
       .get("https://isans.pythonanywhere.com/shop/get-products/")
       .then((response) => {
         setProducts(response.data);
-        setLoading(false);
+        setProdLoading(null)
       })
       .catch((error) => {
         setError("Failed to load products" + error);
-        setLoading(false);
+        setProdLoading(null);
       });
   };
   useEffect(() => {
     fetchProducts();
   }, []);
 
-  if (loading) return <div className="text-center">
-    <LoaderStyle5Component/>
-  </div>;
+  
   if (error) return <p className="text-center text-red-600">{error}</p>;
 
   const handleEdit = (product) => {
@@ -192,9 +192,11 @@ console.log(selectedSizes.join(`, `));
       setProdImgPreview(imageUrl); // Store the preview URL
     }
   };
-
   return (
     <div className="container mx-auto  p-4">
+      {Prodloading === `fetch` && (
+        <LoaderStyle5Component/>
+      )}
       <h1 className="text-2xl font-bold text-center mb-6">Product List</h1>
       <div className="overflow-x-auto card pt-6  rounded-lg">
         <span className="">
@@ -244,12 +246,22 @@ console.log(selectedSizes.join(`, `));
                 <td className="px-4 py-2">
                   {product.barcode ? product.barcode : `Not Set`}
                 </td>
-                <td className="px-4 py-2 text-center">
+                <td className="px-4 py-2 text-center flex gap-x-2 items-center">
                   <button
-                    className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition"
+                    className="px-4 py-2 text-blue-500  rounded hover:text-blue-600 transition"
                     onClick={() => handleEdit(product)}
                   >
-                    Edit
+                    <Pen />
+                  </button>
+                  <button
+                    className="px-4 py-2 text-red-500  rounded hover:text-red-600 transition"
+                    onClick={()=> DeleteProduct(product.id)}
+                  >
+                    {loading === `deleting_product` ? (
+                      <Loader smaillerSize={true} />
+                    ) : (
+                      <Trash />
+                    )}
                   </button>
                 </td>
               </tr>

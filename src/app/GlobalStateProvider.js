@@ -13,42 +13,38 @@ import { useRouter } from "next/router";
 
 const GlobalStateContext = createContext();
 
-
 export const GlobalStateProvider = ({ children }) => {
-  
   const [error, setError] = useState(null);
   const [userToken, setUserToken] = useState(null);
   const [adminToken, setAdminToken] = useState(null);
   const [loading, setLoading] = useState(null);
-    const Clear = () => {
-      localStorage.removeItem("userAuthToken");
-      sessionStorage.removeItem("userAuthToken");
-      alert(`cleared`);
-    };
-    const SignOut = () => {
-      localStorage.removeItem("userAuthToken");
-      sessionStorage.removeItem("userAuthToken");
-      window.location.reload();
+  const Clear = () => {
+    localStorage.removeItem("userAuthToken");
+    sessionStorage.removeItem("userAuthToken");
+    alert(`cleared`);
+  };
+  const SignOut = () => {
+    localStorage.removeItem("userAuthToken");
+    sessionStorage.removeItem("userAuthToken");
+    window.location.reload();
+  };
 
-    };
-
-    const getToken = (type) => {
-      if (typeof window !== "undefined") {
-        if (type === "user") {
-          return (
-            localStorage.getItem("userAuthToken") ||
-            sessionStorage.getItem("userAuthToken")
-          );
-        } else if (type === "admin") {
-          return (
-            localStorage.getItem("adminAuthToken") ||
-            sessionStorage.getItem("adminAuthToken")
-          );
-        }
+  const getToken = (type) => {
+    if (typeof window !== "undefined") {
+      if (type === "user") {
+        return (
+          localStorage.getItem("userAuthToken") ||
+          sessionStorage.getItem("userAuthToken")
+        );
+      } else if (type === "admin") {
+        return (
+          localStorage.getItem("adminAuthToken") ||
+          sessionStorage.getItem("adminAuthToken")
+        );
       }
-      return null; // Return null if the token is not found
-    };
-
+    }
+    return null; // Return null if the token is not found
+  };
 
   const [formData, setFormData] = useState({
     userId: "",
@@ -67,17 +63,17 @@ export const GlobalStateProvider = ({ children }) => {
     userZipCode: "",
     userDateJoined: "",
     userCart: [],
-    wishlist:[],
+    wishlist: [],
     wishlistNo: 0,
     userCartNo: 0,
 
     // Admin-specific fields
-    adminId: '',
+    adminId: "",
     adminFirstName: "",
     adminLastName: "",
     adminEmail: "",
     adminGender: "",
-    adminPhone: '',
+    adminPhone: "",
     adminNotification: [],
     products: [],
     barcodes: [], // Add barcodes field
@@ -94,68 +90,62 @@ export const GlobalStateProvider = ({ children }) => {
     return "0.00";
   };
 
- const addToEndpoint = async ({
-   productId,
-   endpoint,
-   action,
-   quantity,
- }) => {
-   setLoading(`${action}${productId}`);
+  const addToEndpoint = async ({ productId, endpoint, action, quantity }) => {
+    setLoading(`${action}${productId}`);
 
-   if (!productId) {
-     toast.error("Invalid product ID. Please try again.");
-     setLoading(null); // Ensure loading state is reset
-     return;
-   }
+    if (!productId) {
+      toast.error("Invalid product ID. Please try again.");
+      setLoading(null); // Ensure loading state is reset
+      return;
+    }
 
-   // Retrieve adminAuthToken from local or session storage
-   const token = getToken(`user`);
+    // Retrieve adminAuthToken from local or session storage
+    const token = getToken(`user`);
 
-   if (!token) {
-     toast.warning("You need to logged in to perform this action.");
-     setLoading(null); // Ensure loading state is reset
-     return;
-   }
+    if (!token) {
+      toast.warning("You need to logged in to perform this action.");
+      setLoading(null); // Ensure loading state is reset
+      return;
+    }
 
-   try {
-     // API request payload
-     const payload = {
-       product_id: productId, // Dynamic key
-       quantity: quantity || 1, // Default to 1 if quantity is not provided
-     };
+    try {
+      // API request payload
+      const payload = {
+        product_id: productId, // Dynamic key
+        quantity: quantity || 1, // Default to 1 if quantity is not provided
+      };
 
-     // Send POST request to the API
-     const response = await axios.post(endpoint, payload, {
-       headers: {
-         Authorization: `Bearer ${token}`,
-         "Content-Type": "application/json",
-       },
-     });
+      // Send POST request to the API
+      const response = await axios.post(endpoint, payload, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
 
-     // Handle response
-     if (response.status === 200 || response.status === 201) {
-       toast.success(`Product successfully added to ${action}!`);
-       fetchWishlist()
-       fetchCart()
-     } else {
-       toast.warning(`Failed to add product to ${action}. Please try again.`);
-     }
-   } catch (error) {
-     console.error(`Error adding to ${action}:`, error);
-     const errorMessage =
-       error.response?.data.error ||
-       `Failed to add product to ${action}. Please try again.`;
-     toast.error(errorMessage);
-   } finally {
-     setLoading(null); // Always reset loading state
-   }
- };
-
+      // Handle response
+      if (response.status === 200 || response.status === 201) {
+        toast.success(`Product successfully added to ${action}!`);
+        fetchWishlist();
+        fetchCart();
+      } else {
+        toast.warning(`Failed to add product to ${action}. Please try again.`);
+      }
+    } catch (error) {
+      console.error(`Error adding to ${action}:`, error);
+      const errorMessage =
+        error.response?.data.error ||
+        `Failed to add product to ${action}. Please try again.`;
+      toast.error(errorMessage);
+    } finally {
+      setLoading(null); // Always reset loading state
+    }
+  };
 
   // Fetch user data
   const fetchUserData = useCallback(async () => {
-    setLoading(`userData`)
-    const token = getToken(`user`)
+    setLoading(`userData`);
+    const token = getToken(`user`);
     try {
       const response = await axios.get(
         "https://isans.pythonanywhere.com/users/profile/",
@@ -194,7 +184,7 @@ export const GlobalStateProvider = ({ children }) => {
   }, []);
 
   const fetchCart = useCallback(async () => {
-    setLoading(`cart`)
+    setLoading(`cart`);
     try {
       // Retrieve the user authentication token
       const userAuthToken = getToken(`user`);
@@ -210,7 +200,7 @@ export const GlobalStateProvider = ({ children }) => {
       );
 
       // Validate and update the cart data
-      const cart = response.data || []; // Fallback to an empty array if 'cart' is undefined
+      const cart = response.data.cart_items || []; // Fallback to an empty array if 'cart' is undefined
       setFormData((prevState) => ({
         ...prevState,
         cart,
@@ -228,7 +218,7 @@ export const GlobalStateProvider = ({ children }) => {
     }
   }, []);
   const fetchWishlist = useCallback(async () => {
-    setLoading(`wishlist`)
+    setLoading(`wishlist`);
     try {
       // Retrieve the user authentication token
       const userAuthToken = getToken(`user`);
@@ -244,7 +234,7 @@ export const GlobalStateProvider = ({ children }) => {
       );
 
       // Validate and update the cart data
-      const wishlist = response.data.wishlist_items ||[]; // Fallback to an empty array if 'wishlist' is undefined
+      const wishlist = response.data.wishlist_items || []; // Fallback to an empty array if 'wishlist' is undefined
       setFormData((prevState) => ({
         ...prevState,
         wishlist,
@@ -264,7 +254,7 @@ export const GlobalStateProvider = ({ children }) => {
 
   // Fetch products
   const fetchProducts = useCallback(async () => {
-    setLoading(`products`)
+    setLoading(`products`);
     try {
       const response = await axios.get(
         "https://isans.pythonanywhere.com/shop/get-products/"
@@ -281,7 +271,7 @@ export const GlobalStateProvider = ({ children }) => {
       }
     } catch (err) {
       setError("Failed to fetch products.");
-      toast.error("Unable to load products. Please try again.");
+      // toast.error("Unable to load products. Please try again.");
     } finally {
       setLoading(null);
     }
@@ -289,8 +279,8 @@ export const GlobalStateProvider = ({ children }) => {
 
   // Fetch barcodes
   const fetchBarcodes = useCallback(async () => {
-    setLoading(`barcode`)
-    const token = getToken(`admin`)
+    setLoading(`barcode`);
+    const token = getToken(`admin`);
     try {
       const response = await axios.get(
         "https://isans.pythonanywhere.com/shop/barcode/",
@@ -312,15 +302,12 @@ export const GlobalStateProvider = ({ children }) => {
       }
     } catch (err) {
       setError("Failed to fetch barcodes.");
-      toast.error("Unable to load barcodes. Please try again.");
+      // toast.error("Unable to load barcodes. Please try again.");
     } finally {
       setLoading(null);
     }
   }, []);
 
- 
-
-  
   const deleteItem = async (Id, action) => {
     setLoading(`deleting_${action}_${Id}`);
     const token = getToken("user"); // Retrieve user token
@@ -345,9 +332,9 @@ export const GlobalStateProvider = ({ children }) => {
           },
         }
       );
-      
+
       // Handle success
-      if (response.status === 200 || response.status === 204) {
+      if (response.status === 200 || response.status === 201) {
         toast.success(
           `${
             action.charAt(0).toUpperCase() + action.slice(1)
@@ -366,18 +353,61 @@ export const GlobalStateProvider = ({ children }) => {
       const errorMessage =
         error.response?.data?.message || `Unable to delete the ${action} item.`;
       toast.error(errorMessage);
-    } finally{
-      setLoading(null)
+    } finally {
+      setLoading(null);
     }
   };
 
-  useEffect(() => {
-    const userAuthToken =
-     getToken(`user`)
+  const DeleteProduct = async (id) => {
+    // Start loading state
+    console.log(id);
+    
+    setLoading(`deleting_product`);
 
-    if (userAuthToken ) {
+    const token = getToken(`admin`);
+    if (!token) {
+      toast.warning(`You need admin rights to perform this action.`);
+      return; // Prevent further execution
+    }
+
+    try {
+      const response = await axios.delete(
+        `https://isans.pythonanywhere.com/shop/products/${id}/`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      // Check response status
+      if (response.status === 200) {
+        toast.success(`Item deleted successfully.`);
+      } else {
+        toast.error(`Something went wrong. Please try again.`);
+      }
+    } catch (error) {
+      console.error(`Error deleting item:`, error.message || error);
+
+      // Show detailed error message or fallback
+      const errorMessage =
+        error.response?.data?.message ||
+        error.response?.statusText ||
+        `Unable to delete the item.`;
+      toast.error(errorMessage);
+    } finally {
+      // End loading state
+      setLoading(null);
+    }
+  };
+
+
+  useEffect(() => {
+    const userAuthToken = getToken(`user`);
+
+    if (userAuthToken) {
       fetchUserData();
-      fetchWishlist()
+      fetchWishlist();
     }
   }, []); // Dependency array is empty to ensure it runs only on mount
   useEffect(() => {
@@ -405,6 +435,7 @@ export const GlobalStateProvider = ({ children }) => {
           getToken,
           fetchUserData,
           deleteItem,
+          DeleteProduct,
         }}
       >
         {children}

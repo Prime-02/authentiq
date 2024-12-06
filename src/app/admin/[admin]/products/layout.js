@@ -14,7 +14,7 @@ import { toast } from "react-toastify";
 
 
 const Layout = ({ children }) => {
-  const { formData, adminToken, fetchProducts, fetchBarcodes } =
+  const { formData, getToken, fetchProducts, fetchBarcodes } =
     useGlobalState();
   const [products, setProducts] = useState([]);
   const [prodModal, setProdModal] = useState(false);
@@ -79,97 +79,107 @@ const Layout = ({ children }) => {
     setProdModal(!prodModal);
   };
 
+ const addProduct = async (e) => {
+   e.preventDefault();
+   setLoading(true);
 
-const addProduct = async (e) => {
-  e.preventDefault();
-  setLoading(true);
+   // Validate mandatory fields
+   if (
+     !prodName ||
+     !prodPrice ||
+     !prodDesc ||
+     !prodQuantity ||
+     !prodCategory ||
+     !selectedBarcode
+   ) {
+     toast.warning("Please fill in all required fields.");
+     setLoading(false);
+     return;
+   }
 
-  // Validate mandatory fields
-  if (
-    !prodName ||
-    !prodPrice ||
-    !prodDesc ||
-    !prodQuantity ||
-    !prodCategory ||
-    !selectedBarcode
-  ) {
-    toast.warning("Please fill in all required fields.");
-    setLoading(false);
-    return;
-  }
+   try {
+     // Create FormData object
+     const formData = new FormData();
+     formData.append("name", prodName);
+     formData.append("price", prodPrice);
+     formData.append("description", prodDesc);
+     if (prodImg) {
+       formData.append("image", prodImg); // Only append if image is provided
+     }
+     formData.append("category", prodCategory);
+     formData.append("quantity", prodQuantity);
+     formData.append("barcode", selectedBarcode);
 
-  try {
-    // Create FormData object
-    const formData = new FormData();
-    formData.append("name", prodName);
-    formData.append("price", prodPrice);
-    formData.append("description", prodDesc);
-    if (prodImg) {
-      formData.append("image", prodImg); // Only append if image is provided
-    }
-    formData.append("category", prodCategory);
-    formData.append("quantity", prodQuantity);
-    formData.append("barcode", selectedBarcode);
-    formData.append(
-      "size",
-      JSON.stringify(prodVariants.filter((variant) => variant.checked))
-    );
+     // Filter and join selected sizes into a string with double quotes
+     const selectedSizes = prodVariants
+       .filter((variant) => variant.checked)
+       .map((variant) => `"${variant.label}"`) // Add double quotes around each size
+       .join(", "); // Join them with commas (e.g., '"S", "L", "XL"')
 
-    const adminAuthToken = adminToken;
+     // Log the selected sizes for debugging
+     console.log("Selected Sizes:", selectedSizes);
 
-    // Make the API request using Axios
-    const response = await axios.post(
-      "https://isans.pythonanywhere.com/shop/products/",
-      formData,
-      {
-        headers: {
-          Authorization: `Bearer ${adminAuthToken}`,
-          "Content-Type": "multipart/form-data",
-        },
-      }
-    );
+     if (selectedSizes) {
+       formData.append("size", selectedSizes); // Append as a single string
+     } else {
+       console.log("No sizes selected."); // Log if no sizes were selected
+     }
 
-    // Log the response to the console
-    console.log("API Response:", response.data);
+     const adminAuthToken = getToken(`admin`);
 
-    // Show a success toast
-    if (prodImg) {
-      toast.success("Product with image added successfully!");
-    } else {
-      toast.success("Product added successfully!");
-    }
+     // Make the API request using Axios
+     const response = await axios.post(
+       "https://isans.pythonanywhere.com/shop/products/",
+       formData,
+       {
+         headers: {
+           Authorization: `Bearer ${adminAuthToken}`,
+           "Content-Type": "multipart/form-data",
+         },
+       }
+     );
 
-    // Update the UI with the new product
-    setProducts((prevProducts) => [...prevProducts, response.data]);
+     // Log the response to the console
+     console.log("API Response:", response.data);
 
-    // Reset form fields
-    setProdName("");
-    setProdPrice("");
-    setProdDesc("");
-    setProdQuantity("");
-    setProdImg(null);
-    setConvertedImg(null);
-    setSelectedBarcode(null);
-    setProdCategory("");
-    setProdVariants((prev) =>
-      prev.map((variant) => ({ ...variant, checked: false }))
-    );
+     // Show a success toast
+     if (prodImg) {
+       toast.success("Product with image added successfully!");
+     } else {
+       toast.success("Product added successfully!");
+     }
 
-    ToggleModal();
-  } catch (error) {
-    console.error("Error adding product:", error);
-    toast.error("Failed to add the product. Please try again.");
-  } finally {
-    setLoading(false);
-    fetchProducts()
-  }
-};
+     // Update the UI with the new product
+     setProducts((prevProducts) => [...prevProducts, response.data]);
 
-useEffect(()=>{
-  fetchProducts()
-})
+     // Reset form fields
+     setProdName("");
+     setProdPrice("");
+     setProdDesc("");
+     setProdQuantity("");
+     setProdImg(null);
+     setConvertedImg(null);
+     setSelectedBarcode(null);
+     setProdCategory("");
+     setProdVariants((prev) =>
+       prev.map((variant) => ({ ...variant, checked: false }))
+     );
+
+     ToggleModal();
+   } catch (error) {
+     console.error("Error adding product:", error);
+     toast.error("Failed to add the product. Please try again.");
+   } finally {
+     setLoading(false);
+     fetchProducts();
+   }
+ };
 
 
+  useEffect(() => {
+    fetchProducts();
+    fetchBarcodes()
+  }, []);
 
   return (
     <>
@@ -229,11 +239,24 @@ useEffect(()=>{
               />
             </span>
             <span>
-              <FileInput
-                changed={handleFileChange} // Handle file input change
-                type="file"
-                accept="image/*"
-              />
+              <span>
+                {convertedImg && (
+                  <div className="mt-3">
+                    <img
+                      src={convertedImg}
+                      alt="Product Preview"
+                      className="w-24 h-w-24 mx-auto object-cover rounded-lg"
+                    />
+                  </div>
+                )}
+              </span>
+              <span>
+                <FileInput
+                  changed={handleFileChange} // Handle file input change
+                  type="file"
+                  accept="image/*"
+                />
+              </span>
             </span>
           </section>
           <section className="flex items-center justify-between">
