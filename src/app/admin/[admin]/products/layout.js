@@ -1,5 +1,5 @@
 "use client";
-import { useGlobalState } from "@/app/GlobalStateProvider";
+import { useGlobalState, } from "@/app/GlobalStateProvider";
 import BarcodeDropdown from "@/components/inputs/BarcodeDropdown";
 import { CategoryDropdown } from "@/components/inputs/CategoryDropdown";
 import { CheckBoxList } from "@/components/inputs/CheckBox";
@@ -14,7 +14,7 @@ import { toast } from "react-toastify";
 
 
 const Layout = ({ children }) => {
-  const { formData } = useGlobalState();
+  const { formData, adminToken } = useGlobalState();
   const [products, setProducts] = useState([]);
   const [prodModal, setProdModal] = useState(false);
   const [prodCategory, setProdCategory] = useState("");
@@ -114,9 +114,7 @@ const addProduct = async (e) => {
       JSON.stringify(prodVariants.filter((variant) => variant.checked))
     );
 
-    const adminAuthToken =
-      localStorage.getItem("adminAuthToken") ||
-      sessionStorage.getItem("adminAuthToken");
+    const adminAuthToken = adminToken;
 
     // Make the API request using Axios
     const response = await axios.post(

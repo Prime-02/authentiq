@@ -1,7 +1,12 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
-    domains: ["isans.pythonanywhere.com"], // Make sure the domain is correctly added
+     remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'isans.pythonanywhere.com',
+      },
+    ],
   },
   i18n: {
     // Specify your default locale

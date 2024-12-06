@@ -48,11 +48,11 @@ const Wishlist = () => {
               <p> ${item.product.price}</p>
               <span className="absolute bottom-0">
                 <ButtonTwo
-                disabled={loading === `cart`? true : false}
+                  disabled={loading === `cart${item.product.id}` ? true : false}
                   className={`rounded-md`}
                   iconValue={<ShoppingCart size={15} />}
                   buttonValue={`Add to Cart`}
-                  Clicked={()=>handleAddToCart(item.id)}
+                  Clicked={() => handleAddToCart(item.product.id)}
                 />
               </span>
             </div>

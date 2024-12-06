@@ -1,18 +1,19 @@
 "use client";
 
 import { useGlobalState } from "@/app/GlobalStateProvider";
-import { Edit } from "lucide-react";
+import { Edit, LogOut, Pen } from "lucide-react";
 import Link from "next/link";
 import React from "react";
+import { ButtonTwo } from "../buttons/Buttons";
 
 const ProfilePage = ({ prop, route = `/profile/settings` }) => {
   const { formData } = useGlobalState();
 
   // Helper function to get the dynamically replaced property
-  const getDynamicProp = (key) => formData[`${prop}${key}`] || "N/A";
+  const getDynamicProp = (key) => formData[`${prop}${key}`] || "Loading...";
 
   return (
-    <div className="min-h-screen py-20 px-4">
+    <div className="min-h-screen py-20 px-4 ">
       {/* Header Section */}
       <div className="card relative rounded-lg shadow-lg p-6 flex flex-col items-center">
         <div className="w-32 h-32 rounded-full overflow-hidden flex items-center justify-center text-5xl font-extrabold border-4 mb-4">
@@ -23,31 +24,30 @@ const ProfilePage = ({ prop, route = `/profile/settings` }) => {
             .charAt(0)
             .toUpperCase()}`}</h1>
         </div>
-        <h1 className="text-2xl font-semibold ">
-          {getDynamicProp("FirstName")} {getDynamicProp("LastName")}
-        </h1>
-        <p className="">
-          Joined:{" "}
-          {getDynamicProp("DateJoined") !== "N/A"
-            ? new Date(getDynamicProp("DateJoined")).toLocaleDateString("en-US")
-            : "N/A"}
-        </p>
-        <p className="">ID: {getDynamicProp("Id")}</p>
+        <section className="flex flex-col items-center gap-y-2">
+          <h1 className="text-2xl font-semibold ">
+            {getDynamicProp("FirstName")} {getDynamicProp("LastName")}
+          </h1>
+          <p className="">{getDynamicProp("Email")}</p>
 
-        <Link href={route} className="absolute right-2 top-2">
-          <Edit />
-        </Link>
+          <Link href={route} className="">
+            <ButtonTwo
+              buttonValue={`Edit Profile`}
+              iconValue={<Pen size={12} />}
+            />
+          </Link>
+        </section>
+        <span className="absolute top-3 border-b hover:text-blue-500 cursor-pointer font-light right-3 flex items-center gap-x-1">
+          <p>Logout</p>
+  
+        </span>
       </div>
 
       {/* Personal Information Section */}
       <div className="mt-8 card rounded-lg shadow-lg p-6">
         <h2 className="text-xl font-semibold ">Personal Information</h2>
         <div className="mt-4 space-y-2">
-          <p className="">
-            <span className="font-semibold">Email:</span>{" "}
-            {getDynamicProp("Email")}
-          </p>
-          <p className="">
+          <p className="hidden">
             <span className="font-semibold">Phone:</span>{" "}
             {getDynamicProp("Phone")}
           </p>
@@ -66,6 +66,18 @@ const ProfilePage = ({ prop, route = `/profile/settings` }) => {
           <p className="">
             <span className="font-semibold">City:</span>{" "}
             {getDynamicProp("City")}
+          </p>
+          <p className="">
+            <span className="font-semibold">UID:</span>{" "}
+            <strong className="">{getDynamicProp("Id")}</strong>
+          </p>
+          <p className="">
+            Joined:{" "}
+            {getDynamicProp("DateJoined") !== "N/A"
+              ? new Date(getDynamicProp("DateJoined")).toLocaleDateString(
+                  "en-US"
+                )
+              : "N/A"}
           </p>
         </div>
       </div>

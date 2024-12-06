@@ -8,7 +8,7 @@ import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 
 const BarcodePage = () => {
-  const { formData, fetchBarcodes } = useGlobalState();
+  const { formData, fetchBarcodes, getToken } = useGlobalState();
   const Products = formData?.barcodes || []; // Ensure it's an array
 
   const [barcodeCount, setBarcodeCount] = useState(10); // Default to 50
@@ -34,9 +34,7 @@ const BarcodePage = () => {
 
   // Handle barcode generation
   const generateBarcodes = async () => {
-    const token =
-      localStorage.getItem("adminAuthToken") ||
-      sessionStorage.getItem("adminAuthToken");
+    const token = getToken(`admin`);
     if (!token) {
       toast.error("Authorization token is missing!");
       return;

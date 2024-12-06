@@ -6,8 +6,9 @@ import { toast } from "react-toastify";
 import ProfilePage from "@/components/reusables/dynamicProfile/Profile";
 
 const Page = () => {
-  const { formData, setFormData, adminToken } = useGlobalState();
+  const { formData, setFormData, getToken } = useGlobalState();
   const admin = 'admin'
+  const adminToken = getToken(`admin`)
   const routeId = formData.adminEmail
 
   const fetchUserData = useCallback(async () => {

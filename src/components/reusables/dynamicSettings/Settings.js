@@ -4,14 +4,13 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useGlobalState } from "@/app/GlobalStateProvider";
 import { toast } from "react-toastify";
-import { LoaderStyle5Component } from "@/components/Loader/Loader";
 import { useRouter } from "next/navigation";
 import { Textinput } from "@/components/inputs/Textinput";
 import { ButtonTwo } from "../buttons/Buttons";
 
 const Settings = ({ prop = "user", route = `/profile/profile`, token }) => {
   const back = useRouter();
-  const { formData, setFormData } = useGlobalState();
+  const { formData, setFormData, fetchUserData } = useGlobalState();
 
   const [form, setForm] = useState({
     first_name: "",
@@ -112,7 +111,11 @@ const Settings = ({ prop = "user", route = `/profile/profile`, token }) => {
 
       setFormData((prev) => ({ ...prev, ...response.data }));
       toast.success("Profile updated successfully!");
-      setForm(response.data);
+      if (response.status === 201 || response.status === 200){
+        fetchUserData()
+      back.push(route);
+      }
+      // setForm(response.data);
     } catch (error) {
       console.error(
         "Error updating profile:",
@@ -121,7 +124,6 @@ const Settings = ({ prop = "user", route = `/profile/profile`, token }) => {
       toast.error("Failed to update profile.");
     } finally {
       setIsSubmitting(false);
-      back.push(route);
     }
   };
 
@@ -167,7 +169,7 @@ const Settings = ({ prop = "user", route = `/profile/profile`, token }) => {
             )}
           </div>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {/* <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
           <div className="col-span-2">
             <Textinput
               id={`email`}
@@ -199,9 +201,9 @@ const Settings = ({ prop = "user", route = `/profile/profile`, token }) => {
               <span className="text-red-500 text-sm">{errors.phone}</span>
             )}
           </div>
-        </div>
+        </div> */}
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 items-center">
           <div>
             <select
               id="gender"
@@ -212,9 +214,15 @@ const Settings = ({ prop = "user", route = `/profile/profile`, token }) => {
               value={form.gender || ""}
               onChange={handleInputChange}
             >
-              <option value="">Select Gender</option>
-              <option value="MALE">Male</option>
-              <option value="FEMALE">Female</option>
+              <option value="" className="text-blue-600">
+                Select Gender
+              </option>
+              <option value="MALE" className="text-blue-600">
+                Male
+              </option>
+              <option value="FEMALE" className="text-blue-600">
+                Female
+              </option>
             </select>
             {errors.gender && (
               <span className="text-red-500 text-sm">{errors.gender}</span>
@@ -237,7 +245,7 @@ const Settings = ({ prop = "user", route = `/profile/profile`, token }) => {
             )}
           </div>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
           <div>
             <Textinput
               id={`country`}
@@ -290,7 +298,7 @@ const Settings = ({ prop = "user", route = `/profile/profile`, token }) => {
             )}
           </div>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
           <div>
             <Textinput
               id={`state`}
@@ -324,9 +332,9 @@ const Settings = ({ prop = "user", route = `/profile/profile`, token }) => {
 
           <div>
             <Textinput
-              id={`zipcode`}
+              id={`zip_code`}
               label={`Zipcode`}
-              type={`text`}
+              type={`number`}
               className={`mt-1 block w-full bg-transparent p-3 border rounded-lg shadow-sm ${
                 errors.zip_code ? "border-red-500" : "border-gray-300"
               }`}

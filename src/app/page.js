@@ -3,10 +3,8 @@ import DynamicImage from "@/components/reusables/DynamicImage/DynamicImage";
 import { useGlobalState } from "./GlobalStateProvider";
 import { ButtonOne, ButtonTwo } from "@/components/reusables/buttons/Buttons";
 import { Heart, ShoppingCart } from "lucide-react";
-import Image from "next/image";
 import Link from "next/link";
-import { Loader } from "@/components/Loader/Loader";
-import { PopOver, PopOverFour } from "@/components/reusables/popover/PopOver";
+import { Loader, LoaderStyle5Component } from "@/components/Loader/Loader";
 
 export default function Home() {
   const { formData, addToEndpoint, loading, fetchProducts } = useGlobalState(); // Access global state
@@ -25,6 +23,7 @@ export default function Home() {
   };
 
   const groupedProducts = groupProductsByCategory(products); // Grouped products
+  
 
  const handleAddToCart = (productId) => {
    addToEndpoint({
@@ -53,7 +52,8 @@ export default function Home() {
         </h1>
 
         {/* Iterate over grouped products */}
-        {Object.entries(groupedProducts).map(([category, items], ind) => (
+        {products.length === 0 ? <LoaderStyle5Component/> : 
+        Object.entries(groupedProducts).map(([category, items], ind) => (
           <div key={ind}>
             <h2 className="text-xl md:text-3xl font-bold mb-5">{category}</h2>
             <div className="flex gap-x-5 min-w-full overflow-x-auto scrollbar-none pb-16 scroll-snap-x scroll-snap-mandatory">

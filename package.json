@@ -11,8 +11,8 @@
   "dependencies": {
     "@headlessui/react": "^2.2.0",
     "@mui/material": "^5.16.8",
+    "@popperjs/core": "^2.11.8",
     "axios": "^1.7.8",
-    "flowbite": "^2.5.2",
     "i18next": "^24.0.2",
     "jsbarcode": "^3.11.6",
     "lucide-react": "^0.460.0",

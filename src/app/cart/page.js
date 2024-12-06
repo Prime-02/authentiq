@@ -7,13 +7,13 @@ const Cart = () => {
   useEffect(()=>{
     fetchCart()
   }, [fetchCart])
-  const cart = formData?.cart
+  const cart = formData.cart ?? []
   return (
     <div className="flex p-12 w-full justify-between mx-auto flex-col md:flex-row gap-4 h-screen ">
       <section className="  w-1/2">
         <h1 className="text-2xl md:text-4xl ">Shopping Cart</h1>
         <ul>
-        {cart?.map((cart, index) => (
+        {cart.map((cart, index) => (
             <li key={index}>
               <span>{cart.id}</span>
               <span>{cart.product_id}</span>

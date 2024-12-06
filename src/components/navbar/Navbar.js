@@ -16,7 +16,7 @@ import Modal from "../Modal/Modal";
 import { Textinput } from "../inputs/Textinput";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { useGlobalState } from "@/app/GlobalStateProvider";
+import { useGlobalState,} from "@/app/GlobalStateProvider";
 import { FaSignOutAlt } from "react-icons/fa";
 import { toast } from "react-toastify";
 import axios from "axios";
@@ -40,7 +40,7 @@ const Navbar = () => {
   const [adminPassword, setAdminPassword] = useState("");
   const [auth, setAuth] = useState(true);
   const [loading, setLoading] = useState(false);
-  const { formData } = useGlobalState(); // Access global state
+  const { formData, getToken, Clear, SignOut } = useGlobalState(); // Access global state
   const userFirstName = formData.userFirstName ? formData.userFirstName : "";
     const wishlistItems = formData.wishlist || [];
     const cartItems = formData.cart || [];
@@ -68,16 +68,6 @@ const Navbar = () => {
     setIsDropdownOpen(!isDropdownOpen);
   };
 
-  const Clear = () => {
-    localStorage.removeItem("userAuthToken");
-    sessionStorage.removeItem("userAuthToken");
-    alert(`cleared`);
-  };
-  const SignOut = () => {
-    localStorage.removeItem("userAuthToken");
-    sessionStorage.removeItem("userAuthToken");
-    window.location.reload();
-  };
 
   const openModal = (type) => {
     setModalType(type); // Set the type of modal to display
@@ -173,6 +163,7 @@ const Navbar = () => {
           autoClose: 5000,
         });
 
+        
         // Reset form fields
         setFirstName("");
         setLastName("");
@@ -264,9 +255,7 @@ const Navbar = () => {
 
   useEffect(() => {
     // Check if 'userAuthToken' exists in localStorage
-    const token =
-      localStorage.getItem("userAuthToken") ||
-      sessionStorage.getItem("userAuthToken");
+    const token = getToken(`user`)
 
     if (token && token !== "") {
       setAuth(true); // Set auth to true if token is found
@@ -361,10 +350,8 @@ const Navbar = () => {
               className="cursor-pointer py-2 flex items-center relative gap-x-2"
             >
               <ShoppingBag />
-              <span className="absolute bottom-2 right-0 text-xs bg-blue-600 text-white flex items-center justify-center w-4 h-4 rounded-full">
-                <h2 className="text">
+              <span className="absolute bottom-2 right-0 text-[10px] bg-blue-600 text-white flex items-center justify-center w-3 h-3 rounded-full">
                   {cartItems.length > 100 ? "100+" : cartItems.length}
-                </h2>
               </span>
             </Link>
             <Link
@@ -372,7 +359,7 @@ const Navbar = () => {
               className="cursor-pointer relative py-2 flex items-center gap-x-2"
             >
               <Heart />
-              <span className="absolute bottom-2 right-0 text-xs bg-blue-600 text-white flex items-center justify-center w-4 h-4 rounded-full">
+              <span className="absolute bottom-2 right-0 text-[10px] bg-blue-600 text-white flex items-center justify-center w-3 h-3 rounded-full">
                 <h2 className="text">
                   {wishlistItems.length > 100 ? "100+" : wishlistItems.length}
                 </h2>

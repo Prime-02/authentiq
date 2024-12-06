@@ -18,7 +18,7 @@ export const Textinput = ({ label, type, value, changed, className, placeholder,
         }
         onChange={changed}
         id={id}
-        className={`${className} block px-2.5 pb-2.5 pt-4 w-full text-sm bg-transparent  border-1 border-gray-300 appearance-none  rounded-lg dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer`}
+        className={`${className} block px-2.5 pb-2.5 pt-4 w-full text-sm bg-transparent  border-1 border-gray-300 appearance-none  dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer`}
         placeholder=" "
       />
       <label

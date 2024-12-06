@@ -6,9 +6,10 @@ import Settings from "../../../components/reusables/dynamicSettings/Settings";
 import { useGlobalState } from "@/app/GlobalStateProvider";
 
 const Page = () => {
-  const {userToken} = useGlobalState()
+  const {getToken} = useGlobalState()
   const pathname = usePathname(); // Get the current path
   const user = 'user'
+  const userToken = getToken(`user`)
   const pages = [
     { link: "profile", component: <Profile prop={user} /> },
     {

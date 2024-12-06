@@ -1,16 +1,15 @@
+'use client'
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 
 export const CategoryDropdown = ({ onCategorySelect }) => {
   const [categories, setCategories] = useState([]);
+  const {adminToken} = useGlobalState()
   const [selectedCategory, setSelectedCategory] = useState("");
 
   // Get adminAuthToken from storage
   const getAuthToken = () => {
-    return (
-      localStorage.getItem("adminAuthToken") ||
-      sessionStorage.getItem("adminAuthToken")
-    );
+    return adminToken;
   };
 
   // Fetch categories from the API
@@ -63,16 +62,14 @@ export const CategoryDropdown = ({ onCategorySelect }) => {
 import { Plus } from "lucide-react";
 import { toast } from "react-toastify";
 import { Textinput } from "./Textinput";
+import { useGlobalState } from "@/app/GlobalStateProvider";
 
 export const AddCategory = ({ onCategoryAdded }) => {
   const [newCategory, setNewCategory] = useState("");
 
   // Get adminAuthToken from storage
   const getAuthToken = () => {
-    return (
-      localStorage.getItem("adminAuthToken") ||
-      sessionStorage.getItem("adminAuthToken")
-    );
+    return adminToken;
   };
 
   // Handle adding a new category

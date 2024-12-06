@@ -1,25 +1,22 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import Image from "next/image";
 import { TextArea, Textinput } from "@/components/inputs/Textinput";
 import { CheckBoxList } from "@/components/inputs/CheckBox";
 import Modal from "@/components/Modal/Modal";
 import { FileInput } from "@/components/inputs/FIleInput";
 import { toast } from "react-toastify";
-import {
-  AddCategory,
-  CategoryDropdown,
-} from "@/components/inputs/CategoryDropdown";
+import { AddCategory, CategoryDropdown } from "@/components/inputs/CategoryDropdown";
 import { useGlobalState } from "@/app/GlobalStateProvider";
-import BarcodeDropdown from "@/components/inputs/BarcodeDropdown";
 import DynamicImage from "@/components/reusables/DynamicImage/DynamicImage";
+import BarcodeDropdown from "@/components/inputs/BarcodeDropdown";
+import { LoaderStyle5Component } from "@/components/Loader/Loader";
 
 const ProductTable = () => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const { formData } = useGlobalState();
+  const { formData, getToken } = useGlobalState();
 
   // Modal state and product data for editing
   const [prodModal, setProdModal] = useState(false);
@@ -39,7 +36,7 @@ const ProductTable = () => {
   };
 
   // Available sizes for checkboxes
-  const sizeOptions = ["XS","S", "M", "FS", "L", "XL"];
+  const sizeOptions = ["XS", "S", "M", "FS", "L", "XL"];
 
   // Fetch products from the API
   const fetchProducts = () => {
@@ -58,28 +55,29 @@ const ProductTable = () => {
     fetchProducts();
   }, []);
 
-  if (loading) return <p className="text-center">Loading...</p>;
+  if (loading) return <div className="text-center">
+    <LoaderStyle5Component/>
+  </div>;
   if (error) return <p className="text-center text-red-600">{error}</p>;
 
- const handleEdit = (product) => {
-   setProdId(product.id); // Store productId when editing
-   setProdName(product.name);
-   setProdImg(`https://isans.pythonanywhere.com${product.image}`);
-   setProdPrice(product.price);
-   setProdDesc(product.description);
-   setProdCategory(product.category);
-   setProdQuantity(product.quantity);
+  const handleEdit = (product) => {
+    setProdId(product.id); // Store productId when editing
+    setProdName(product.name);
+    setProdImg(`https://isans.pythonanywhere.com${product.image}`);
+    setProdPrice(product.price);
+    setProdDesc(product.description);
+    setProdCategory(product.category);
+    setProdQuantity(product.quantity);
 
-   // Create initial variant checkboxes
-   const initialVariants = sizeOptions.map((size) => ({
-     size,
-     checked: product.sizes?.includes(size) || false, // Mark as checked if the size exists in the product's sizes array
-   }));
+    // Create initial variant checkboxes
+    const initialVariants = sizeOptions.map((size) => ({
+      size,
+      checked: product.sizes?.includes(size) || false, // Mark as checked if the size exists in the product's sizes array
+    }));
 
-   setProdVariants(initialVariants);
-   setProdModal(true);
- };
-
+    setProdVariants(initialVariants);
+    setProdModal(true);
+  };
 
   // Handle form submission (e.g., updating the product)
   const editProduct = (e) => {
@@ -104,10 +102,7 @@ const ProductTable = () => {
     }
 
     // Check if user is logged in
-    const token =
-      localStorage.getItem("adminAuthToken") ||
-      sessionStorage.getItem("adminAuthToken");
-
+    const token = getToken(`admin`);
     if (!token) {
       toast.warning("You must be logged in to edit products.");
       return;
@@ -124,7 +119,7 @@ const ProductTable = () => {
     formData.append("price", prodPrice);
     formData.append("description", prodDesc);
     formData.append("category", prodCategory);
-    formData.append("sizes", selectedSizes); // Convert to JSON if API expects it this way
+    formData.append("sizes", selectedSizes.join(`, `)); // Convert to JSON if API expects it this way
     formData.append("quantity", prodQuantity);
 
     if (prodImg && prodImg instanceof File) {
@@ -134,6 +129,7 @@ const ProductTable = () => {
       toast.error("Please upload a valid image file.");
       return;
     }
+console.log(selectedSizes.join(`, `));
 
     // Make the API request to update the product
     axios
@@ -169,7 +165,6 @@ const ProductTable = () => {
       )
     );
   };
-
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
@@ -333,13 +328,13 @@ const ProductTable = () => {
             />
           </section>
 
-          {/* <section>
+          <section>
             <CategoryDropdown onCategorySelect={setProdCategory} />
             <BarcodeDropdown
               products={Barcodes} // Pass the product list with barcode codes
               onSelectBarcode={handleBarcodeSelect} // Handler to update the selected barcode
             />
-          </section> */}
+          </section>
 
           <section>
             <CheckBoxList

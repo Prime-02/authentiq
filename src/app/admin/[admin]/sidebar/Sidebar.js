@@ -21,7 +21,7 @@ const Sidebar = () => {
 
   const formattedPath = pathname.replace(/\//g, " > ").replace(/^ > /, "");
 
-  const { formData } = useGlobalState(); // Access global state
+  const { formData, adminToken } = useGlobalState(); // Access global state
   const adminFirstName = formData.adminFirstName
     ? formData.adminFirstName
     : "admin"; // Extract adminFirstName from formData
@@ -66,8 +66,7 @@ const Sidebar = () => {
   };
 
   const LogoutUser = () => {
-    localStorage.removeItem("authToken");
-    sessionStorage.removeItem("authToken");
+   adminToken
     setShowLogoutModal(false);
   };
 

@@ -9,18 +9,45 @@ import React, {
 import axios from "axios";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { useRouter } from "next/router";
 
 const GlobalStateContext = createContext();
 
 export const GlobalStateProvider = ({ children }) => {
+  
   const [error, setError] = useState(null);
-    const [loading, setLoading] = useState(null);
-  const userToken =
-    localStorage.getItem("userAuthToken") ||
-    sessionStorage.getItem("userAuthToken"); 
-  const adminToken =
-    localStorage.getItem("adminAuthToken") ||
-    sessionStorage.getItem("adminAuthToken"); 
+  const [userToken, setUserToken] = useState(null);
+  const [adminToken, setAdminToken] = useState(null);
+  const [loading, setLoading] = useState(null);
+    const Clear = () => {
+      localStorage.removeItem("userAuthToken");
+      sessionStorage.removeItem("userAuthToken");
+      alert(`cleared`);
+    };
+    const SignOut = () => {
+      localStorage.removeItem("userAuthToken");
+      sessionStorage.removeItem("userAuthToken");
+      window.location.reload();
+
+    };
+
+    const getToken = (type) => {
+      if (typeof window !== "undefined") {
+        if (type === "user") {
+          return (
+            localStorage.getItem("userAuthToken") ||
+            sessionStorage.getItem("userAuthToken")
+          );
+        } else if (type === "admin") {
+          return (
+            localStorage.getItem("adminAuthToken") ||
+            sessionStorage.getItem("adminAuthToken")
+          );
+        }
+      }
+      return null; // Return null if the token is not found
+    };
+
 
   const [formData, setFormData] = useState({
     userId: "",
@@ -82,10 +109,10 @@ export const GlobalStateProvider = ({ children }) => {
    }
 
    // Retrieve adminAuthToken from local or session storage
-   const token = userToken;
+   const token = getToken(`user`);
 
    if (!token) {
-     toast.warning("You need to log in to perform this action.");
+     toast.warning("You need to logged in to perform this action.");
      setLoading(null); // Ensure loading state is reset
      return;
    }
@@ -128,7 +155,7 @@ export const GlobalStateProvider = ({ children }) => {
   // Fetch user data
   const fetchUserData = useCallback(async () => {
     setLoading(`userData`)
-    const token = userToken
+    const token = getToken(`user`)
     try {
       const response = await axios.get(
         "https://isans.pythonanywhere.com/users/profile/",
@@ -170,11 +197,7 @@ export const GlobalStateProvider = ({ children }) => {
     setLoading(`cart`)
     try {
       // Retrieve the user authentication token
-      const userAuthToken = userToken;
-      if (!userAuthToken) {
-        toast.warning("Authentication token is not available. Please log in.");
-        return;
-      }
+      const userAuthToken = getToken(`user`);
 
       // Make the API request to fetch the cart data
       const response = await axios.get(
@@ -208,11 +231,7 @@ export const GlobalStateProvider = ({ children }) => {
     setLoading(`wishlist`)
     try {
       // Retrieve the user authentication token
-      const userAuthToken = userToken;
-      if (!userAuthToken) {
-        toast.warning("Authentication token is not available. Please log in.");
-        return;
-      }
+      const userAuthToken = getToken(`user`);
 
       // Make the API request to fetch the cart data
       const response = await axios.get(
@@ -271,8 +290,7 @@ export const GlobalStateProvider = ({ children }) => {
   // Fetch barcodes
   const fetchBarcodes = useCallback(async () => {
     setLoading(`barcode`)
-    const token =
-      adminToken
+    const token = getToken(`admin`)
     try {
       const response = await axios.get(
         "https://isans.pythonanywhere.com/shop/barcode/",
@@ -304,10 +322,10 @@ export const GlobalStateProvider = ({ children }) => {
 
   useEffect(() => {
     const userAuthToken =
-     userToken
+     getToken(`user`)
 
     if (userAuthToken ) {
-      fetchUserData(userToken);
+      fetchUserData();
       fetchWishlist()
     }
   }, []); // Dependency array is empty to ensure it runs only on mount
@@ -331,6 +349,10 @@ export const GlobalStateProvider = ({ children }) => {
           fetchCart,
           fetchWishlist,
           fetchBarcodes, // Provide the function to access barcodes
+          Clear,
+          SignOut,
+          getToken,
+          fetchUserData
         }}
       >
         {children}

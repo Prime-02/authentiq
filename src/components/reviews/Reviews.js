@@ -2,10 +2,12 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { toast } from "react-toastify"; // Ensure toast is imported
+import { useGlobalState } from "@/app/GlobalStateProvider";
 
 const Reviews = ({ id }) => {
   const [reviews, setReviews] = useState([]);
   const [loading, setLoading] = useState(true);
+  const {userToken} = useGlobalState()
   const [error, setError] = useState(null);
   const [newReview, setNewReview] = useState({ rating: "", comment: "" });
 
@@ -55,9 +57,7 @@ const Reviews = ({ id }) => {
     e.preventDefault();
     console.log("Submitting new review...", newReview);
 
-    const userAuthToken =
-      localStorage.getItem("userAuthToken") ||
-      sessionStorage.getItem("userAuthToken");
+    const userAuthToken = userToken
 
     if (!userAuthToken) {
       console.error("User authorization token not found.");
