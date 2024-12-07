@@ -109,20 +109,18 @@ const Layout = ({ children }) => {
      formData.append("category", prodCategory);
      formData.append("quantity", prodQuantity);
      formData.append("barcode", selectedBarcode);
-
-     // Filter and join selected sizes into a string with double quotes
+     // Filter and collect the selected sizes into an array
      const selectedSizes = prodVariants
-       .filter((variant) => variant.checked)
-       .map((variant) => `"${variant.label}"`) // Add double quotes around each size
-       .join(", "); // Join them with commas (e.g., '"S", "L", "XL"')
+       .filter((variant) => variant.checked) // Get the selected sizes
+       .map((variant) => variant.label); // Collect only the label values (e.g., "S", "L", "M")
 
      // Log the selected sizes for debugging
      console.log("Selected Sizes:", selectedSizes);
 
-     if (selectedSizes) {
-       formData.append("size", selectedSizes); // Append as a single string
+     if (selectedSizes.length > 0) {
+       formData.append("sizes", JSON.stringify(selectedSizes)); // Append the sizes as a JSON array string
      } else {
-       console.log("No sizes selected."); // Log if no sizes were selected
+       console.log("No sizes selected.");
      }
 
      const adminAuthToken = getToken(`admin`);
