@@ -16,7 +16,7 @@ import Modal from "../Modal/Modal";
 import { Textinput } from "../inputs/Textinput";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { useGlobalState,} from "@/app/GlobalStateProvider";
+import { useGlobalState } from "@/app/GlobalStateProvider";
 import { FaSignOutAlt } from "react-icons/fa";
 import { toast } from "react-toastify";
 import axios from "axios";
@@ -42,8 +42,8 @@ const Navbar = () => {
   const [loading, setLoading] = useState(false);
   const { formData, getToken, Clear, SignOut } = useGlobalState(); // Access global state
   const userFirstName = formData.userFirstName ? formData.userFirstName : "";
-    const wishlistItems = formData.wishlist || [];
-    const cartItems = formData.cart || [];
+  const wishlistItems = formData.wishlist || [];
+  const cartItems = formData.cart || [];
   const profileNav = {
     profileName: `${userFirstName} ${formData.userLastName}.`,
     navigations: [
@@ -67,7 +67,6 @@ const Navbar = () => {
   const toggleDropdown = () => {
     setIsDropdownOpen(!isDropdownOpen);
   };
-
 
   const openModal = (type) => {
     setModalType(type); // Set the type of modal to display
@@ -163,7 +162,6 @@ const Navbar = () => {
           autoClose: 5000,
         });
 
-        
         // Reset form fields
         setFirstName("");
         setLastName("");
@@ -252,10 +250,9 @@ const Navbar = () => {
     }
   };
 
-
   useEffect(() => {
     // Check if 'userAuthToken' exists in localStorage
-    const token = getToken(`user`)
+    const token = getToken(`user`);
 
     if (token && token !== "") {
       setAuth(true); // Set auth to true if token is found
@@ -351,7 +348,7 @@ const Navbar = () => {
             >
               <ShoppingBag />
               <span className="absolute bottom-2 right-0 text-[10px] bg-blue-600 text-white flex items-center justify-center w-3 h-3 rounded-full">
-                  {cartItems.length > 100 ? "100+" : cartItems.length}
+                {cartItems.length > 100 ? "100+" : cartItems.length}
               </span>
             </Link>
             <Link
@@ -438,6 +435,7 @@ const Navbar = () => {
                 className="cursor-pointer py-2 flex items-center gap-x-2"
               >
                 <ShoppingBag size={15} /> Cart
+                <h2>{cartItems.length > 100 ? "100+" : cartItems.length}</h2>
               </Link>
               <Link
                 href={`/wishlist`}
