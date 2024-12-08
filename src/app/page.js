@@ -60,7 +60,8 @@ export default function Home() {
               {items.map((product) => (
                 <div
                   key={product.id}
-                  className="flex-shrink-0 flex flex-col min-h-full items-center justify-between p-5 card relative shadow-2xl overflow-hidden rounded-lg scroll-snap-align-start"
+                  className="flex-shrink-0 flex flex-col min-h-full items-center justify-between p-5 card relative shadow-2xl overflow-hidden rounded-lg w-full 
+                  sm:w-1/2 md:w-1/3 lg:w-1/4 scroll-snap-align-start"
                 >
                   <span className="absolute top-2 right-2 cursor-pointer">
                     {loading === `wishlist${product.id}` ? (

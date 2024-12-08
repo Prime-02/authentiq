@@ -18,6 +18,8 @@ export const GlobalStateProvider = ({ children }) => {
   const [userToken, setUserToken] = useState(null);
   const [adminToken, setAdminToken] = useState(null);
   const [loading, setLoading] = useState(null);
+  const [modal, setModal] = useState(false);
+  const [modalType, setModalType] = useState(null); // Determines which modal to show
   const Clear = () => {
     localStorage.removeItem("userAuthToken");
     sessionStorage.removeItem("userAuthToken");
@@ -103,8 +105,8 @@ export const GlobalStateProvider = ({ children }) => {
     const token = getToken(`user`);
 
     if (!token) {
-      toast.warning("You need to logged in to perform this action.");
-      setLoading(null); // Ensure loading state is reset
+      openModal(`login`); // Ensure loading state is reset
+      setLoading(null);
       return;
     }
 
@@ -361,7 +363,7 @@ export const GlobalStateProvider = ({ children }) => {
   const DeleteProduct = async (id) => {
     // Start loading state
     console.log(id);
-    
+
     setLoading(`deleting_product`);
 
     const token = getToken(`admin`);
@@ -401,6 +403,10 @@ export const GlobalStateProvider = ({ children }) => {
     }
   };
 
+  const openModal = (type) => {
+    setModalType(type); // Set the type of modal to display
+    setModal(true); // Open modal
+  };
 
   useEffect(() => {
     const userAuthToken = getToken(`user`);
@@ -436,6 +442,11 @@ export const GlobalStateProvider = ({ children }) => {
           fetchUserData,
           deleteItem,
           DeleteProduct,
+          modal,
+          setModal,
+          modalType,
+          setModalType,
+          openModal,
         }}
       >
         {children}

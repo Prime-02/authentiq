@@ -25,8 +25,6 @@ import { PopOver } from "../reusables/popover/PopOver";
 const Navbar = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [profile, setProfile] = useState(false);
-  const [modal, setModal] = useState(false);
-  const [modalType, setModalType] = useState(null); // Determines which modal to show
   const [loginPassword, setLoginPassword] = useState("");
   const [signUpPassword, setSignUpPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -39,8 +37,18 @@ const Navbar = () => {
   const [adminEmail, setAdminEmail] = useState("");
   const [adminPassword, setAdminPassword] = useState("");
   const [auth, setAuth] = useState(true);
-  const [loading, setLoading] = useState(false);
-  const { formData, getToken, Clear, SignOut } = useGlobalState(); // Access global state
+  const [Loading, setLoading] = useState(false);
+  const {
+    formData,
+    getToken,
+    Clear,
+    SignOut,
+    modal,
+    setModal,
+    modalType,
+    setModalType,
+    openModal,
+  } = useGlobalState(); // Access global state
   const userFirstName = formData.userFirstName ? formData.userFirstName : "";
   const wishlistItems = formData.wishlist || [];
   const cartItems = formData.cart || [];
@@ -68,10 +76,7 @@ const Navbar = () => {
     setIsDropdownOpen(!isDropdownOpen);
   };
 
-  const openModal = (type) => {
-    setModalType(type); // Set the type of modal to display
-    setModal(true); // Open modal
-  };
+ 
 
   const closeModal = () => {
     setModal(false); // Close modal
@@ -285,7 +290,7 @@ const Navbar = () => {
                     userFirstName ? (
                       <strong>{userFirstName.charAt(0).toUpperCase()}</strong>
                     ) : (
-                      <User />
+                      <User size={25} className="translate-y-1"/>
                     )
                   }
                   heading={
@@ -346,7 +351,7 @@ const Navbar = () => {
               href={`/cart`}
               className="cursor-pointer py-2 flex items-center relative gap-x-2"
             >
-              <ShoppingBag />
+              <ShoppingBag size={25} />
               <span className="absolute bottom-2 right-0 text-[10px] bg-blue-600 text-white flex items-center justify-center w-3 h-3 rounded-full">
                 {cartItems.length > 100 ? "100+" : cartItems.length}
               </span>
@@ -355,7 +360,7 @@ const Navbar = () => {
               href={`/wishlist`}
               className="cursor-pointer relative py-2 flex items-center gap-x-2"
             >
-              <Heart />
+              <Heart size={25} />
               <span className="absolute bottom-2 right-0 text-[10px] bg-blue-600 text-white flex items-center justify-center w-3 h-3 rounded-full">
                 <h2 className="text">
                   {wishlistItems.length > 100 ? "100+" : wishlistItems.length}
@@ -454,8 +459,8 @@ const Navbar = () => {
       {/* Single Modal for Login, SignUp, and Forgot Password */}
       <Modal
         clickedTitle={Clear}
-        loading={loading}
-        disabled={loading}
+        Loading={Loading}
+        disabled={Loading}
         title={
           modalType === "login"
             ? "Login"
@@ -484,7 +489,7 @@ const Navbar = () => {
             : "Submit"
         }
         subChildren={
-          modalType === "login" ? (
+          modalType === "login" ?  (
             <span className="text-center gap-x-2 items-center justify-center flex text-sm">
               <p>Don't have an account?</p>
               <span
