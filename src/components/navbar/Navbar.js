@@ -284,67 +284,13 @@ const Navbar = () => {
             </span>
             <span className="text- rounded-full text-2xl h-10 w-10 flex items-center justify-center cursor-pointer">
               <div>
-                <PopOver
-                  placement="bottom"
-                  button={
-                    userFirstName ? (
-                      <strong>{userFirstName.charAt(0).toUpperCase()}</strong>
-                    ) : (
-                      <User size={25} className="translate-y-1"/>
-                    )
-                  }
-                  heading={
-                    auth ? (
-                      <h2 className="font-bold text">
-                        {profileNav.profileName}
-                      </h2>
-                    ) : (
-                      "Not Logged In"
-                    )
-                  }
-                  content={
-                    auth ? (
-                      <>
-                        <div className="flex flex-col text-base  space-y-5 mb-3">
-                          {profileNav.navigations.map((nav, ind) => (
-                            <Link
-                              href={nav.href}
-                              key={ind}
-                              className="flex gap-x-2 items-center hover:underline"
-                            >
-                              <span>{nav.icon}</span>
-                              <span>{nav.nav}</span>
-                            </Link>
-                          ))}
-                        </div>
-                        <span className="my-5">
-                          <ButtonTwo
-                            buttonValue={`Sign Out`}
-                            iconValue={<FaSignOutAlt size={15} />}
-                            Clicked={SignOut}
-                          />
-                        </span>
-                      </>
-                    ) : (
-                      !auth && (
-                        <span className="flex gap-x-3">
-                          <span>
-                            <ButtonOne
-                              buttonValue={`Login`}
-                              Clicked={() => openModal("login")}
-                            />
-                          </span>
-                          <span>
-                            <ButtonTwo
-                              buttonValue={`Sign up`}
-                              Clicked={() => openModal("signup")}
-                            />
-                          </span>
-                        </span>
-                      )
-                    )
-                  }
-                />
+                {userFirstName ? (
+                  <Link href={`/profile/${userFirstName? userFirstName : 'user'}`}>
+                  <strong>{userFirstName.charAt(0).toUpperCase()}</strong>
+                  </Link>
+                ) : (
+                  <User size={25} className="translate-y-1" onClick={()=>openModal(`login`)}/>
+                )}
               </div>
             </span>
             <Link
@@ -352,20 +298,24 @@ const Navbar = () => {
               className="cursor-pointer py-2 flex items-center relative gap-x-2"
             >
               <ShoppingBag size={25} />
+              {cartItems.length > 0 &&(
               <span className="absolute bottom-2 right-0 text-[10px] bg-blue-600 text-white flex items-center justify-center w-3 h-3 rounded-full">
                 {cartItems.length > 100 ? "100+" : cartItems.length}
               </span>
+              )}
             </Link>
             <Link
               href={`/wishlist`}
               className="cursor-pointer relative py-2 flex items-center gap-x-2"
             >
               <Heart size={25} />
-              <span className="absolute bottom-2 right-0 text-[10px] bg-blue-600 text-white flex items-center justify-center w-3 h-3 rounded-full">
-                <h2 className="text">
-                  {wishlistItems.length > 100 ? "100+" : wishlistItems.length}
-                </h2>
-              </span>
+              {wishlistItems.length > 0 && (
+                <span className="absolute bottom-2 right-0 text-[10px] bg-blue-600 text-white flex items-center justify-center w-3 h-3 rounded-full">
+                  <h2 className="text">
+                    {wishlistItems.length > 100 ? `100+` : wishlistItems.length}
+                  </h2>
+                </span>
+              )}
             </Link>
           </section>
         </div>
@@ -440,7 +390,9 @@ const Navbar = () => {
                 className="cursor-pointer py-2 flex items-center gap-x-2"
               >
                 <ShoppingBag size={15} /> Cart
-                <h2>{cartItems.length > 100 ? "100+" : cartItems.length}</h2>
+                {cartItems.length > 0 && (
+                  <h2>{cartItems.length > 100 ? "100+" : cartItems.length}</h2>
+                )}
               </Link>
               <Link
                 href={`/wishlist`}
@@ -448,7 +400,13 @@ const Navbar = () => {
               >
                 <Heart size={15} /> Wishlist
                 <span>
-                  <h2 className="text">{wishlistItems.length}</h2>
+                  {wishlistItems.length > 0 && (
+                    <h2 className="text">
+                      {wishlistItems.length > 100
+                        ? `100+`
+                        : wishlistItems.length}
+                    </h2>
+                  )}
                 </span>
               </Link>
             </div>
@@ -489,7 +447,7 @@ const Navbar = () => {
             : "Submit"
         }
         subChildren={
-          modalType === "login" ?  (
+          modalType === "login" ? (
             <span className="text-center gap-x-2 items-center justify-center flex text-sm">
               <p>Don't have an account?</p>
               <span

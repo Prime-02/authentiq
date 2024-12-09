@@ -47,10 +47,10 @@ export const PopOver = ({
           role="menu"
           className="absolute z-10 w-64 h-auto text-sm transition-opacity duration-300 bg-white border border-gray-200 rounded-lg shadow-md dark:bg-gray-800 dark:border-gray-600"
         >
-          <div className="px-3 py-2 border-b border-gray-200 rounded-t-lg dark:border-gray-600">
+          <div className="px-3 py-2 border-b border-gray-200 rounded-t-lg dark:border-gray-600 text-slate-800">
             <div className="font-semibold">{heading}</div>
           </div>
-          <div className="px-3 py-2">
+          <div className="px-3 py-2 text-slate-800">
             <div>{content}</div>
           </div>
         </div>

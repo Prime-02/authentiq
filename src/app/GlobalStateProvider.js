@@ -68,6 +68,7 @@ export const GlobalStateProvider = ({ children }) => {
     wishlist: [],
     wishlistNo: 0,
     userCartNo: 0,
+    userOrderHistory: [],
 
     // Admin-specific fields
     adminId: "",
@@ -408,12 +409,52 @@ export const GlobalStateProvider = ({ children }) => {
     setModal(true); // Open modal
   };
 
+  const fetchOrderHistory = useCallback(async () => {
+    setLoading(`cart`);
+    try {
+      // Retrieve the user authentication token
+      const userAuthToken = getToken(`user`);
+
+      // Make the API request to fetch the cart data
+      const response = await axios.get(
+        "https://isans.pythonanywhere.com/shop/order-history/",
+        {
+          headers: {
+            Authorization: `Bearer ${userAuthToken}`,
+          },
+        }
+      );
+
+      // Validate and update the cart data
+      const userOrderHistory = response.data || []; // Fallback to an empty array if 'orderHistory' is undefined
+      setFormData((prevState) => ({
+        ...prevState,
+        userOrderHistory,
+        orderHistoryNo: userOrderHistory.length, // Optional: Update the orderHistory count
+      }));
+
+      console.log("Order history retrieved:", userOrderHistory);
+    } catch (error) {
+      console.error(
+        "Error fetching orderHistory data:",
+        error.message || error
+      );
+      const errorMessage =
+        error.response?.data?.message || "Unable to fetch orderHistory data.";
+      toast.error(errorMessage);
+    } finally {
+      setLoading(null);
+    }
+  }, []);
+
   useEffect(() => {
     const userAuthToken = getToken(`user`);
 
     if (userAuthToken) {
       fetchUserData();
       fetchWishlist();
+      fetchCart();
+      fetchOrderHistory();
     }
   }, []); // Dependency array is empty to ensure it runs only on mount
   useEffect(() => {
@@ -447,6 +488,7 @@ export const GlobalStateProvider = ({ children }) => {
           modalType,
           setModalType,
           openModal,
+          fetchOrderHistory,
         }}
       >
         {children}

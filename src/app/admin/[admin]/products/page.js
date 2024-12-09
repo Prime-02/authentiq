@@ -17,7 +17,8 @@ const ProductTable = () => {
   const [products, setProducts] = useState([]);
   const [Prodloading, setProdLoading] = useState(null);
   const [error, setError] = useState("");
-  const { formData, getToken, DeleteProduct, loading } = useGlobalState();
+  const { formData, getToken, DeleteProduct, loading, fetchProducts } =
+    useGlobalState();
 
   // Modal state and product data for editing
   const [prodModal, setProdModal] = useState(false);
@@ -39,20 +40,6 @@ const ProductTable = () => {
   // Available sizes for checkboxes
   const sizeOptions = ["XS", "S", "M", "FS", "L", "XL"];
 
-  // Fetch products from the API
-  const fetchProducts = () => {
-        setProdLoading(`fetch`);
-    axios
-      .get("https://isans.pythonanywhere.com/shop/get-products/")
-      .then((response) => {
-        setProducts(response.data);
-        setProdLoading(null)
-      })
-      .catch((error) => {
-        setError("Failed to load products" + error);
-        setProdLoading(null);
-      });
-  };
   useEffect(() => {
     fetchProducts();
   }, []);
@@ -218,7 +205,7 @@ console.log(selectedSizes.join(`, `));
             </tr>
           </thead>
           <tbody>
-            {products.map((product) => (
+            {formData.products.map((product) => (
               <tr key={product.id} className="border-t">
                 <td className="px-4 py-2">{product.id}</td>
                 <td className="px-4 py-2">{product.name}</td>

@@ -33,7 +33,7 @@ const Wishlist = () => {
             key={index}
             className="flex relative flex-row w-full justify-start gap-x-12   mx-auto border-b border-gray-400 py-5"
           >
-            <div className=" w-1/2 h-72 flex items-center justify-center card rounded-lg">
+            <div className=" w-1/2 h-72 flex items-center justify-center card rounded-lg overflow-hidden">
               <DynamicImage
                 prop={item.product.image}
                 prod={item.product.name}

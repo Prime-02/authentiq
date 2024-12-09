@@ -27,13 +27,15 @@ const Layout = ({ children }) => {
   const [prodQuantity, setProdQuantity] = useState("");
   const [selectedBarcode, setSelectedBarcode] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [prodVariants, setProdVariants] = useState([
-    { id: "sm", label: "S", value: "small", checked: false },
-    { id: "md", label: "M", value: "medium", checked: false },
-    { id: "lg", label: "L", value: "large", checked: false },
-    { id: "xl", label: "XL", value: "extra-large", checked: false },
-    { id: "xxl", label: "XXL", value: "extra-extra-large", checked: false },
-  ]);
+ const [prodVariants, setProdVariants] = useState([
+   { id: "xs", label: "XS", value: "extra-small", checked: false },
+   { id: "sm", label: "S", value: "small", checked: false },
+   { id: "md", label: "M", value: "medium", checked: false },
+   { id: "fs", label: "FS", value: "free-size", checked: false },
+   { id: "lg", label: "L", value: "large", checked: false },
+   { id: "xl", label: "XL", value: "extra-large", checked: false },
+ ]);
+
   const routeId = formData.adminFirstName.replace(/\s+/g, "_");
   const Barcodes = formData?.barcodes || [];
 
@@ -80,8 +82,8 @@ const Layout = ({ children }) => {
   };
 
  const addProduct = async (e) => {
-   e.preventDefault();
    setLoading(true);
+   e.preventDefault();
 
    // Validate mandatory fields
    if (
@@ -118,7 +120,10 @@ const Layout = ({ children }) => {
      console.log("Selected Sizes:", selectedSizes);
 
      if (selectedSizes.length > 0) {
-       formData.append("sizes", JSON.stringify(selectedSizes)); // Append the sizes as a JSON array string
+       // Join the selected sizes into a comma-separated string
+       const sizesString = selectedSizes.join(",");
+       formData.append("sizes", sizesString); // Append the sizes as a comma-separated string
+       console.log("Uploaded Sizes:", sizesString);
      } else {
        console.log("No sizes selected.");
      }

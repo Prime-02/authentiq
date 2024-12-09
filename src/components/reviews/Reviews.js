@@ -1,94 +1,105 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { toast } from "react-toastify"; // Ensure toast is imported
+import { toast } from "react-toastify";
 import { useGlobalState } from "@/app/GlobalStateProvider";
+import { Plus } from "lucide-react";
+import Modal from "../Modal/Modal";
+import { TextArea } from "../inputs/Textinput";
 
 const Reviews = ({ id }) => {
   const [reviews, setReviews] = useState([]);
   const [loading, setLoading] = useState(true);
-  const {userToken} = useGlobalState()
+  const { getToken } = useGlobalState();
   const [error, setError] = useState(null);
-  const [newReview, setNewReview] = useState({ rating: "", comment: "" });
+  const [newReview, setNewReview] = useState({ rating: 0 });
+  const userToken = getToken(`user`);
+  const [modal, setModal] = useState(false);
+  const [comment, setComment] = useState("");
 
   useEffect(() => {
     const fetchReviews = async () => {
-      console.log("Fetching reviews started...");
-      console.log(`Product ID: ${id}`);
-
       try {
-        console.log("Sending GET request to fetch reviews...");
         const response = await axios.get(
-          `https://isans.pythonanywhere.com/shop/see-reviews/${id}`
+          `https://isans.pythonanywhere.com/shop/see-reviews/${id}/`
         );
-
-        console.log("Response received:", response);
         if (response.status === 200) {
-          console.log("Successfully fetched reviews.");
           setReviews(response.data.reviews || []);
+        } else if (response.status === 404) {
+          setReviews([]); // No reviews found
         } else {
-          console.error("Unexpected response status:", response.status);
           setError("Failed to fetch reviews.");
           toast.error("Failed to fetch reviews. Please try again.");
         }
       } catch (err) {
-        console.error("Error occurred while fetching reviews:", err);
-        setError("Failed to fetch reviews.");
-        toast.error("Unable to load reviews. Please try again.");
+        if (err.response && err.response.status === 404) {
+          setReviews([]); // Handle 404 as no reviews
+        } else {
+          setError("Failed to fetch reviews.");
+          toast.error("Unable to load reviews. Please try again.");
+        }
       } finally {
-        console.log("Fetching reviews process completed.");
         setLoading(false);
       }
     };
-
-    console.log("useEffect triggered. Calling fetchReviews...");
     fetchReviews();
   }, [id]);
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
+  const handleStarClick = (rating) => {
     setNewReview((prev) => ({
       ...prev,
-      [name]: name === "rating" ? parseInt(value, 10) : value, // Convert rating to integer
+      rating,
     }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Submitting new review...", newReview);
-
-    const userAuthToken = userToken
-
-    if (!userAuthToken) {
-      console.error("User authorization token not found.");
+    if (!userToken) {
       toast.error("You must be logged in to submit a review.");
       return;
     }
-
     try {
       const response = await axios.post(
         `https://isans.pythonanywhere.com/shop/add-reviews/${id}/`,
-        newReview,
+        { rating: newReview.rating, comment },
         {
           headers: {
-            Authorization: `Bearer ${userAuthToken}`,
+            Authorization: `Bearer ${userToken}`,
             "Content-Type": "application/json",
           },
         }
       );
-
-      console.log("Response from adding review:", response);
       if (response.status === 201) {
         toast.success("Review added successfully!");
         setReviews((prev) => [...prev, response.data]);
-        setNewReview({ rating: "", comment: "" }); // Reset form
+        setNewReview({ rating: 0 });
+        setComment(""); // Reset comment state
       } else {
         toast.error("Failed to add review. Please try again.");
       }
     } catch (err) {
-      console.error("Error while submitting review:", err);
       toast.error("Unable to submit review. Please try again.");
     }
+  };
+
+  const renderStars = (rating, setRating) => {
+    return (
+      <div className="flex">
+        {[1, 2, 3, 4, 5].map((star) => (
+          <span
+            key={star}
+            onClick={() => setRating(star)}
+            style={{
+              cursor: "pointer",
+              color: star <= rating ? "#FFD700" : "#ddd",
+              fontSize: "1.5rem",
+            }}
+          >
+            ★
+          </span>
+        ))}
+      </div>
+    );
   };
 
   if (loading) {
@@ -96,57 +107,86 @@ const Reviews = ({ id }) => {
   }
 
   if (error) {
+    return <div>{error}</div>;
   }
 
   return (
-    <div className="w-full h-screen">
-      <h3>Product Reviews</h3>
-      <div>Total Reviews: {reviews.length}</div>
-      <ul>
-        {reviews.map((review) => (
-          <li key={review.id}>
-            <strong>{review.user_first_name}</strong> (Rating: {review.rating})
-            <p>{review.comment}</p>
-            <small>{new Date(review.created_at).toLocaleString()}</small>
-          </li>
-        ))}
-      </ul>
+    <div className="card p-6 rounded-lg shadow-md ">
+      {/* Reviews Header */}
+      <div className="pb-4 mb-4 flex w-full justify-between">
+        <span>
+          <h3 className="text-2xl font-bold ">Review on this Product</h3>
+          <p>
+            Total Reviews: <span className="font-medium">{reviews.length}</span>
+          </p>
+        </span>
+        {userToken && (
+          <span
+            className="flex gap-x-4 cursor-pointer"
+            onClick={() => setModal(!modal)}
+          >
+            <p className="hidden md:flex">Add a review</p>
+            <p>
+              <Plus />
+            </p>
+          </span>
+        )}
+      </div>
 
-      <h4>Add a Review</h4>
-      <form onSubmit={handleSubmit} className="border">
+      {/* No Reviews Message */}
+      {reviews.length === 0 ? (
+        <div className="text-center text-gray-500">
+          No reviews for this product yet.
+        </div>
+      ) : (
+        <ul className="space-y-6 w-full">
+          {reviews.map((review) => (
+            <li key={review.id} className="pb-4 last:border-none">
+              <div className="flex flex-col items-start gap-x-8 w-full">
+                <span className="flex gap-x-3">
+                  <span className="border text-center flex items-center justify-center w-12 h-12 rounded-full text-3xl font-extrabold">
+                    {review.user_first_name.charAt(0).toUpperCase()}
+                  </span>
+                  <span>
+                    <h1 className="text-lg font-bold">
+                      {review.user_first_name}
+                    </h1>
+                    <small className="text-sm">
+                      {new Date(review.created_at).toLocaleString()}
+                    </small>
+                    <span>{renderStars(review.rating)}</span>
+                    <p className="mt-2">{review.comment}</p>
+                  </span>
+                </span>
+              </div>
+            </li>
+          ))}
+        </ul>
+      )}
+
+      <Modal
+        isOpen={modal}
+        onClose={() => setModal(!modal)}
+        onSubmit={handleSubmit}
+        buttonValue={`Submit Review`}
+        title={`Review & Rating`}
+      >
         <div>
-          <label>
-            Rating:
-            <select
-              name="rating"
-              value={newReview.rating}
-              onChange={handleInputChange}
-              required
-            >
-              <option value="" disabled>
-                Select Rating
-              </option>
-              {[1, 2, 3, 4, 5].map((num) => (
-                <option key={num} value={num}>
-                  {num}
-                </option>
-              ))}
-            </select>
-          </label>
+          <label className="block font-medium">Rating:</label>
+          <div className="flex">
+            {renderStars(newReview.rating, handleStarClick)}
+          </div>
         </div>
         <div>
-          <label>
-            Comment:
-            <textarea
-              name="comment"
-              value={newReview.comment}
-              onChange={handleInputChange}
-              required
-            />
-          </label>
+          <TextArea
+            id={`comments`}
+            label="Comment"
+            value={comment}
+            changed={(e) => setComment(e.target.value)}
+            className="w-full p-3 border rounded-lg focus:outline-none"
+          />
         </div>
-        <button type="submit">Submit Review</button>
-      </form>
+      </Modal>
     </div>
   );
 };

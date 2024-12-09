@@ -7,10 +7,19 @@ import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
 import { Textinput } from "@/components/inputs/Textinput";
 import { ButtonTwo } from "../buttons/Buttons";
+import Link from "next/link";
 
 const Settings = ({ prop = "user", route = `/profile/profile`, token }) => {
   const back = useRouter();
-  const { formData, setFormData, fetchUserData } = useGlobalState();
+  const { formData, setFormData, fetchUserData, } = useGlobalState();
+  const nav = useRouter()
+  const SignOut = () => {
+    localStorage.removeItem("userAuthToken");
+    sessionStorage.removeItem("userAuthToken");
+    // window.location.reload();
+    nav.push(`/`)
+  };
+
 
   const [form, setForm] = useState({
     first_name: "",
@@ -128,15 +137,37 @@ const Settings = ({ prop = "user", route = `/profile/profile`, token }) => {
   };
 
   return (
-    <div className="max-w-3xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
-      <h1 className="text-3xl font-semibold text-center mb-6">Edit Profile</h1>
+    <div className="max-w-3xl mx-auto py-8  px-4 sm:px-6 lg:px-8">
       <form
         onSubmit={handleSubmit}
-        className="space-y-6 card p-6 rounded-lg shadow-lg"
+        className="space-y-6 card p-8  relative rounded-lg shadow-lg"
       >
+        <header className="flex mb-6 justify-between items-center">
+          <Link
+            href={`/`}
+            className="text-xs underline hover:text-blue-600 cursor-pointer"
+          >
+            Back
+          </Link>
+          <h1 className="text-3xl font-semibold text-center ">Profile</h1>
+          <span
+            className="text-xs underline hover:text-blue-600 cursor-pointer"
+            onClick={() => SignOut()}
+          >
+            Log Out
+          </span>
+        </header>
         {/* Form fields */}
-        <div className="grid grid-cols-1">
-          <div>
+        <div className="flex flex-wrap items-center gap-5 w-full">
+          {/* Initial Letter Avatar */}
+          <div className="flex-shrink-0 flex items-center justify-center">
+            <span className="border text-center flex items-center justify-center w-16 h-16 sm:w-20 sm:h-20 lg:w-24 lg:h-24 rounded-full text-4xl sm:text-5xl lg:text-6xl font-extrabold">
+              {form.first_name.charAt(0).toUpperCase()}
+            </span>
+          </div>
+
+          {/* First Name Input */}
+          <div className="flex-1 min-w-[150px]">
             <Textinput
               id={`first_name`}
               label={`First Name`}
@@ -151,9 +182,9 @@ const Settings = ({ prop = "user", route = `/profile/profile`, token }) => {
               <span className="text-red-500 text-sm">{errors.first_name}</span>
             )}
           </div>
-        </div>
-        <div className="grid grid-cols-1">
-          <div>
+
+          {/* Last Name Input */}
+          <div className="flex-1 min-w-[150px]">
             <Textinput
               id={`last_name`}
               label={`Last Name`}
@@ -165,10 +196,11 @@ const Settings = ({ prop = "user", route = `/profile/profile`, token }) => {
               changed={handleInputChange}
             />
             {errors.last_name && (
-              <span className="text-red-500 text-sm">{errors.first_name}</span>
+              <span className="text-red-500 text-sm">{errors.last_name}</span>
             )}
           </div>
         </div>
+
         {/* <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
           <div className="col-span-2">
             <Textinput
