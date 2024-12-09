@@ -56,7 +56,7 @@ const AdminOrdersPage = () => {
   }, []);
 
   return (
-    <div className="min-w-[90rem] mx-auto py-8 px-4 sm:px-6 lg:px-8">
+    <div className=" mx-auto py-8 px-4 sm:px-6 lg:px-8">
       <h2 className="text-2xl font-semibold mb-6">Admin Orders</h2>
 
       {loading ? (
@@ -64,7 +64,7 @@ const AdminOrdersPage = () => {
       ) : orders.length > 0 ? (
         <div>
           {/* Orders Table */}
-          <table className="min-w-full border-collapse border border-gray-300">
+          <table className="min-w-[90rem] border-collapse border border-gray-300">
             <thead>
               <tr className="card">
                 <th className="border border-gray-300 px-4 py-2 text-left text-sm font-medium ">
