@@ -69,6 +69,7 @@ export const GlobalStateProvider = ({ children }) => {
     wishlistNo: 0,
     userCartNo: 0,
     userOrderHistory: [],
+    category: [],
 
     // Admin-specific fields
     adminId: "",
@@ -115,7 +116,7 @@ export const GlobalStateProvider = ({ children }) => {
       // API request payload
       const payload = {
         product_id: productId, // Dynamic key
-        quantity: quantity || 1, // Default to 1 if quantity is not provided
+        quantity: quantity || 30, // Default to 1 if quantity is not provided
       };
 
       // Send POST request to the API
@@ -255,30 +256,48 @@ export const GlobalStateProvider = ({ children }) => {
     }
   }, []);
 
-  // Fetch products
-  const fetchProducts = useCallback(async () => {
-    setLoading(`products`);
-    try {
-      const response = await axios.get(
-        "https://isans.pythonanywhere.com/shop/get-products/"
-      );
+ 
+  const fetchProducts = useCallback(
+    async (filter = { name: "", category: "" }) => {
+      setLoading(`products`);
+      try {
+        const response = await axios.get(
+          "https://isans.pythonanywhere.com/shop/get-products/"
+        );
 
-      if (response.status === 200) {
-        const products = response.data || [];
-        setFormData((prevState) => ({
-          ...prevState,
-          products,
-        }));
-      } else {
-        toast.error("Failed to fetch products. Please try again.");
+        if (response.status === 200) {
+          const products = response.data || [];
+
+          // Apply filtering based on name or category
+          const filteredProducts = products.filter((product) => {
+            const matchesName = filter.name
+              ? product.name?.toLowerCase().includes(filter.name.toLowerCase())
+              : true; // Safe access with `?`
+            const matchesCategory = filter.category
+              ? product.category?.toLowerCase() ===
+                filter.category.toLowerCase()
+              : true;
+
+            return matchesName && matchesCategory;
+          });
+
+          setFormData((prevState) => ({
+            ...prevState,
+            products: filteredProducts,
+          }));
+        } else {
+          toast.error("Failed to fetch products. Please try again.");
+        }
+      } catch (err) {
+        setError("Failed to fetch products.");
+        toast.error("Unable to load products. Please try again."); // Uncommented this
+      } finally {
+        setLoading(null);
       }
-    } catch (err) {
-      setError("Failed to fetch products.");
-      // toast.error("Unable to load products. Please try again.");
-    } finally {
-      setLoading(null);
-    }
-  }, []);
+    },
+    [setFormData, setLoading, setError] // Added dependencies
+  );
+
 
   // Fetch barcodes
   const fetchBarcodes = useCallback(async () => {
@@ -404,6 +423,20 @@ export const GlobalStateProvider = ({ children }) => {
     }
   };
 
+   const fetchCategories = async () => {
+     try {
+       const response = await axios.get(
+         "https://isans.pythonanywhere.com/shop/getcategory/"
+       );
+        setFormData((prevState) => ({
+          ...prevState,
+          category: response.data,
+        }));
+     } catch (error) {
+       console.error("Error fetching categories:", error);
+     }
+   };
+
   const openModal = (type) => {
     setModalType(type); // Set the type of modal to display
     setModal(true); // Open modal
@@ -458,6 +491,7 @@ export const GlobalStateProvider = ({ children }) => {
     }
   }, []); // Dependency array is empty to ensure it runs only on mount
   useEffect(() => {
+    fetchCategories()
     fetchProducts();
   }, []);
 
@@ -466,6 +500,7 @@ export const GlobalStateProvider = ({ children }) => {
       <ToastContainer />
       <GlobalStateContext.Provider
         value={{
+          fetchCategories,
           formData,
           loading,
           fetchProducts,

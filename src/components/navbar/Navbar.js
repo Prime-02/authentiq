@@ -20,7 +20,7 @@ import { useGlobalState } from "@/app/GlobalStateProvider";
 import { FaSignOutAlt } from "react-icons/fa";
 import { toast } from "react-toastify";
 import axios from "axios";
-import { PopOver } from "../reusables/popover/PopOver";
+import Dropdown from "../inputs/DynamicDropdown";
 
 const Navbar = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -37,6 +37,7 @@ const Navbar = () => {
   const [adminEmail, setAdminEmail] = useState("");
   const [adminPassword, setAdminPassword] = useState("");
   const [auth, setAuth] = useState(true);
+  const [searchTwo, setSearchTwo] = useState("");
   const [Loading, setLoading] = useState(false);
   const {
     formData,
@@ -48,10 +49,13 @@ const Navbar = () => {
     modalType,
     setModalType,
     openModal,
+    fetchProducts,
   } = useGlobalState(); // Access global state
   const userFirstName = formData.userFirstName ? formData.userFirstName : "";
   const wishlistItems = formData.wishlist || [];
   const cartItems = formData.cart || [];
+  const category = formData.category;
+
   const profileNav = {
     profileName: `${userFirstName} ${formData.userLastName}.`,
     navigations: [
@@ -75,8 +79,6 @@ const Navbar = () => {
   const toggleDropdown = () => {
     setIsDropdownOpen(!isDropdownOpen);
   };
-
- 
 
   const closeModal = () => {
     setModal(false); // Close modal
@@ -266,30 +268,64 @@ const Navbar = () => {
     }
   }, []);
 
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    // setSearchTwo(e.target.value);
+    fetchProducts({ name: searchTwo });
+  };
+
+  const fiterAll = () => {
+    fetchProducts({ name: "", category: "" });
+  };
+
+  // Handle category selection
+  const handleCategorySelect = (selectedCategory) => {
+    // Call fetchProducts with the selected category
+    fetchProducts({ category: selectedCategory });
+  };
+
   return (
     <>
       <nav className="fixed top-0 w-full py-5 flex items-center justify-center backdrop-blur-lg z-50">
         <div className="w-[80%] mx-auto hidden md:flex flex-row items-center justify-between">
-          <section className="flex flex-row justify-evenly gap-x-5">
+          <section className="flex flex-row justify-evenly items-center gap-x-5">
             <span onClick={() => openModal("admin")} className="cursor-pointer">
               Logo
             </span>
-            <span>All</span>
-            <span>Tees</span>
-            <span>Accessories</span>
+            <span onClick={fiterAll}>All</span>
+            <Dropdown
+              options={category} // Replace this with your actual category data
+              onSelect={handleCategorySelect}
+              tag="category"
+              placeholder="Categories"
+              valueKey="name" // Assuming categories have an `id` property
+              displayKey="name" // Assuming categories have a `name` property
+              className=""
+              emptyMessage="No categories available"
+            />
           </section>
           <section className="flex flex-row justify-evenly items-center gap-x-5">
             <span>
-              <SearchTwo />
+              <SearchTwo
+                searchTwo={searchTwo}
+                onChange={(e) => setSearchTwo(e.target.value)}
+                handleSubmit={handleSubmit}
+              />
             </span>
             <span className="text- rounded-full text-2xl h-10 w-10 flex items-center justify-center cursor-pointer">
               <div>
                 {userFirstName ? (
-                  <Link href={`/profile/${userFirstName? userFirstName : 'user'}`}>
-                  <strong>{userFirstName.charAt(0).toUpperCase()}</strong>
+                  <Link
+                    href={`/profile/${userFirstName ? userFirstName : "user"}`}
+                  >
+                    <strong>{userFirstName.charAt(0).toUpperCase()}</strong>
                   </Link>
                 ) : (
-                  <User size={25} className="translate-y-1" onClick={()=>openModal(`login`)}/>
+                  <User
+                    size={25}
+                    className="translate-y-1"
+                    onClick={() => openModal(`login`)}
+                  />
                 )}
               </div>
             </span>
@@ -298,10 +334,10 @@ const Navbar = () => {
               className="cursor-pointer py-2 flex items-center relative gap-x-2"
             >
               <ShoppingBag size={25} />
-              {cartItems.length > 0 &&(
-              <span className="absolute bottom-2 right-0 text-[10px] bg-blue-600 text-white flex items-center justify-center w-3 h-3 rounded-full">
-                {cartItems.length > 100 ? "100+" : cartItems.length}
-              </span>
+              {cartItems.length > 0 && (
+                <span className="absolute bottom-2 right-0 text-[10px] bg-blue-600 text-white flex items-center justify-center w-3 h-3 rounded-full">
+                  {cartItems.length > 100 ? "100+" : cartItems.length}
+                </span>
               )}
             </Link>
             <Link
@@ -330,9 +366,27 @@ const Navbar = () => {
         {isDropdownOpen && (
           <div className="absolute top-full left-0 w-full card border-t shadow-lg md:hidden h-auto">
             <div className="flex flex-col px-5 py-4">
-              <span className="cursor-pointer py-2">
-                <Search category={cat} />
-              </span>
+              <div className="flex items-center w-full">
+                <span className="cursor-pointer py-2">
+                  <Dropdown
+                    options={category} // Replace this with your actual category data
+                    onSelect={handleCategorySelect}
+                    tag="category"
+                    placeholder="Categories"
+                    valueKey="name" // Assuming categories have an `id` property
+                    displayKey="name" // Assuming categories have a `name` property
+                    className=""
+                    emptyMessage="No categories available"
+                  />
+                </span>
+                <span>
+                  <SearchTwo
+                    searchTwo={searchTwo}
+                    onChange={(e) => setSearchTwo(e.target.value)}
+                    handleSubmit={handleSubmit}
+                  />
+                </span>
+              </div>
               <hr className="my-2" />
               <span
                 onClick={() => setProfile(!profile)}

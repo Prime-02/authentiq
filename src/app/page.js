@@ -52,78 +52,86 @@ export default function Home() {
         </h1>
 
         {/* Iterate over grouped products */}
-        {products.length === 0 ? <LoaderStyle5Component/> : 
-        Object.entries(groupedProducts).map(([category, items], ind) => (
-          <div key={ind}>
-            <h2 className="text-xl md:text-3xl font-bold mb-5">{category}</h2>
-            <div className="flex gap-x-5 min-w-full overflow-x-auto scrollbar-none pb-16 scroll-snap-x scroll-snap-mandatory">
-              {items.map((product) => (
-                <div
-                  key={product.id}
-                  className="flex-shrink-0 flex flex-col min-h-full items-center justify-between p-5 card relative shadow-2xl overflow-hidden rounded-lg w-full 
+        {products.length === 0 ? (
+          <div className="w-full h-screen flex-col gap-y-12 flex items-center">
+            <LoaderStyle5Component />
+            <p>
+              No Item
+            </p>
+          </div>
+        ) : (
+          Object.entries(groupedProducts).map(([category, items], ind) => (
+            <div key={ind}>
+              <h2 className="text-xl md:text-3xl font-bold mb-5">{category}</h2>
+              <div className="flex gap-x-5 min-w-full overflow-x-auto scrollbar-none pb-16 scroll-snap-x scroll-snap-mandatory">
+                {items.map((product) => (
+                  <div
+                    key={product.id}
+                    className="flex-shrink-0 flex flex-col min-h-full items-center justify-between p-5 card relative shadow-2xl overflow-hidden rounded-lg w-full 
                   sm:w-1/2 md:w-1/3 lg:w-1/4 scroll-snap-align-start"
-                >
-                  <span className="absolute top-2 right-2 cursor-pointer">
-                    {loading === `wishlist${product.id}` ? (
-                      <Loader smaillerSize={true} />
-                    ) : (
-                      <Heart
-                        size={20}
-                        onClick={() => handleAddToWishlist(product.id)}
-                      />
-                    )}
-                  </span>
-
-                  {/* Image */}
-                  <Link
-                    href={`/product/${product.name
-                      .toLowerCase()
-                      .replace(/\s+/g, "-")}`}
-                    passHref
-                    className="rounded-lg  flex items-center justify-center flex-1"
                   >
-                    <DynamicImage
-                      className={`object-cover drop-shadow-2xl hover:scale-90 transition w-auto h-auto`}
-                      width={250}
-                      height={250}
-                      prod={product.name}
-                      prop={product.image}
-                    />
-                  </Link>
-                  <div className="w-full flex flex-col items-start justify-between">
+                    <span className="absolute top-2 right-2 cursor-pointer">
+                      {loading === `wishlist${product.id}` ? (
+                        <Loader smaillerSize={true} />
+                      ) : (
+                        <Heart
+                          size={20}
+                          onClick={() => handleAddToWishlist(product.id)}
+                        />
+                      )}
+                    </span>
+
+                    {/* Image */}
                     <Link
                       href={`/product/${product.name
                         .toLowerCase()
                         .replace(/\s+/g, "-")}`}
                       passHref
-                      className="flex text-start flex-col "
+                      className="rounded-lg  flex items-center justify-center flex-1"
                     >
-                      {/* Title */}
-                      <figcaption className="mt-4 text-lg font-bold">
-                        {product.name}
-                      </figcaption>
-                    </Link>
-
-                    <span className="flex justify-between w-full items-end mt-8">
-                      <p className="text-base font-semibold">
-                        ${product.price}
-                      </p>
-                      <ButtonTwo
-                        disabled={
-                          loading === `cart${product.id}` ? true : false
-                        }
-                        className={`rounded-md`}
-                        iconValue={<ShoppingCart size={15} />}
-                        buttonValue={`Add to Cart`}
-                        Clicked={() => handleAddToCart(product.id)}
+                      <DynamicImage
+                        className={`object-cover drop-shadow-2xl hover:scale-90 transition w-auto h-auto`}
+                        width={250}
+                        height={250}
+                        prod={product.name}
+                        prop={product.image}
                       />
-                    </span>
+                    </Link>
+                    <div className="w-full flex flex-col items-start justify-between">
+                      <Link
+                        href={`/product/${product.name
+                          .toLowerCase()
+                          .replace(/\s+/g, "-")}`}
+                        passHref
+                        className="flex text-start flex-col "
+                      >
+                        {/* Title */}
+                        <figcaption className="mt-4 text-lg font-bold">
+                          {product.name}
+                        </figcaption>
+                      </Link>
+
+                      <span className="flex justify-between w-full items-end mt-8">
+                        <p className="text-base font-semibold">
+                          ${product.price}
+                        </p>
+                        <ButtonTwo
+                          disabled={
+                            loading === `cart${product.id}` ? true : false
+                          }
+                          className={`rounded-md`}
+                          iconValue={<ShoppingCart size={15} />}
+                          buttonValue={`Add to Cart`}
+                          Clicked={() => handleAddToCart(product.id)}
+                        />
+                      </span>
+                    </div>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
-          </div>
-        ))}
+          ))
+        )}
       </div>
     </main>
   );

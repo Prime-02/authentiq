@@ -9,10 +9,19 @@ import { toast } from "react-toastify";
 
 const BarcodePage = () => {
   const { formData, fetchBarcodes, getToken } = useGlobalState();
-  const Products = formData?.barcodes || []; // Ensure it's an array
+  const allProducts = formData?.barcodes || []; // Ensure it's an array
 
-  const [barcodeCount, setBarcodeCount] = useState(10); // Default to 50
+  const [barcodeCount, setBarcodeCount] = useState(10); // Default to 10
   const [loading, setLoading] = useState(false);
+  const [filterStatus, setFilterStatus] = useState("all"); // Default to 'all'
+
+  // Filter products based on the selected status
+  const filteredProducts =
+    filterStatus === "all"
+      ? allProducts
+      : allProducts.filter(
+          (product) => product.status.toLowerCase() === filterStatus
+        );
 
   // Generate and download barcode
   const generateAndDownloadBarcode = (value, name) => {
@@ -56,9 +65,9 @@ const BarcodePage = () => {
             Authorization: `Bearer ${token}`, // Use the token for authorization
           },
           body: JSON.stringify({ start, count }),
-        }        
+        }
       );
-        console.log(response);
+
       if (response.status === 200 || response.status === 201) {
         // Fetch the updated barcode data and refresh the page
         await fetchBarcodes(); // Assuming this function fetches the latest barcode data
@@ -74,9 +83,9 @@ const BarcodePage = () => {
     }
   };
 
-  useEffect(()=>{
-    fetchBarcodes()
-  })
+  useEffect(() => {
+    fetchBarcodes();
+  }, [fetchBarcodes]);
 
   return (
     <div className="container mx-auto p-4">
@@ -109,20 +118,34 @@ const BarcodePage = () => {
         </button>
       </div>
 
+      {/* Barcode Table */}
       <div className="overflow-x-auto">
-        {Products.length > 0 ? (
+        {filteredProducts.length > 0 ? (
           <table className="min-w-full table-auto border-collapse border border-gray-300 text-left">
             <thead>
               <tr className="bg-gray-100">
                 <th className="px-4 py-2 border-b">ID</th>
                 <th className="px-4 py-2 border-b">Code</th>
-                <th className="px-4 py-2 border-b">Status</th>
+                <th className="px-4 py-2 border-b">
+                  <div className="">
+                    <select
+                      id="filterStatus"
+                      value={filterStatus}
+                      onChange={(e) => setFilterStatus(e.target.value)}
+                      className="bg-transparent outline-none"
+                    >
+                      <option value="all">All</option>
+                      <option value="unused">Unused</option>
+                      <option value="used">Used</option>
+                    </select>
+                  </div>
+                </th>
                 <th className="px-4 py-2 border-b">Barcode</th>
                 <th className="px-4 py-2 border-b text-center">Actions</th>
               </tr>
             </thead>
             <tbody>
-              {Products.map((product, index) => (
+              {filteredProducts.map((product) => (
                 <tr key={product.id} className="hover:bg-gray-50">
                   <td className="px-4 py-2 border-b">{product.id}</td>
                   <td className="px-4 py-2 border-b">{product.code}</td>
@@ -145,7 +168,7 @@ const BarcodePage = () => {
             </tbody>
           </table>
         ) : (
-          <p className="text-center text-gray-500">No products available.</p>
+          <p className="text-center text-gray-500">No barcodes available.</p>
         )}
       </div>
     </div>

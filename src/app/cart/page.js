@@ -85,9 +85,9 @@ const Cart = () => {
         </Link>
       </header>
       <div
-        className={`flex flex-col ${
+        className={`flex ${
           groupedCart.length > 0 ? "flex-col-reverse" : "flex-col"
-        } md:flex-row p-6 md:p-12 w-full md:w-[90%] justify-between mx-auto gap-6 h-auto min-h-screen`}
+        } md:flex-row p-6 md:p-12 w-full md:w-full justify-between mx-auto gap-6 h-auto min-h-screen`}
       >
         {/* Order Summary Section */}
         {groupedCart.length > 0 && (

@@ -1,6 +1,6 @@
 "use client";
-import { useGlobalState, } from "@/app/GlobalStateProvider";
-import BarcodeDropdown from "@/components/inputs/BarcodeDropdown";
+import { useGlobalState } from "@/app/GlobalStateProvider";
+import BarcodeDropdown from "@/components/inputs/DynamicDropdown";
 import { CategoryDropdown } from "@/components/inputs/CategoryDropdown";
 import { CheckBoxList } from "@/components/inputs/CheckBox";
 import { FileInput } from "@/components/inputs/FIleInput";
@@ -11,10 +11,10 @@ import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
-
+import Dropdown from "@/components/inputs/DynamicDropdown";
 
 const Layout = ({ children }) => {
-  const { formData, getToken, fetchProducts, fetchBarcodes } =
+  const { formData, getToken, fetchProducts, fetchBarcodes, fetchCategories } =
     useGlobalState();
   const [products, setProducts] = useState([]);
   const [prodModal, setProdModal] = useState(false);
@@ -27,14 +27,18 @@ const Layout = ({ children }) => {
   const [prodQuantity, setProdQuantity] = useState("");
   const [selectedBarcode, setSelectedBarcode] = useState(null);
   const [loading, setLoading] = useState(false);
- const [prodVariants, setProdVariants] = useState([
-   { id: "xs", label: "XS", value: "extra-small", checked: false },
-   { id: "sm", label: "S", value: "small", checked: false },
-   { id: "md", label: "M", value: "medium", checked: false },
-   { id: "fs", label: "FS", value: "free-size", checked: false },
-   { id: "lg", label: "L", value: "large", checked: false },
-   { id: "xl", label: "XL", value: "extra-large", checked: false },
- ]);
+  const [prodVariants, setProdVariants] = useState([
+    { id: "xs", label: "XS", value: "extra-small", checked: false },
+    { id: "sm", label: "S", value: "small", checked: false },
+    { id: "md", label: "M", value: "medium", checked: false },
+    { id: "fs", label: "FS", value: "free-size", checked: false },
+    { id: "lg", label: "L", value: "large", checked: false },
+    { id: "xl", label: "XL", value: "extra-large", checked: false },
+  ]);
+
+  useEffect(() => {
+    fetchCategories();
+  }, [fetchCategories]);
 
   const routeId = formData.adminFirstName.replace(/\s+/g, "_");
   const Barcodes = formData?.barcodes || [];
@@ -66,15 +70,25 @@ const Layout = ({ children }) => {
     });
   };
 
-  // Handle file input change
-  const handleFileChange = async (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      setProdImg(file); // Save the original file
-      const webpImage = await convertToWebP(file);
-      setConvertedImg(webpImage); // Save the converted WebP image
-    }
-  };
+ const handleFileChange = async (e) => {
+   const file = e.target.files[0];
+
+   if (file) {
+     // Check if the file size is greater than 2MB (2MB = 2 * 1024 * 1024 bytes)
+     if (file.size > 2 * 1024 * 1024) {
+       // Show a toast warning
+       toast.warning(
+         "The file size exceeds the 2MB limit. Please upload a smaller file."
+       );
+       return; // Prevent setting the file
+     }
+
+     setProdImg(file); // Save the original file
+     const webpImage = await convertToWebP(file); // Convert to WebP
+     setConvertedImg(webpImage); // Save the converted WebP image
+   }
+ };
+
 
   // Toggle Modal
   const ToggleModal = () => {
@@ -105,32 +119,31 @@ const Layout = ({ children }) => {
      formData.append("name", prodName);
      formData.append("price", prodPrice);
      formData.append("description", prodDesc);
-     if (prodImg) {
-       formData.append("image", prodImg); // Only append if image is provided
+
+     if (convertedImg) {
+       // Append the WebP image instead of the original image
+       const webpBlob = dataURLtoBlob(convertedImg); // Convert WebP data URL to Blob
+       formData.append("image", webpBlob, "product-image.webp"); // Use WebP file name
+     } else if (prodImg) {
+       formData.append("image", prodImg); // Fallback to original image if WebP not available
      }
+
      formData.append("category", prodCategory);
      formData.append("quantity", prodQuantity);
      formData.append("barcode", selectedBarcode);
+
      // Filter and collect the selected sizes into an array
      const selectedSizes = prodVariants
        .filter((variant) => variant.checked) // Get the selected sizes
        .map((variant) => variant.label); // Collect only the label values (e.g., "S", "L", "M")
 
-     // Log the selected sizes for debugging
-     console.log("Selected Sizes:", selectedSizes);
-
      if (selectedSizes.length > 0) {
-       // Join the selected sizes into a comma-separated string
        const sizesString = selectedSizes.join(",");
        formData.append("sizes", sizesString); // Append the sizes as a comma-separated string
-       console.log("Uploaded Sizes:", sizesString);
-     } else {
-       console.log("No sizes selected.");
      }
 
      const adminAuthToken = getToken(`admin`);
 
-     // Make the API request using Axios
      const response = await axios.post(
        "https://isans.pythonanywhere.com/shop/products/",
        formData,
@@ -142,17 +155,7 @@ const Layout = ({ children }) => {
        }
      );
 
-     // Log the response to the console
-     console.log("API Response:", response.data);
-
-     // Show a success toast
-     if (prodImg) {
-       toast.success("Product with image added successfully!");
-     } else {
-       toast.success("Product added successfully!");
-     }
-
-     // Update the UI with the new product
+     toast.success("Product added successfully!");
      setProducts((prevProducts) => [...prevProducts, response.data]);
 
      // Reset form fields
@@ -178,10 +181,23 @@ const Layout = ({ children }) => {
    }
  };
 
+ // Helper function to convert data URL (base64 encoded) to Blob
+ const dataURLtoBlob = (dataUrl) => {
+   const byteString = atob(dataUrl.split(",")[1]);
+   const arrayBuffer = new ArrayBuffer(byteString.length);
+   const uintArray = new Uint8Array(arrayBuffer);
+
+   for (let i = 0; i < byteString.length; i++) {
+     uintArray[i] = byteString.charCodeAt(i);
+   }
+
+   return new Blob([arrayBuffer], { type: "image/webp" });
+ };
+
 
   useEffect(() => {
     fetchProducts();
-    fetchBarcodes()
+    fetchBarcodes();
   }, []);
 
   return (
@@ -273,9 +289,16 @@ const Layout = ({ children }) => {
               />
             </span>
             <div className="col-span-2 sm:col-span-1">
-              <BarcodeDropdown
-                products={Barcodes}
-                onSelectBarcode={handleBarcodeSelect}
+              <Dropdown
+                className="border border-gray-300 px-4 py-2 rounded-md"
+                options={Barcodes}
+                tag={`Barcode`}
+                onSelect={handleBarcodeSelect}
+                placeholder="Select Barcode"
+                filterFn={(product) => product.status === "unused"} // Only unused barcodes
+                valueKey="id"
+                displayKey="code"
+                emptyMessage="No unused barcodes available"
               />
             </div>
           </section>

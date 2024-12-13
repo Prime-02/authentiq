@@ -1,13 +1,11 @@
-'use client'
-
 import { ArrowDown } from "lucide-react";
 import React, { useState } from "react";
 import { IoMdArrowDropdown, IoMdSearch } from "react-icons/io";
+import { Textinput } from "./Textinput";
 
-export const Search = ({category}) => {
+export const Search = ({ category }) => {
   const [isDropdownOpen, setDropdownOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState("All categories");
-  
 
   const toggleDropdown = () => {
     setDropdownOpen((prev) => !prev);
@@ -29,12 +27,11 @@ export const Search = ({category}) => {
       <div className="flex">
         <button
           id="dropdown-button"
-          className="flex-shrink-0 z-10 inline-flex items-center py-2.5 px-4 text-sm font-medium text-center text-gray-900 bg-gray-100 border border-gray-300 rounded-s-lg hover:bg-gray-200 focus:ring-4 focus:outline-none focus:ring-gray-100 dark:bg-gray-700 dark:hover:bg-gray-600 dark:focus:ring-gray-700 dark:text-white dark:border-gray-600"
+          className="flex-shrink-0 z-10 inline-flex items-center py-2.5 px-4 text-sm font-medium text-center text-gray-900 border border-gray-300 rounded-s-lg  focus:ring-4 focus:outline-none focus:ring-gray-100 dark:bg-gray-700 dark:hover:bg-gray-600 dark:focus:ring-gray-700 dark:text-white dark:border-gray-600"
           type="button"
           onClick={toggleDropdown}
         >
-          {selectedCategory}{" "}
-         <IoMdArrowDropdown className="ml-3"/>
+          {selectedCategory} <IoMdArrowDropdown className="ml-3" />
         </button>
         {isDropdownOpen && (
           <div
@@ -46,7 +43,7 @@ export const Search = ({category}) => {
                 <li key={category}>
                   <button
                     type="button"
-                    className="inline-flex w-full px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
+                    className="inline-flex w-full px-4 py-2 bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
                     onClick={() => handleCategorySelect(category)}
                   >
                     {category}
@@ -66,9 +63,9 @@ export const Search = ({category}) => {
           />
           <button
             type="submit"
-            className="absolute top-0 end-0 p-2.5 text-sm font-medium h-full text-white bg-blue-700 rounded-e-lg border border-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+            className="absolute top-0 end-0 p-2.5 text-sm font-medium h-full text-white  rounded-e-lg border border-blue-700  focus:ring-4 focus:outline-none focus:ring-blue-300 dark:focus:ring-blue-800"
           >
-           <IoMdSearch size={20}/>
+            <IoMdSearch size={20} />
             <span className="sr-only">Search</span>
           </button>
         </div>
@@ -77,36 +74,25 @@ export const Search = ({category}) => {
   );
 };
 
-
-export const SearchTwo = () => {
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    // Add your search logic here
-    console.log("Search submitted");
-  };
-
+export const SearchTwo = ({ handleSubmit, searchTwo, onChange }) => {
   return (
-    <form className="flex items-center w-full mx-auto" onSubmit={handleSubmit}>
-      <label htmlFor="simple-search" className="sr-only">
-        Search
-      </label>
+    <form className="flex items-center w-full mx-auto border-b-2" onSubmit={handleSubmit}>
       <div className="relative w-full">
-        <input
-          type="text"
-          id="simple-search"
-          className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full  p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-          placeholder="Search..."
-          required
-        />
+       <Textinput
+       labelStyle={`bg-transparent`}
+       label={`Search`}
+       value={searchTwo}
+       changed={onChange}
+       className={`border-b`}
+       />
       </div>
       <button
         type="submit"
-        className="p-2.5 ms-2 text-sm font-medium text-white bg-blue-700 rounded-lg border border-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+        className="p-2.5 ms-2 text-sm font-medium"
       >
-        <IoMdSearch size={20}/>
+        <IoMdSearch size={20} />
         <span className="sr-only">Search</span>
       </button>
     </form>
   );
 };
-

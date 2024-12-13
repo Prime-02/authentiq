@@ -1,7 +1,7 @@
 import { Eye, EyeClosed, Image, Plus } from "lucide-react";
 import React, { useState } from "react";
 
-export const Textinput = ({ label, type, value, changed, className, placeholder, id =`floating_label` }) => {
+export const Textinput = ({ label, type, value, changed, className, labelStyle, id =`floating_label` }) => {
   const [passwordVisible, setPasswordVisible] = useState(false);
 
   const toggleShowPassword = () => {
@@ -12,7 +12,7 @@ export const Textinput = ({ label, type, value, changed, className, placeholder,
     <div className="relative">
       <input
         value={value}
-        required
+        // required
         type={
           type === "password" ? (passwordVisible ? "text" : "password") : type
         }
@@ -23,7 +23,9 @@ export const Textinput = ({ label, type, value, changed, className, placeholder,
       />
       <label
         htmlFor={id}
-        className="absolute text-sm card  dark:text-gray-400 duration-300 transhtmlForm -translate-y-4 scale-75 top-2 z-10 origin-[0]   px-2 peer-focus:px-2 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto start-1"
+        className={`absolute text-sm   dark:text-gray-400 duration-300 transhtmlForm -translate-y-4 scale-75 top-2 z-10 origin-[0]   px-2 peer-focus:px-2 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto start-1 ${
+          labelStyle ? labelStyle : `card`
+        }`}
       >
         {label}
       </label>

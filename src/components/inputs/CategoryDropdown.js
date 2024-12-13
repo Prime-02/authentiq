@@ -1,37 +1,14 @@
-'use client'
+"use client";
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 
 export const CategoryDropdown = ({ onCategorySelect }) => {
-  const [categories, setCategories] = useState([]);
-  const { getToken} = useGlobalState()
   const [selectedCategory, setSelectedCategory] = useState("");
-
-
-  // Fetch categories from the API
-  useEffect(() => {
-    const fetchCategories = async () => {
-      try {
-        const token = getToken(`admin`);
-        const response = await axios.get(
-          "https://isans.pythonanywhere.com/shop/category/",
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-        setCategories(response.data);
-      } catch (error) {
-        console.error("Error fetching categories:", error);
-      }
-    };
-    fetchCategories();
-  }, []);
+  const { formData } = useGlobalState();
+  const categories = formData.category; // Fetch categories from global state
 
   // Handle category selection
-  const handleSelect = (event) => {
-    const selectedValue = event.target.value;
+  const handleSelect = (selectedValue) => {
     setSelectedCategory(selectedValue);
 
     // Notify the parent component of the selected category
@@ -39,18 +16,19 @@ export const CategoryDropdown = ({ onCategorySelect }) => {
       onCategorySelect(selectedValue);
     }
   };
+
   return (
     <div>
-      <select value={selectedCategory} onChange={handleSelect}>
-        <option value="" disabled>
-          Select a category
-        </option>
-        {categories.map((category) => (
-          <option key={category.name} value={category.name}>
-            {category.name}
-          </option>
-        ))}
-      </select>
+      <Dropdown
+        options={categories} // Categories array from global state
+        onSelect={handleSelect} // Handle selection
+        tag="category"
+        className="border border-gray-300 px-4 py-2 rounded-md"
+        placeholder="Select a category"
+        valueKey="name" // Use `name` as the value for options
+        displayKey="name" // Use `name` as the display text for options
+        emptyMessage="No categories available" // Message when no categories are present
+      />
     </div>
   );
 };
@@ -59,6 +37,7 @@ import { Plus } from "lucide-react";
 import { toast } from "react-toastify";
 import { Textinput } from "./Textinput";
 import { useGlobalState } from "@/app/GlobalStateProvider";
+import Dropdown from "./DynamicDropdown";
 
 export const AddCategory = ({ onCategoryAdded }) => {
   const [newCategory, setNewCategory] = useState("");

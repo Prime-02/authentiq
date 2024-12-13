@@ -55,3 +55,10 @@ html[data-theme='light'] .card {
   color: var(--text-color);
   border: 1px solid var(--border-color);
 }
+
+select {
+  appearance: none; /* Standard way to hide the dropdown arrow */
+  -webkit-appearance: none; /* For WebKit browsers (Chrome, Safari, etc.) */
+  -moz-appearance: none; /* For Firefox */
+  background-image: none; /* Remove any background image that may be applied */
+}

@@ -6,10 +6,13 @@ import { CheckBoxList } from "@/components/inputs/CheckBox";
 import Modal from "@/components/Modal/Modal";
 import { FileInput } from "@/components/inputs/FIleInput";
 import { toast } from "react-toastify";
-import { AddCategory, CategoryDropdown } from "@/components/inputs/CategoryDropdown";
+import {
+  AddCategory,
+  CategoryDropdown,
+} from "@/components/inputs/CategoryDropdown";
 import { useGlobalState } from "@/app/GlobalStateProvider";
 import DynamicImage from "@/components/reusables/DynamicImage/DynamicImage";
-import BarcodeDropdown from "@/components/inputs/BarcodeDropdown";
+import BarcodeDropdown from "@/components/inputs/DynamicDropdown";
 import { Loader, LoaderStyle5Component } from "@/components/Loader/Loader";
 import { Pen, Trash } from "lucide-react";
 
@@ -44,7 +47,6 @@ const ProductTable = () => {
     fetchProducts();
   }, []);
 
-  
   if (error) return <p className="text-center text-red-600">{error}</p>;
 
   const handleEdit = (product) => {
@@ -116,7 +118,7 @@ const ProductTable = () => {
       toast.error("Please upload a valid image file.");
       return;
     }
-console.log(selectedSizes.join(`, `));
+    console.log(selectedSizes.join(`, `));
 
     // Make the API request to update the product
     axios
@@ -181,9 +183,7 @@ console.log(selectedSizes.join(`, `));
   };
   return (
     <div className="container mx-auto  p-4">
-      {Prodloading === `fetch` && (
-        <LoaderStyle5Component/>
-      )}
+      {Prodloading === `fetch` && <LoaderStyle5Component />}
       <h1 className="text-2xl font-bold text-center mb-6">Product List</h1>
       <div className="overflow-x-auto card pt-6  rounded-lg">
         <span className="">
@@ -242,7 +242,7 @@ console.log(selectedSizes.join(`, `));
                   </button>
                   <button
                     className="px-4 py-2 text-red-500  rounded hover:text-red-600 transition"
-                    onClick={()=> DeleteProduct(product.id)}
+                    onClick={() => DeleteProduct(product.id)}
                   >
                     {loading === `deleting_product` ? (
                       <Loader smaillerSize={true} />
