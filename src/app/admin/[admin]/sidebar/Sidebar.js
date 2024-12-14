@@ -13,6 +13,7 @@ import { RiSideBarLine } from "react-icons/ri";
 
 const Sidebar = () => {
   const [sideSlide, setSideSlide] = useState(false);
+  const [searchTwo, setSearchTwo] = useState("");
   const [activeLink, setActiveLink] = useState("");
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const pathname = usePathname();
@@ -21,13 +22,19 @@ const Sidebar = () => {
 
   const formattedPath = pathname.replace(/\//g, " > ").replace(/^ > /, "");
 
-  const { formData, adminToken } = useGlobalState(); // Access global state
+  const { formData, adminToken, fetchProducts } = useGlobalState(); // Access global state
   const adminFirstName = formData.adminFirstName
     ? formData.adminFirstName
     : "admin"; // Extract adminFirstName from formData
 
   // Replace spaces with hyphens in the adminFirstName
   const formattedadminFirstName = adminFirstName.replace(/\s+/g, "_");
+
+   const handleSearch = (e) => {
+     e.preventDefault();
+     // setSearchTwo(e.target.value);
+     fetchProducts({ name: searchTwo });
+   };
 
   useEffect(() => {
     const handleResize = () => {
@@ -156,14 +163,22 @@ const Sidebar = () => {
 
           {/* Middle Section */}
           <div className="flex-1 md:flex md:justify-center hidden">
-            <SearchTwo />
+            <SearchTwo
+                searchTwo={searchTwo}
+                onChange={(e) => setSearchTwo(e.target.value)}
+                handleSubmit={handleSearch}
+              />
           </div>
 
           {/* Right Section */}
           <div className="flex items-center gap-4">
             {/* Search Button (Visible on small screens) */}
             <span className="block md:hidden">
-              <SearchTwo />
+              <SearchTwo
+                searchTwo={searchTwo}
+                onChange={(e) => setSearchTwo(e.target.value)}
+                handleSubmit={handleSearch}
+              />
             </span>
 
             {/* User Icon or Initial */}

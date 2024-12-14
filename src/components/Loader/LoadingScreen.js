@@ -50,7 +50,7 @@ const FifthBar = styled(Bar)`
 
 export default function LoadingScreen() {
   return (
-    <Wrapper className='flex w-full justify-between gap-x-32'>
+    <Wrapper className='flex w-full justify-between card'>
      <LoaderStyle8Component/>
     </Wrapper>
   );

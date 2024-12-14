@@ -81,6 +81,7 @@ export const GlobalStateProvider = ({ children }) => {
     adminNotification: [],
     products: [],
     barcodes: [], // Add barcodes field
+    orders: [],
   });
 
   // Utils: Format balance
@@ -256,7 +257,6 @@ export const GlobalStateProvider = ({ children }) => {
     }
   }, []);
 
- 
   const fetchProducts = useCallback(
     async (filter = { name: "", category: "" }) => {
       setLoading(`products`);
@@ -297,7 +297,6 @@ export const GlobalStateProvider = ({ children }) => {
     },
     [setFormData, setLoading, setError] // Added dependencies
   );
-
 
   // Fetch barcodes
   const fetchBarcodes = useCallback(async () => {
@@ -423,19 +422,19 @@ export const GlobalStateProvider = ({ children }) => {
     }
   };
 
-   const fetchCategories = async () => {
-     try {
-       const response = await axios.get(
-         "https://isans.pythonanywhere.com/shop/getcategory/"
-       );
-        setFormData((prevState) => ({
-          ...prevState,
-          category: response.data,
-        }));
-     } catch (error) {
-       console.error("Error fetching categories:", error);
-     }
-   };
+  const fetchCategories = async () => {
+    try {
+      const response = await axios.get(
+        "https://isans.pythonanywhere.com/shop/getcategory/"
+      );
+      setFormData((prevState) => ({
+        ...prevState,
+        category: response.data,
+      }));
+    } catch (error) {
+      console.error("Error fetching categories:", error);
+    }
+  };
 
   const openModal = (type) => {
     setModalType(type); // Set the type of modal to display
@@ -480,6 +479,105 @@ export const GlobalStateProvider = ({ children }) => {
     }
   }, []);
 
+  // Fetch orders from API with optional filtering
+  const fetchOrders = async (filterString = "ups") => {
+    const token = getToken(`admin`);
+    setLoading(`admin_login`);
+    try {
+      const response = await axios.get(
+        "https://isans.pythonanywhere.com/shop/admin-orders/",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      let orders = response.data;
+
+      // If a filter string is provided, filter the orders
+      if (filterString.trim() !== "") {
+        const lowerCaseFilter = filterString.toLowerCase();
+        orders = orders.filter(
+          (order) =>
+            order.user_details.first_name
+              .toLowerCase()
+              .includes(lowerCaseFilter) ||
+            order.product_details.name
+              .toLowerCase()
+              .includes(lowerCaseFilter) ||
+            order.delivery_company.toLowerCase().includes(lowerCaseFilter) 
+        );
+      }
+
+      // Update the global state with filtered or unfiltered orders
+      setFormData((prevState) => ({
+        ...prevState,
+        orders,
+      }));
+    } catch (error) {
+      console.error("Error fetching orders:", error);
+      toast.error("Failed to fetch orders. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchAdminData = useCallback(async () => {
+    const adminToken = getToken(`admin`);
+    if (!adminToken) {
+      toast.error("Admin token is missing. Please log in again.");
+      return;
+    }
+
+    try {
+      const response = await axios.get(
+        "https://isans.pythonanywhere.com/users/profile/",
+        {
+          headers: {
+            Authorization: `Bearer ${adminToken}`,
+          },
+        }
+      );
+
+      // Check response status
+      if (response.status === 200 || response.status === 201) {
+        toast.success("Data fetched successfully!");
+
+        const userData = response.data?.data || {};
+        console.log("Fetched user data:", userData);
+
+        // Dynamically map the user data to formData
+        const updatedData = {
+          adminId: userData.id || "",
+          adminFirstName: userData.first_name || "",
+          adminLastName: userData.last_name || "",
+          adminEmail: userData.email || "",
+          adminGender: userData.gender || "",
+          adminPhone: userData.phone_number || "",
+          adminLocation: userData.location || "",
+          adminShippingAddress: userData.shipping_address || "",
+          adminCountry: userData.country || "",
+          adminStreetAddress: userData.street_address || "",
+          adminCity: userData.city || "",
+          adminState: userData.state || "",
+          adminZipCode: userData.zip_code || "",
+          adminDateJoined: userData.date_joined || "",
+        };
+
+        setFormData((prevState) => ({
+          ...prevState,
+          ...updatedData,
+        }));
+      } else {
+        toast.error("Failed to fetch user data.");
+      }
+    } catch (error) {
+      console.error("Error fetching user data:", error);
+      toast.error("Unable to load user data. Please try again.");
+    }
+  }, [adminToken, setFormData]);
+
   useEffect(() => {
     const userAuthToken = getToken(`user`);
 
@@ -491,13 +589,29 @@ export const GlobalStateProvider = ({ children }) => {
     }
   }, []); // Dependency array is empty to ensure it runs only on mount
   useEffect(() => {
-    fetchCategories()
+    const adminAuthToken = getToken(`admin`);
+    if (adminAuthToken) {
+      fetchAdminData();
+    }
+  }, []); // Dependency array is empty to ensure it runs only on mount
+  useEffect(() => {
+    fetchCategories();
     fetchProducts();
   }, []);
-
   return (
     <>
-      <ToastContainer />
+      <ToastContainer
+        position="top-center" // Choose your desired position
+        autoClose={5000} // Optional: default timeout
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+      />
       <GlobalStateContext.Provider
         value={{
           fetchCategories,
@@ -524,6 +638,8 @@ export const GlobalStateProvider = ({ children }) => {
           setModalType,
           openModal,
           fetchOrderHistory,
+          fetchOrders,
+          fetchAdminData,
         }}
       >
         {children}

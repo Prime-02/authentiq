@@ -64,6 +64,7 @@ export const DeliveryCompany = () => {
     setLoading(true);
     if (!selectedCompanyId) {
       toast.error("Please select a delivery company.");
+    setLoading(false);
       return;
     }
 
@@ -90,31 +91,40 @@ export const DeliveryCompany = () => {
 
     setIsSubmitting(true);
 
-    try {
-      const response = await axios.post(
-        "https://isans.pythonanywhere.com/shop/orders/",
-        orderData,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+   try {
+     const response = await axios.post(
+       "https://isans.pythonanywhere.com/shop/orders/",
+       orderData,
+       {
+         headers: {
+           "Content-Type": "application/json",
+           Authorization: `Bearer ${token}`,
+         },
+       }
+     );
 
-      if (response.status === 201 || response.status === 200) {
-        toast.success("Order confirmed successfully!");
+     if (response.status === 201 || response.status === 200) {
+       toast.success("Order confirmed successfully!");
+     }
+   } catch (error) {
+     // Handle error response
+     if (error.response) {
+       console.error("Error Details:", error.response.data); // Log full error details
+       if (error.response.data.detail) {
+         toast.error(error.response.data.detail); // Show details in toast if available
+       } else {
+         toast.error("Failed to confirm order. Please check your input.");
+       }
+     } else {
+       console.error("Error confirming order:", error.message); // Handle network errors
+       toast.error("An unexpected error occurred. Please try again.");
+     }
+   } finally {
+     setIsSubmitting(false);
+     setLoading(false);
+     fetchCart();
+   }
 
-        // Reset cart or perform other actions
-      }
-    } catch (error) {
-      console.error("Error confirming order:", error.message);
-      toast.error("Failed to confirm order. Please try again.");
-    } finally {
-      setIsSubmitting(false);
-      setLoading(false);
-      fetchCart();
-    }
   };
 
   // Handle input changes
@@ -158,7 +168,8 @@ export const DeliveryCompany = () => {
           },
         }
       );
-
+console.log("Response:", response.status, response.data);
+      
       if (response.status === 201 || response.status === 200) {
         toast.success("Delivery company added successfully!");
         setForm({
@@ -310,14 +321,14 @@ export const DeliveryCompany = () => {
         </div>
       </Modal>
 
-      <div className="mt-8">
+      <div className="mt-8 ">
         <h2 className="text-lg font-semibold w-full flex justify-between">
           <span>Delivery Companies</span>
           <span onClick={() => setModal(true)}>
             <Plus />
           </span>
         </h2>
-        <div className="flex flex-wrap gap-4 items-center justify-center">
+        <div className="flex flex-wrap gap-4 items-center  justify-center">
           {deliveryCompanies.map((company) => (
             <div
               key={company.id}
@@ -371,14 +382,13 @@ export const DeliveryCompany = () => {
             </div>
           ))}
         </div>
-      </div>
-
       <ButtonTwo
         disabled={loading}
         className="w-full mt-6 rounded-md"
         buttonValue="Confirm Order"
         Clicked={handleConfirmOrder} // Trigger order confirmation
       />
+      </div>
     </div>
   );
 };

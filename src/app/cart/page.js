@@ -128,6 +128,7 @@ const Cart = () => {
                     </h3>
                     <span className="flex items-center gap-x-2  text-sm md:text-base my-2">
                       <p>{item.product.category}</p>
+                      <p>{item.id}</p>
                       <span className="h-6 w-[1px] bg-gray-400"></span>
                       <p>{item.product.sizes.join(", ")}</p>
                     </span>
@@ -141,13 +142,14 @@ const Cart = () => {
                     <div className="flex items-center gap-4 mt-4">
                       {/* Quantity Controls */}
                       <ButtonTwo
-                        disabled={loading === `cart${item.product.id}`}
+                        disabled={loading === `cart${item.id}`}
                         className="rounded-md"
+                        Clicked={() => deleteItem(item.id, `cart`)}
                         iconValue={<Minus size={15} />}
                       />
                       <p className="text-sm md:text-base ">{item.quantity}</p>
                       <ButtonTwo
-                        disabled={loading === `cart${item.product.id}`}
+                        disabled={loading === `deleting_cart_${item.product.id}`}
                         className="rounded-md"
                         iconValue={<Plus size={15} />}
                         Clicked={() => handleAddToCart(item.product.id)}

@@ -292,7 +292,7 @@ const Navbar = () => {
             <span onClick={() => openModal("admin")} className="cursor-pointer">
               Logo
             </span>
-            <span onClick={fiterAll}>All</span>
+            <span onClick={fiterAll} className="cursor-pointer">All</span>
             <Dropdown
               options={category} // Replace this with your actual category data
               onSelect={handleCategorySelect}
@@ -300,7 +300,7 @@ const Navbar = () => {
               placeholder="Categories"
               valueKey="name" // Assuming categories have an `id` property
               displayKey="name" // Assuming categories have a `name` property
-              className=""
+              divClassName="border-b py-1 px-2  cursor-pointer"
               emptyMessage="No categories available"
             />
           </section>
@@ -364,10 +364,10 @@ const Navbar = () => {
           </span>
         </div>
         {isDropdownOpen && (
-          <div className="absolute top-full left-0 w-full card border-t shadow-lg md:hidden h-auto">
+          <div className="absolute  top-full left-0 w-full card border-t shadow-lg md:hidden h-auto">
             <div className="flex flex-col px-5 py-4">
-              <div className="flex items-center w-full">
-                <span className="cursor-pointer py-2">
+              <div className="flex items-end w-full gap-x-4">
+                <span className="cursor-pointer ">
                   <Dropdown
                     options={category} // Replace this with your actual category data
                     onSelect={handleCategorySelect}
@@ -375,11 +375,11 @@ const Navbar = () => {
                     placeholder="Categories"
                     valueKey="name" // Assuming categories have an `id` property
                     displayKey="name" // Assuming categories have a `name` property
-                    className=""
+                    divClassName="border-b py-1 px-2 cursor-pointer"
                     emptyMessage="No categories available"
                   />
                 </span>
-                <span>
+                <span className="w-full">
                   <SearchTwo
                     searchTwo={searchTwo}
                     onChange={(e) => setSearchTwo(e.target.value)}
@@ -388,57 +388,25 @@ const Navbar = () => {
                 </span>
               </div>
               <hr className="my-2" />
-              <span
-                onClick={() => setProfile(!profile)}
-                className="text-2xl rounded-full px-5 cursor-pointer h-10 w-10 flex items-center justify-center gap-x-2 ml-4"
-              >
+              <span>
                 {userFirstName ? (
-                  <strong>{userFirstName.charAt(0).toUpperCase()}</strong>
+                  <Link
+                    href={`/profile/${userFirstName ? userFirstName : "user"}`}
+                    className="flex items-end"
+                  >
+                    <strong className="text-2xl">{userFirstName.charAt(0).toUpperCase()}</strong>
+                    <p>{userFirstName.slice(1)}</p>
+                  </Link>
                 ) : (
-                  <User />
-                )}
-                <p className="font-normal text-base ">Profile</p>
-              </span>
-              {profile && auth ? (
-                <div className="flex flex-col gap-y-3 mt-2">
-                  {profileNav.navigations.map((nav, ind) => (
-                    <Link
-                      href={nav.href}
-                      key={ind}
-                      className="flex gap-x-2 items-center"
-                    >
-                      <span>{nav.icon}</span>
-                      <span>{nav.nav}</span>
-                    </Link>
-                  ))}
-
-                  <ButtonTwo
-                    buttonValue={`Sign Out`}
-                    iconValue={<FaSignOutAlt size={15} />}
-                    Clicked={SignOut}
-                    className={`w-32`}
-                  />
-                </div>
-              ) : (
-                profile && (
-                  <span className="flex flex-col gap-y-3">
-                    <span className="flex gap-x-3">
-                      <span>
-                        <ButtonOne
-                          buttonValue={`Login`}
-                          Clicked={() => openModal("login")}
-                        />
-                      </span>
-                      <span>
-                        <ButtonTwo
-                          buttonValue={`Sign up`}
-                          Clicked={() => openModal("signup")}
-                        />
-                      </span>
-                    </span>
+                  <span
+                    onClick={() => openModal(`login`)}
+                    className="flex gap-x-2 cursor-pointer"
+                  >
+                    <User size={15} className="translate-y-1" />
+                    <p>Profile</p>
                   </span>
-                )
-              )}
+                )}
+              </span>
               <Link
                 href={`/cart`}
                 className="cursor-pointer py-2 flex items-center gap-x-2"

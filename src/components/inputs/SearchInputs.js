@@ -76,7 +76,7 @@ export const Search = ({ category }) => {
 
 export const SearchTwo = ({ handleSubmit, searchTwo, onChange }) => {
   return (
-    <form className="flex items-center w-full mx-auto border-b-2" onSubmit={handleSubmit}>
+    <form className="flex items-center w-full mx-auto relative" onSubmit={handleSubmit}>
       <div className="relative w-full">
        <Textinput
        labelStyle={`bg-transparent`}
@@ -88,7 +88,7 @@ export const SearchTwo = ({ handleSubmit, searchTwo, onChange }) => {
       </div>
       <button
         type="submit"
-        className="p-2.5 ms-2 text-sm font-medium"
+        className="p-2.5 ms-2 text-sm font-medium absolute right-0"
       >
         <IoMdSearch size={20} />
         <span className="sr-only">Search</span>
