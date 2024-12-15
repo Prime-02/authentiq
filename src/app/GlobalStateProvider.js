@@ -298,36 +298,51 @@ export const GlobalStateProvider = ({ children }) => {
     [setFormData, setLoading, setError] // Added dependencies
   );
 
-  // Fetch barcodes
-  const fetchBarcodes = useCallback(async () => {
-    setLoading(`barcode`);
-    const token = getToken(`admin`);
-    try {
-      const response = await axios.get(
-        "https://isans.pythonanywhere.com/shop/barcode/",
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+ const fetchBarcodes = useCallback(async (filterParam = "") => {
+   setLoading(`barcode`);
+   const token = getToken(`admin`);
+   try {
+     const response = await axios.get(
+       "https://isans.pythonanywhere.com/shop/barcode/",
+       {
+         headers: {
+           Authorization: `Bearer ${token}`,
+         },
+       }
+     );
 
-      if (response.status === 200 || response.status === 201) {
-        const barcodes = response.data || []; // Assuming response contains an array of barcode objects
-        setFormData((prevState) => ({
-          ...prevState,
-          barcodes, // Store the barcodes in the state
-        }));
-      } else {
-        toast.error("Failed to fetch barcodes. Please try again.");
-      }
-    } catch (err) {
-      setError("Failed to fetch barcodes.");
-      // toast.error("Unable to load barcodes. Please try again.");
-    } finally {
-      setLoading(null);
-    }
-  }, []);
+     if (response.status === 200 || response.status === 201) {
+       let barcodes = response.data || []; // Assuming response contains an array of barcode objects
+
+       // Convert filterParam to string for comparison
+       const filterStr = String(filterParam);
+
+       // Filter barcodes based on the filter parameter
+       if (filterStr) {
+         barcodes = barcodes.filter((barcode) => {
+           return (
+             String(barcode.id).includes(filterStr) ||
+             String(barcode.code.toLowerCase()).includes(filterStr) ||
+             String(barcode.status.toLowerCase()).includes(filterStr)
+           );
+         });
+       }
+
+       setFormData((prevState) => ({
+         ...prevState,
+         barcodes, // Store the filtered or unfiltered barcodes in the state
+       }));
+     } else {
+       toast.error("Failed to fetch barcodes. Please try again.");
+     }
+   } catch (err) {
+     setError("Failed to fetch barcodes.");
+     // toast.error("Unable to load barcodes. Please try again.");
+   } finally {
+     setLoading(null);
+   }
+ }, []);
+
 
   const deleteItem = async (Id, action) => {
     setLoading(`deleting_${action}_${Id}`);
@@ -479,10 +494,11 @@ export const GlobalStateProvider = ({ children }) => {
     }
   }, []);
 
-  // Fetch orders from API with optional filtering
-  const fetchOrders = async (filterString = "ups") => {
-    const token = getToken(`admin`);
-    setLoading(`admin_login`);
+  // Fetch orders from API
+  const fetchOrders = async (filterString = "") => {
+    const token = getToken("admin");
+    setLoading("admin_order");
+
     try {
       const response = await axios.get(
         "https://isans.pythonanywhere.com/shop/admin-orders/",
@@ -495,7 +511,7 @@ export const GlobalStateProvider = ({ children }) => {
 
       let orders = response.data;
 
-      // If a filter string is provided, filter the orders
+      // Apply filtering logic if filterString is provided
       if (filterString.trim() !== "") {
         const lowerCaseFilter = filterString.toLowerCase();
         orders = orders.filter(
@@ -506,11 +522,10 @@ export const GlobalStateProvider = ({ children }) => {
             order.product_details.name
               .toLowerCase()
               .includes(lowerCaseFilter) ||
-            order.delivery_company.toLowerCase().includes(lowerCaseFilter) 
+            order.delivery_company.name.toLowerCase().includes(lowerCaseFilter)
         );
       }
 
-      // Update the global state with filtered or unfiltered orders
       setFormData((prevState) => ({
         ...prevState,
         orders,
@@ -519,7 +534,7 @@ export const GlobalStateProvider = ({ children }) => {
       console.error("Error fetching orders:", error);
       toast.error("Failed to fetch orders. Please try again.");
     } finally {
-      setLoading(false);
+      setLoading(null);
     }
   };
 

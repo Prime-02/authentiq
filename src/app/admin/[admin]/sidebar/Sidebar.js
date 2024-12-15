@@ -22,7 +22,7 @@ const Sidebar = () => {
 
   const formattedPath = pathname.replace(/\//g, " > ").replace(/^ > /, "");
 
-  const { formData, adminToken, fetchProducts } = useGlobalState(); // Access global state
+  const { formData, adminToken, fetchProducts, fetchOrders, fetchBarcodes } = useGlobalState(); // Access global state
   const adminFirstName = formData.adminFirstName
     ? formData.adminFirstName
     : "admin"; // Extract adminFirstName from formData
@@ -34,6 +34,8 @@ const Sidebar = () => {
      e.preventDefault();
      // setSearchTwo(e.target.value);
      fetchProducts({ name: searchTwo });
+     fetchOrders(searchTwo)
+     fetchBarcodes(searchTwo)
    };
 
   useEffect(() => {

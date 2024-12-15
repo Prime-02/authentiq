@@ -12,9 +12,9 @@ import axios from "axios";
 const OrdersByStatusPage = () => {
   const { status } = useParams(); // Get the status parameter from the route
   const [filteredOrders, setFilteredOrders] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [loadingOrder, setLoadingOrder] = useState(false);
   const [statusLoading, setStatusLoading] = useState(false);
-  const { formData, fetchOrders, setFormData, getToken } = useGlobalState();
+  const { formData, fetchOrders, setFormData, getToken, loading } = useGlobalState();
   const orders = formData.orders;
   const token = getToken(`admin`); // Assuming you have the token in the formData state
 
@@ -22,7 +22,7 @@ const OrdersByStatusPage = () => {
   useEffect(() => {
     const fetchAndFilterOrders = async () => {
       try {
-        setLoading(true);
+        setLoadingOrder(true);
 
         // Fetch orders if they are not already fetched
         if (!orders || orders.length === 0) {
@@ -38,7 +38,7 @@ const OrdersByStatusPage = () => {
         console.error("Error fetching or filtering orders:", error);
         toast.error("Failed to fetch orders. Please try again.");
       } finally {
-        setLoading(false);
+        setLoadingOrder(false);
       }
     };
 
@@ -120,7 +120,7 @@ const updateOrderStatus = async (orderId, newStatus) => {
                 </th>
               </tr>
             </thead>
-            {loading ? (
+            {loadingOrder ? (
               <tfoot>
                 <tr>
                   <td colSpan="7" className="text-center">

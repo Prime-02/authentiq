@@ -81,7 +81,7 @@ const AdminOrdersPage = () => {
     <main className="w-full overflow-x-hidden">
       <div className="mx-auto py-8 px-4 sm:px-6 lg:px-8">
         <h2 className="text-2xl font-semibold mb-6">All</h2>
-        {loading === "admin_login" ? (
+        {loading === "admin_order" ? (
           <div>
             <Loader />
           </div>
