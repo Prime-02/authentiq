@@ -18,7 +18,7 @@ const DynamicImage = ({ prop, prod, width, height, className }) => {
       {/* HTML image tag */}
       {!isError && (
         <img
-          src={`https://isans.pythonanywhere.com${prop || ""}`} // Append base URL to image path
+          src={prop} // Append base URL to image path
           alt={prod}
           width={width || 300}
           height={height || 300}

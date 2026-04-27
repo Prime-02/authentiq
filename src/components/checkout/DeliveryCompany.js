@@ -1,51 +1,51 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import axios from "axios";
 import { Textinput } from "@/components/inputs/Textinput";
 import { ButtonTwo } from "../reusables/buttons/Buttons";
 import { toast } from "react-toastify";
 import { useGlobalState } from "@/app/GlobalStateProvider";
 import Modal from "../Modal/Modal";
-import { Link2, Pen, Plus } from "lucide-react";
+import { Link2, Pen, Plus, Truck } from "lucide-react";
 import Link from "next/link";
-import { useRouter } from "next/router";
+
+const BASE_URL = "https://isans.pythonanywhere.com";
+
+const EMPTY_FORM = {
+  name: "",
+  contact_number: "",
+  address: "",
+  branch: "",
+  state: "",
+  website: "",
+};
 
 export const DeliveryCompany = () => {
   const { getToken, formData, fetchCart } = useGlobalState();
-  const [modal, setModal] = useState(false);
   const token = getToken("user");
   const cart = formData.cart;
+
+  const [modal, setModal] = useState(false);
+  // When editing, store the company being edited; null means "create" mode
+  const [editingCompany, setEditingCompany] = useState(null);
+
   const [selectedCompanyId, setSelectedCompanyId] = useState(null);
   const [loading, setLoading] = useState(false);
-
-  // Form state
-  const [form, setForm] = useState({
-    name: "",
-    contact_number: "",
-    address: "",
-    branch: "",
-    state: "",
-    website: "",
-  });
-
-  const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const [form, setForm] = useState(EMPTY_FORM);
+  const [errors, setErrors] = useState({});
   const [deliveryCompanies, setDeliveryCompanies] = useState([]);
 
-  // Fetch delivery companies on component mount
-  const fetchDeliveryCompanies = async () => {
+  // ── Fetch ────────────────────────────────────────────────────────────────
+
+  const fetchDeliveryCompanies = useCallback(async () => {
     setLoading(true);
     try {
-      const response = await axios.get(
-        "https://isans.pythonanywhere.com/shop/userdelivery/",
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const response = await axios.get(`${BASE_URL}/shop/delivery-companies/`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       setDeliveryCompanies(response.data);
     } catch (error) {
       console.error("Error fetching delivery companies:", error.message);
@@ -53,175 +53,229 @@ export const DeliveryCompany = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [token]);
 
   useEffect(() => {
     fetchDeliveryCompanies();
-  }, [token]);
+  }, [fetchDeliveryCompanies]);
 
-  // Confirm order
+  // ── Confirm order ────────────────────────────────────────────────────────
+
   const handleConfirmOrder = async () => {
-    setLoading(true);
     if (!selectedCompanyId) {
       toast.error("Please select a delivery company.");
-    setLoading(false);
       return;
     }
-
-    if (cart.length === 0) {
+    if (!cart || cart.length === 0) {
       toast.error("Your cart is empty.");
       return;
     }
 
-    // Prepare the order payload
-    const orderData = {
-      delivery_company_id: selectedCompanyId,
-      items: cart.map((item) => ({
-        product_id: item.product_id,
-        quantity: item.quantity,
-      })),
-      shipping_address: {
-        street: formData.userStreetAddress,
-        city: formData.userCity,
-        state: formData.userState,
-        zip_code: formData.userZipcode,
-        country: formData.userCountry,
-      },
-    };
-
+    setLoading(true);
     setIsSubmitting(true);
 
-   try {
-     const response = await axios.post(
-       "https://isans.pythonanywhere.com/shop/orders/",
-       orderData,
-       {
-         headers: {
-           "Content-Type": "application/json",
-           Authorization: `Bearer ${token}`,
-         },
-       }
-     );
+    // Build a flat shipping_address string expected by the backend
+    const shippingAddress = [
+      formData.userStreetAddress,
+      formData.userCity,
+      formData.userState,
+      formData.userZipcode,
+      formData.userCountry,
+    ]
+      .filter(Boolean)
+      .join(", ");
 
-     if (response.status === 201 || response.status === 200) {
-       toast.success("Order confirmed successfully!");
-     }
-   } catch (error) {
-     // Handle error response
-     if (error.response) {
-       console.error("Error Details:", error.response.data); // Log full error details
-       if (error.response.data.detail) {
-         toast.error(error.response.data.detail); // Show details in toast if available
-       } else {
-         toast.error("Failed to confirm order. Please check your input.");
-       }
-     } else {
-       console.error("Error confirming order:", error.message); // Handle network errors
-       toast.error("An unexpected error occurred. Please try again.");
-     }
-   } finally {
-     setIsSubmitting(false);
-     setLoading(false);
-     fetchCart();
-   }
+    const params = new URLSearchParams({
+      shipping_address: shippingAddress,
+      ...(formData.shippingCost != null && {
+        shipping_cost: formData.shippingCost,
+      }),
+      ...(formData.tax != null && { tax: formData.tax }),
+      delivery_company_id: selectedCompanyId,
+    });
 
+    try {
+      const response = await axios.post(
+        `${BASE_URL}/shop/orders/?${params.toString()}`,
+        null,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        },
+      );
+
+      if (response.status === 201 || response.status === 200) {
+        toast.success("Order confirmed successfully!");
+        setSelectedCompanyId(null);
+        fetchCart();
+      }
+    } catch (error) {
+      if (error.response?.data?.detail) {
+        toast.error(error.response.data.detail);
+      } else {
+        console.error("Error confirming order:", error.message);
+        toast.error("Failed to confirm order. Please try again.");
+      }
+    } finally {
+      setIsSubmitting(false);
+      setLoading(false);
+    }
   };
 
-  // Handle input changes
+  // ── Form helpers ─────────────────────────────────────────────────────────
+
   const handleInputChange = (e) => {
     const { id, value } = e.target;
     setForm((prev) => ({ ...prev, [id]: value }));
+    // Clear error on change
+    if (errors[id]) setErrors((prev) => ({ ...prev, [id]: undefined }));
   };
 
-  // Handle form validation
   const validateForm = () => {
     const newErrors = {};
-    if (!form.name) newErrors.name = "Delivery company name is required.";
-    if (!form.contact_number)
+    if (!form.name.trim()) newErrors.name = "Company name is required.";
+    if (!form.contact_number.trim())
       newErrors.contact_number = "Contact number is required.";
-    if (!form.address) newErrors.address = "Address is required.";
-    if (!form.branch) newErrors.branch = "Branch is required.";
-    if (!form.state) newErrors.state = "State is required.";
-    if (!form.website) newErrors.website = "Website is required."; // Added validation for website
-
+    if (!form.address.trim()) newErrors.address = "Address is required.";
+    if (!form.branch.trim()) newErrors.branch = "Branch is required.";
+    if (!form.state.trim()) newErrors.state = "State is required.";
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
-  // Handle form submission
-  const handleSubmit = async (e) => {
-    setLoading(true);
-    e.preventDefault();
-
-    if (!validateForm()) return;
-
-    setIsSubmitting(true);
-
-    try {
-      const response = await axios.post(
-        "https://isans.pythonanywhere.com/shop/userdelivery/",
-        form,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-console.log("Response:", response.status, response.data);
-      
-      if (response.status === 201 || response.status === 200) {
-        toast.success("Delivery company added successfully!");
-        setForm({
-          name: "",
-          contact_number: "",
-          address: "",
-          branch: "",
-          state: "",
-          website: "",
-        });
-        fetchDeliveryCompanies(); // Refresh the list after successful addition
-      }
-    } catch (error) {
-      console.error("Error adding delivery company:", error.message);
-      toast.error("Failed to add delivery company. Please try again.");
-    } finally {
-      setIsSubmitting(false);
-      setLoading(false);
-      setModal(false);
-    }
+  const openCreateModal = () => {
+    setEditingCompany(null);
+    setForm(EMPTY_FORM);
+    setErrors({});
+    setModal(true);
   };
 
-  // Handle editing a delivery company
-  const handleEdit = (company) => {
+  const openEditModal = (company) => {
+    setEditingCompany(company);
     setForm({
       name: company.name,
       contact_number: company.contact_number,
       address: company.address,
       branch: company.branch,
       state: company.state,
-      website: company.website || "", // Handle null values
+      website: company.website || "",
     });
-    setModal(true); // Open modal when edit is triggered
+    setErrors({});
+    setModal(true);
   };
 
-  // Handle radio button selection
-  const handleRadioChange = (id) => {
-    setSelectedCompanyId(id);
+  const closeModal = () => {
+    setModal(false);
+    setEditingCompany(null);
+    setForm(EMPTY_FORM);
+    setErrors({});
   };
+
+  // ── Create ───────────────────────────────────────────────────────────────
+
+  const handleCreate = async () => {
+    if (!validateForm()) return;
+
+    setIsSubmitting(true);
+    setLoading(true);
+    try {
+      // Build query params — the backend reads fields from query params for this endpoint
+      const params = new URLSearchParams(
+        Object.fromEntries(Object.entries(form).filter(([, v]) => v !== "")),
+      );
+
+      const response = await axios.post(
+        `${BASE_URL}/shop/admin/delivery-companies/?${params.toString()}`,
+        null,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        },
+      );
+
+      if (response.status === 201 || response.status === 200) {
+        toast.success("Delivery company added successfully!");
+        fetchDeliveryCompanies();
+        closeModal();
+      }
+    } catch (error) {
+      const detail = error.response?.data?.detail;
+      console.error("Error adding delivery company:", detail || error.message);
+      toast.error(
+        detail || "Failed to add delivery company. Please try again.",
+      );
+    } finally {
+      setIsSubmitting(false);
+      setLoading(false);
+    }
+  };
+
+  // ── Update ───────────────────────────────────────────────────────────────
+
+  const handleUpdate = async () => {
+    if (!validateForm()) return;
+
+    setIsSubmitting(true);
+    setLoading(true);
+    try {
+      const params = new URLSearchParams(
+        Object.fromEntries(Object.entries(form).filter(([, v]) => v !== "")),
+      );
+
+      const response = await axios.patch(
+        `${BASE_URL}/shop/admin/delivery-companies/${editingCompany.id}?${params.toString()}`,
+        null,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        },
+      );
+
+      if (response.status === 200) {
+        toast.success("Delivery company updated successfully!");
+        // Optimistically update the local list
+        setDeliveryCompanies((prev) =>
+          prev.map((c) => (c.id === editingCompany.id ? response.data : c)),
+        );
+        closeModal();
+      }
+    } catch (error) {
+      const detail = error.response?.data?.detail;
+      console.error(
+        "Error updating delivery company:",
+        detail || error.message,
+      );
+      toast.error(
+        detail || "Failed to update delivery company. Please try again.",
+      );
+    } finally {
+      setIsSubmitting(false);
+      setLoading(false);
+    }
+  };
+
+  // Single submit handler dispatched by Modal's onSubmit
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (editingCompany) {
+      handleUpdate();
+    } else {
+      handleCreate();
+    }
+  };
+
+  // ── Render ───────────────────────────────────────────────────────────────
 
   return (
     <div className="max-w-3xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
       <Modal
         loading={loading}
-        disabled={loading}
+        disabled={isSubmitting || loading}
         isOpen={modal}
-        onClose={() => setModal(false)}
-        title={`Add or Update Delivery Company`}
+        onClose={closeModal}
+        title={
+          editingCompany ? "Update Delivery Company" : "Add Delivery Company"
+        }
         onSubmit={handleSubmit}
-        buttonValue={`Add Company`}
+        buttonValue={editingCompany ? "Update Company" : "Add Company"}
       >
-        {/* Modal form inputs */}
         <div className="mb-4">
           <Textinput
             id="name"
@@ -307,87 +361,109 @@ console.log("Response:", response.status, response.data);
         <div className="mb-4">
           <Textinput
             id="website"
-            label="Website"
+            label="Website (optional)"
             type="text"
-            className={`mt-1 block w-full bg-transparent p-3 border rounded-lg shadow-sm ${
-              errors.website ? "border-red-500" : "border-gray-300"
-            }`}
+            className="mt-1 block w-full bg-transparent p-3 border rounded-lg shadow-sm border-gray-300"
             value={form.website}
             changed={handleInputChange}
           />
-          {errors.website && (
-            <span className="text-red-500 text-sm mt-1">{errors.website}</span>
-          )}
         </div>
       </Modal>
 
-      <div className="mt-8 ">
-        <h2 className="text-lg font-semibold w-full flex justify-between">
-          <span>Delivery Companies</span>
-          <span onClick={() => setModal(true)}>
-            <Plus />
+      <div className="mt-8">
+        <h2 className="text-lg font-semibold w-full flex justify-between items-center mb-4">
+          <span className="flex items-center gap-2">
+            <Truck size={20} />
+            Delivery Companies
           </span>
+          <button
+            onClick={openCreateModal}
+            className="p-1 rounded-full hover:bg-gray-100 transition-colors"
+            aria-label="Add delivery company"
+          >
+            <Plus />
+          </button>
         </h2>
-        <div className="flex flex-wrap gap-4 items-center  justify-center">
-          {deliveryCompanies.map((company) => (
-            <div
-              key={company.id}
-              className={`p-6 card shadow-lg rounded-xl cursor-pointer overflow-hidden relative w-full ${
-                selectedCompanyId === company.id
-                  ? "border-4 border-purple-500"
-                  : ""
-              }`}
-              onClick={() => handleRadioChange(company.id)} // Set selected company id
-            >
-              <div className="relative">
-                <h3 className="font-semibold text-xl truncate">
-                  {company.name}
-                </h3>
 
-                {/* Radio Button */}
-                <input
-                  type="radio"
-                  name="company"
-                  checked={selectedCompanyId === company.id}
-                  onChange={() => handleRadioChange(company.id)}
-                  className="mt-2 absolute top-2 right-2"
-                />
-              </div>
+        {loading && deliveryCompanies.length === 0 ? (
+          <p className="text-sm text-gray-500 text-center py-8">
+            Loading delivery companies…
+          </p>
+        ) : deliveryCompanies.length === 0 ? (
+          <p className="text-sm text-gray-500 text-center py-8">
+            No delivery companies available. Add one above.
+          </p>
+        ) : (
+          <div className="flex flex-wrap gap-4 items-start justify-center">
+            {deliveryCompanies.map((company) => (
+              <div
+                key={company.id}
+                className={`p-6 card shadow-lg rounded-xl cursor-pointer overflow-hidden relative w-full transition-all ${
+                  selectedCompanyId === company.id
+                    ? "border-4 border-purple-500"
+                    : "border border-transparent"
+                }`}
+                onClick={() => setSelectedCompanyId(company.id)}
+              >
+                <div className="relative pr-8">
+                  <h3 className="font-semibold text-xl truncate">
+                    {company.name}
+                  </h3>
+                  <input
+                    type="radio"
+                    name="company"
+                    checked={selectedCompanyId === company.id}
+                    onChange={() => setSelectedCompanyId(company.id)}
+                    className="absolute top-1 right-0"
+                  />
+                </div>
 
-              {/* Company Details */}
-              <div className="mt-4 space-y-2">
-                <p className="text-sm">{company.contact_number}</p>
-                <span className="flex items-center divide-x-2">
-                  <p className="text-sm pr-2">{company.state}</p>
-                  <p className="text-sm px-2">{company.branch}</p>
-                </span>
-                <p className="text-sm truncate">{company.address}</p>
-              </div>
+                <div className="mt-4 space-y-2">
+                  <p className="text-sm">{company.contact_number}</p>
+                  <span className="flex items-center divide-x-2">
+                    <p className="text-sm pr-2">{company.state}</p>
+                    <p className="text-sm px-2">{company.branch}</p>
+                  </span>
+                  <p className="text-sm truncate">{company.address}</p>
+                </div>
 
-              {/* Next.js Link for website */}
-              {company.website && (
-                <span className="mt-4 w-full flex justify-between items-center text-blue-500 hover:underline">
-                  <Link href={company.website} target="_blank">
-                    <Link2 size={24} className="mr-2" />
-                  </Link>
-                  {/* Update Button */}
+                <span className="mt-4 w-full flex justify-between items-center">
+                  {company.website ? (
+                    <Link
+                      href={company.website}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={(e) => e.stopPropagation()}
+                      className="text-blue-500 hover:underline"
+                    >
+                      <Link2 size={20} />
+                    </Link>
+                  ) : (
+                    <span />
+                  )}
                   <button
-                    className="text-blue-500 hover:underline "
-                    onClick={() => handleEdit(company)}
+                    className="text-blue-500 hover:text-blue-700 transition-colors"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      openEditModal(company);
+                    }}
+                    aria-label={`Edit ${company.name}`}
                   >
                     <Pen size={15} />
                   </button>
                 </span>
-              )}
-            </div>
-          ))}
-        </div>
-      <ButtonTwo
-        disabled={loading}
-        className="w-full mt-6 rounded-md"
-        buttonValue="Confirm Order"
-        Clicked={handleConfirmOrder} // Trigger order confirmation
-      />
+              </div>
+            ))}
+          </div>
+        )}
+
+
+        <ButtonTwo
+          disabled={loading || isSubmitting}
+          className="w-full mt-6 rounded-md"
+          buttonValue={isSubmitting ? "Placing Order…" : "Confirm Order"}
+          Clicked={handleConfirmOrder}
+        />
       </div>
     </div>
   );

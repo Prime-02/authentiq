@@ -1,405 +1,328 @@
 "use client";
 
-import React, { useEffect, useRef, useState } from "react";
-import {
-  Heart,
-  icons,
-  Menu,
-  Settings,
-  ShoppingBag,
-  User,
-  X,
-} from "lucide-react";
-import { ButtonOne, ButtonTwo } from "../reusables/buttons/Buttons";
-import { Search, SearchTwo } from "../inputs/SearchInputs";
+import React, { useState } from "react";
+import { Heart, Menu, ShoppingBag, User, X } from "lucide-react";
+import { SearchTwo } from "../inputs/SearchInputs";
 import Modal from "../Modal/Modal";
 import { Textinput } from "../inputs/Textinput";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { useGlobalState } from "@/app/GlobalStateProvider";
-import { FaSignOutAlt } from "react-icons/fa";
-import { toast } from "react-toastify";
-import axios from "axios";
 import Dropdown from "../inputs/DynamicDropdown";
+import {
+  useAuthStore,
+  useCartStore,
+  useCategoryStore,
+  useUIStore,
+  useWishlistStore,
+} from "@/stores";
+
+// FIX: removed unused imports — Search, Settings, toast
 
 const Navbar = () => {
+  const {
+    userFirstName,
+    signOut,
+    login,
+    signUp,
+    forgotPassword,
+    adminLogin,
+    loadingAuth,
+  } = useAuthStore();
+  const { userCart } = useCartStore();
+  const { categories } = useCategoryStore();
+  const { userWishlist } = useWishlistStore();
+  const { modalType, modal, openModal, closeModal } = useUIStore();
+  const router = useRouter();
+
+  // ── UI state ──────────────────────────────────────────────────────────────
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [profile, setProfile] = useState(false);
-  const [loginPassword, setLoginPassword] = useState("");
-  const [signUpPassword, setSignUpPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
+
+  // ── Modal form state ──────────────────────────────────────────────────────
+  const [rememberMe, setRememberMe] = useState(false);
+
+  // Login
   const [loginEmail, setLoginEmail] = useState("");
-  const [signUpEmail, setSignUpEmail] = useState("");
+  const [loginPassword, setLoginPassword] = useState("");
+
+  // Sign up
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
-  const [rememberMe, setRememberMe] = useState(false);
+  const [signUpEmail, setSignUpEmail] = useState("");
+  const [signUpPassword, setSignUpPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+
+  // Forgot password
   const [forgotPasswordEmail, setForgotPasswordEmail] = useState("");
+
+  // Admin
   const [adminEmail, setAdminEmail] = useState("");
   const [adminPassword, setAdminPassword] = useState("");
-  const [auth, setAuth] = useState(true);
+
+  // Search
   const [searchTwo, setSearchTwo] = useState("");
-  const [Loading, setLoading] = useState(false);
-  const {
-    formData,
-    getToken,
-    Clear,
-    SignOut,
-    modal,
-    setModal,
-    modalType,
-    setModalType,
-    openModal,
-    fetchProducts,
-  } = useGlobalState(); // Access global state
-  const userFirstName = formData.userFirstName ? formData.userFirstName : "";
-  const wishlistItems = formData.wishlist || [];
-  const cartItems = formData.cart || [];
-  const category = formData.category;
 
-  const profileNav = {
-    profileName: `${userFirstName} ${formData.userLastName}.`,
-    navigations: [
-      { nav: "Profile", href: "/profile/profile", icon: <User size={15} /> },
-      {
-        nav: "Wish List",
-        href: "/profile/wish-list",
-        icon: <Heart size={15} />,
-      },
-      {
-        nav: "Setting",
-        href: "/profile/settings",
-        icon: <Settings size={15} />,
-      },
-    ],
+  // FIX: helper to close mobile menu on navigation
+  const closeMobileMenu = () => setIsDropdownOpen(false);
+
+  const handleSearchSubmit = (e) => {
+    e.preventDefault();
+    // fetchProducts({ name: searchTwo });
   };
 
-  const nav = useRouter();
-  const [cat] = useState(["All Categories", "Tees", "Accessories"]);
-
-  const toggleDropdown = () => {
-    setIsDropdownOpen(!isDropdownOpen);
+  const handleCategorySelect = (selected) => {
+    // fetchProducts({ category: selected });
   };
 
-  const closeModal = () => {
-    setModal(false); // Close modal
-    setModalType(null); // Reset modal type
+  const handleShowAll = () => {
+    // fetchProducts({});
   };
+
+  // ── Auth handlers ─────────────────────────────────────────────────────────
 
   const loginForm = async (e) => {
     e.preventDefault();
-    setLoading(true);
-
-    try {
-      const response = await axios.post(
-        "https://isans.pythonanywhere.com/users/login/",
-        {
-          email: loginEmail,
-          password: loginPassword,
-        }
-      );
-
-      if (response.status === 200 || response.status === 201) {
-        const token = response.data.access;
-
-        // Save token in local or session storage based on "Remember Me" selection
-        if (rememberMe) {
-          localStorage.setItem("userAuthToken", token);
-        } else {
-          sessionStorage.setItem("userAuthToken", token);
-        }
-
-        toast.success("Welcome!", { position: "top-right", autoClose: 5000 });
-        setLoginEmail("");
-        setLoginPassword("");
-        window.location.reload();
-      } else {
-        toast.error("Login failed. Please try again.", {
-          position: "top-right",
-          autoClose: 5000,
-        });
-      }
-    } catch (err) {
-      const errorMsg = err.response
-        ? err.response.status === 401
-          ? "Incorrect password. Please try again."
-          : `An error occurred. ${
-              err.response.data.email ||
-              err.response.data.password ||
-              "Please check your Internet and try again."
-            }`
-        : "An error occurred. Please check your Internet and try again.";
-      toast.error(errorMsg, { position: "top-right", autoClose: 5000 });
-    } finally {
-      setLoading(false);
+    const success = await login(loginEmail, loginPassword);
+    if (success) {
+      setLoginEmail("");
+      setLoginPassword("");
+      closeModal();
     }
   };
 
-  const SignUpForm = async (e) => {
+  const signUpForm = async (e) => {
     e.preventDefault();
-    setLoading(true);
-
-    if (signUpPassword !== confirmPassword) {
-      toast.error("Passwords do not match.", {
-        position: "top-right",
-        autoClose: 5000,
-      });
-      setLoading(false);
-      return;
-    }
-
-    try {
-      const response = await axios.post(
-        "https://isans.pythonanywhere.com/users/register/",
-        {
-          email: signUpEmail,
-          password: signUpPassword,
-          first_name: firstName,
-          last_name: lastName,
-          location: "not set",
-        }
-      );
-
-      // Log the API response
-      console.log("API Response:", response);
-
-      if (response.status === 201 || response.status === 200) {
-        sessionStorage.setItem("userAuthToken", response.data.token);
-        toast.success("Welcome aboard! Now login.", {
-          position: "top-right",
-          autoClose: 5000,
-        });
-
-        // Reset form fields
-        setFirstName("");
-        setLastName("");
-        setSignUpEmail("");
-        setSignUpPassword("");
-        setConfirmPassword("");
-
-        setModalType("login");
-      }
-    } catch (err) {
-      const errorMsg =
-        err.response?.data?.message ||
-        err.response?.data?.email ||
-        err.response?.data?.password ||
-        "An unexpected error occurred. Please try again.";
-      toast.error(errorMsg, {
-        position: "top-right",
-        autoClose: 5000,
-      });
-    } finally {
-      setLoading(false);
+    // FIX: pass confirmPassword as 3rd arg to match the updated store signature:
+    // signUp(email, password, confirmPassword, firstname, lastname)
+    // FIX: removed the duplicate password-match check — the store owns that logic
+    const success = await signUp(
+      signUpEmail,
+      signUpPassword,
+      confirmPassword,
+      firstName,
+      lastName,
+    );
+    if (success) {
+      setFirstName("");
+      setLastName("");
+      setSignUpEmail("");
+      setSignUpPassword("");
+      setConfirmPassword("");
+      closeModal();
     }
   };
 
-  const ForgottenPasswordForm = async (e) => {
+  const forgotPasswordForm = async (e) => {
     e.preventDefault();
-  };
-  const AdminForm = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-
-    // Log the email and password before sending the request
-
-    try {
-      // Start of the request
-      console.log("Sending request to server...");
-
-      const response = await axios.post(
-        "https://isans.pythonanywhere.com/users/admin/login/",
-        {
-          email: adminEmail,
-          password: adminPassword,
-        }
-      );
-
-      // Log the response when received
-      console.log("Response received:", response);
-
-      if (response.status === 200 || response.status === 201) {
-        const token = response.data.access;
-
-        // Save token in local or session storage based on "Remember Me" selection
-        if (rememberMe) {
-          localStorage.setItem("adminAuthToken", token);
-        } else {
-          sessionStorage.setItem("adminAuthToken", token);
-        }
-
-        toast.success("Welcome!", { position: "top-right", autoClose: 5000 });
-        setLoginEmail("");
-        setLoginPassword("");
-        nav.push(`/admin/${adminEmail ? adminEmail : "admin"}/dashboard`);
-      } else {
-        console.log("Login failed with status:", response.status);
-        toast.error("Login failed. Please try again.", {
-          position: "top-right",
-          autoClose: 5000,
-        });
-      }
-    } catch (err) {
-      // Log the error if something goes wrong
-      console.error("Error occurred during login:", err);
-      const errorMsg = err.response
-        ? err.response.status === 401
-          ? "Incorrect password. Please try again."
-          : `An error occurred. ${
-              err.response.data.email ||
-              err.response.data.password ||
-              "Please check your Internet and try again."
-            }`
-        : "An error occurred. Please check your Internet and try again.";
-
-      toast.error(errorMsg, { position: "top-right", autoClose: 5000 });
-    } finally {
-      setLoading(false);
+    const success = await forgotPassword(forgotPasswordEmail);
+    if (success) {
+      setForgotPasswordEmail("");
+      closeModal();
     }
   };
 
-  useEffect(() => {
-    // Check if 'userAuthToken' exists in localStorage
-    const token = getToken(`user`);
-
-    if (token && token !== "") {
-      setAuth(true); // Set auth to true if token is found
-    } else {
-      setAuth(false); // Set auth to false if token is not found
-    }
-  }, []);
-
-  const handleSubmit = (e) => {
+  const adminForm = async (e) => {
     e.preventDefault();
-    // setSearchTwo(e.target.value);
-    fetchProducts({ name: searchTwo });
+    const success = await adminLogin(adminEmail, adminPassword);
+    if (success) {
+      setAdminEmail("");
+      setAdminPassword("");
+      closeModal();
+      router.push("/admin/dashboard");
+    }
   };
 
-  const fiterAll = () => {
-    fetchProducts({ name: "", category: "" });
-  };
+  // ── Modal config helpers ──────────────────────────────────────────────────
 
-  // Handle category selection
-  const handleCategorySelect = (selectedCategory) => {
-    // Call fetchProducts with the selected category
-    fetchProducts({ category: selectedCategory });
-  };
+  const modalTitle =
+    {
+      login: "Login",
+      signup: "Sign Up",
+      forgotPassword: "Forgot Password?",
+      admin: "Admin Login",
+    }[modalType] ?? "Login";
+
+  const modalSubmit =
+    {
+      login: loginForm,
+      signup: signUpForm,
+      forgotPassword: forgotPasswordForm,
+      admin: adminForm,
+    }[modalType] ?? loginForm;
+
+  const modalButtonLabel =
+    {
+      login: "Login",
+      signup: "Sign Up",
+      forgotPassword: "Send Reset Link",
+      admin: "Login",
+    }[modalType] ?? "Submit";
+
+  const modalSubChildren =
+    {
+      login: (
+        <span className="text-center gap-x-2 items-center justify-center flex text-sm">
+          <p>Don&apos;t have an account?</p>
+          <span
+            className="text-blue-600 cursor-pointer"
+            onClick={() => openModal("signup")}
+          >
+            Sign up
+          </span>
+        </span>
+      ),
+      signup: (
+        <span className="w-full justify-center items-center text-sm flex gap-x-2">
+          <p>Already have an account?</p>
+          <span
+            className="text-blue-600 cursor-pointer"
+            onClick={() => openModal("login")}
+          >
+            Log in
+          </span>
+        </span>
+      ),
+      forgotPassword: (
+        <span className="w-full justify-center items-center text-sm flex gap-x-2">
+          <p>Remember your password?</p>
+          <span
+            className="text-blue-600 cursor-pointer"
+            onClick={() => openModal("login")}
+          >
+            Log in
+          </span>
+        </span>
+      ),
+      admin: null,
+    }[modalType] ?? null;
+
+  // ── Shared nav sections ───────────────────────────────────────────────────
+
+  const CategoryDropdown = (
+    <Dropdown
+      options={categories}
+      onSelect={handleCategorySelect}
+      tag="category"
+      placeholder="Categories"
+      valueKey="name"
+      displayKey="name"
+      divClassName="border-b py-1 px-2 cursor-pointer"
+      emptyMessage="No categories available"
+    />
+  );
+
+  const UserAvatar = userFirstName ? (
+    <Link href={`/profile/${userFirstName}`}>
+      <strong>{userFirstName.charAt(0).toUpperCase()}</strong>
+    </Link>
+  ) : (
+    <User
+      size={25}
+      className="translate-y-1 cursor-pointer"
+      onClick={() => openModal("login")}
+    />
+  );
+
+  const CartLink = (
+    <Link
+      href="/cart"
+      className="cursor-pointer py-2 flex items-center relative gap-x-2"
+    >
+      <ShoppingBag size={25} />
+      {userCart.length > 0 && (
+        <span className="absolute bottom-2 right-0 text-[10px] bg-blue-600 text-white flex items-center justify-center w-3 h-3 rounded-full">
+          {userCart.length > 100 ? "100+" : userCart.length}
+        </span>
+      )}
+    </Link>
+  );
+
+  const WishlistLink = (
+    <Link
+      href="/wishlist"
+      className="cursor-pointer relative py-2 flex items-center gap-x-2"
+    >
+      <Heart size={25} />
+      {userWishlist.length > 0 && (
+        <span className="absolute bottom-2 right-0 text-[10px] bg-blue-600 text-white flex items-center justify-center w-3 h-3 rounded-full">
+          {userWishlist.length > 100 ? "100+" : userWishlist.length}
+        </span>
+      )}
+    </Link>
+  );
+
+  // ── Render ────────────────────────────────────────────────────────────────
 
   return (
     <>
       <nav className="fixed top-0 w-full py-5 flex items-center justify-center backdrop-blur-lg z-50">
+        {/* Desktop */}
         <div className="w-[80%] mx-auto hidden md:flex flex-row items-center justify-between">
           <section className="flex flex-row justify-evenly items-center gap-x-5">
             <span onClick={() => openModal("admin")} className="cursor-pointer">
               Logo
             </span>
-            <span onClick={fiterAll} className="cursor-pointer">All</span>
-            <Dropdown
-              options={category} // Replace this with your actual category data
-              onSelect={handleCategorySelect}
-              tag="category"
-              placeholder="Categories"
-              valueKey="name" // Assuming categories have an `id` property
-              displayKey="name" // Assuming categories have a `name` property
-              divClassName="border-b py-1 px-2  cursor-pointer"
-              emptyMessage="No categories available"
-            />
+            <span onClick={handleShowAll} className="cursor-pointer">
+              All
+            </span>
+            {CategoryDropdown}
           </section>
+
           <section className="flex flex-row justify-evenly items-center gap-x-5">
-            <span>
-              <SearchTwo
-                searchTwo={searchTwo}
-                onChange={(e) => setSearchTwo(e.target.value)}
-                handleSubmit={handleSubmit}
-              />
+            <SearchTwo
+              searchTwo={searchTwo}
+              onChange={(e) => setSearchTwo(e.target.value)}
+              handleSubmit={handleSearchSubmit}
+            />
+            <span className="rounded-full text-2xl h-10 w-10 flex items-center justify-center cursor-pointer">
+              {UserAvatar}
             </span>
-            <span className="text- rounded-full text-2xl h-10 w-10 flex items-center justify-center cursor-pointer">
-              <div>
-                {userFirstName ? (
-                  <Link
-                    href={`/profile/${userFirstName ? userFirstName : "user"}`}
-                  >
-                    <strong>{userFirstName.charAt(0).toUpperCase()}</strong>
-                  </Link>
-                ) : (
-                  <User
-                    size={25}
-                    className="translate-y-1"
-                    onClick={() => openModal(`login`)}
-                  />
-                )}
-              </div>
-            </span>
-            <Link
-              href={`/cart`}
-              className="cursor-pointer py-2 flex items-center relative gap-x-2"
-            >
-              <ShoppingBag size={25} />
-              {cartItems.length > 0 && (
-                <span className="absolute bottom-2 right-0 text-[10px] bg-blue-600 text-white flex items-center justify-center w-3 h-3 rounded-full">
-                  {cartItems.length > 100 ? "100+" : cartItems.length}
-                </span>
-              )}
-            </Link>
-            <Link
-              href={`/wishlist`}
-              className="cursor-pointer relative py-2 flex items-center gap-x-2"
-            >
-              <Heart size={25} />
-              {wishlistItems.length > 0 && (
-                <span className="absolute bottom-2 right-0 text-[10px] bg-blue-600 text-white flex items-center justify-center w-3 h-3 rounded-full">
-                  <h2 className="text">
-                    {wishlistItems.length > 100 ? `100+` : wishlistItems.length}
-                  </h2>
-                </span>
-              )}
-            </Link>
+            {CartLink}
+            {WishlistLink}
           </section>
         </div>
+
+        {/* Mobile toggle */}
         <div className="w-[80%] mx-auto flex md:hidden flex-row items-center justify-between relative">
           <span onClick={() => openModal("admin")} className="cursor-pointer">
             Logo
           </span>
-          <span onClick={toggleDropdown} className="cursor-pointer">
+          <span
+            onClick={() => setIsDropdownOpen((o) => !o)}
+            className="cursor-pointer"
+          >
             {isDropdownOpen ? <X /> : <Menu />}
           </span>
         </div>
+
+        {/* Mobile menu */}
         {isDropdownOpen && (
-          <div className="absolute  top-full left-0 w-full card border-t shadow-lg md:hidden h-auto">
+          <div className="absolute top-full left-0 w-full card border-t shadow-lg md:hidden h-auto">
             <div className="flex flex-col px-5 py-4">
               <div className="flex items-end w-full gap-x-4">
-                <span className="cursor-pointer ">
-                  <Dropdown
-                    options={category} // Replace this with your actual category data
-                    onSelect={handleCategorySelect}
-                    tag="category"
-                    placeholder="Categories"
-                    valueKey="name" // Assuming categories have an `id` property
-                    displayKey="name" // Assuming categories have a `name` property
-                    divClassName="border-b py-1 px-2 cursor-pointer"
-                    emptyMessage="No categories available"
-                  />
-                </span>
-                <span className="w-full">
-                  <SearchTwo
-                    searchTwo={searchTwo}
-                    onChange={(e) => setSearchTwo(e.target.value)}
-                    handleSubmit={handleSubmit}
-                  />
-                </span>
+                {CategoryDropdown}
+                <SearchTwo
+                  searchTwo={searchTwo}
+                  onChange={(e) => setSearchTwo(e.target.value)}
+                  handleSubmit={handleSearchSubmit}
+                />
               </div>
               <hr className="my-2" />
               <span>
                 {userFirstName ? (
+                  // FIX: close mobile menu on navigation
                   <Link
-                    href={`/profile/${userFirstName ? userFirstName : "user"}`}
+                    href={`/profile/${userFirstName}`}
                     className="flex items-end"
+                    onClick={closeMobileMenu}
                   >
-                    <strong className="text-2xl">{userFirstName.charAt(0).toUpperCase()}</strong>
+                    <strong className="text-2xl">
+                      {userFirstName.charAt(0).toUpperCase()}
+                    </strong>
                     <p>{userFirstName.slice(1)}</p>
                   </Link>
                 ) : (
                   <span
-                    onClick={() => openModal(`login`)}
+                    onClick={() => openModal("login")}
                     className="flex gap-x-2 cursor-pointer"
                   >
                     <User size={15} className="translate-y-1" />
@@ -407,102 +330,46 @@ const Navbar = () => {
                   </span>
                 )}
               </span>
+              {/* FIX: close mobile menu on navigation */}
               <Link
-                href={`/cart`}
+                href="/cart"
                 className="cursor-pointer py-2 flex items-center gap-x-2"
+                onClick={closeMobileMenu}
               >
                 <ShoppingBag size={15} /> Cart
-                {cartItems.length > 0 && (
-                  <h2>{cartItems.length > 100 ? "100+" : cartItems.length}</h2>
+                {userCart.length > 0 && (
+                  <span>
+                    {userCart.length > 100 ? "100+" : userCart.length}
+                  </span>
                 )}
               </Link>
               <Link
-                href={`/wishlist`}
+                href="/wishlist"
                 className="cursor-pointer relative py-2 flex items-center gap-x-2"
+                onClick={closeMobileMenu}
               >
                 <Heart size={15} /> Wishlist
-                <span>
-                  {wishlistItems.length > 0 && (
-                    <h2 className="text">
-                      {wishlistItems.length > 100
-                        ? `100+`
-                        : wishlistItems.length}
-                    </h2>
-                  )}
-                </span>
+                {userWishlist.length > 0 && (
+                  <span>
+                    {userWishlist.length > 100 ? "100+" : userWishlist.length}
+                  </span>
+                )}
               </Link>
             </div>
           </div>
         )}
       </nav>
 
-      {/* Single Modal for Login, SignUp, and Forgot Password */}
+      {/* Auth Modal */}
       <Modal
-        clickedTitle={Clear}
-        Loading={Loading}
-        disabled={Loading}
-        title={
-          modalType === "login"
-            ? "Login"
-            : modalType === "signup"
-            ? "Sign Up"
-            : modalType === "forgotPassword"
-            ? "Forgot Password?"
-            : "admin Login"
-        }
+        Loading={loadingAuth}
+        disabled={loadingAuth}
+        title={modalTitle}
         isOpen={modal}
         onClose={closeModal}
-        onSubmit={
-          modalType === "login"
-            ? loginForm
-            : modalType === "signup"
-            ? SignUpForm
-            : modalType === "forgotPassword"
-            ? ForgottenPasswordForm
-            : AdminForm
-        }
-        buttonValue={
-          modalType === "login"
-            ? "Login"
-            : modalType === "signup"
-            ? "Sign Up"
-            : "Submit"
-        }
-        subChildren={
-          modalType === "login" ? (
-            <span className="text-center gap-x-2 items-center justify-center flex text-sm">
-              <p>Don't have an account?</p>
-              <span
-                className="text-blue-600 cursor-pointer"
-                onClick={() => openModal("signup")}
-              >
-                Sign up
-              </span>
-            </span>
-          ) : modalType === "signup" ? (
-            <span className="w-full justify-center items-center text-sm flex gap-x-2">
-              <p>Already have an account?</p>
-              <span
-                className="text-blue-600 cursor-pointer"
-                onClick={() => openModal("login")}
-              >
-                Log in
-              </span>
-            </span>
-          ) : modalType === "admin" ? (
-            ""
-          ) : (
-            <span className="w-full justify-center items-center text-sm flex gap-x-2">
-              <p>Remember your password?</p>
-              <span
-                className="text-blue-600 cursor-pointer"
-                onClick={() => openModal("login")}
-              >
-                Log in
-              </span>
-            </span>
-          )
-        }
+        onSubmit={modalSubmit}
+        buttonValue={modalButtonLabel}
+        subChildren={modalSubChildren}
       >
         {modalType === "login" && (
           <>
@@ -522,19 +389,16 @@ const Navbar = () => {
               value={loginPassword}
               changed={(e) => setLoginPassword(e.target.value)}
             />
-            <span className="w-full flex justify-between  text-xs">
-              <div className="flex items-center">
+            <span className="w-full flex justify-between text-xs">
+              <label className="flex items-center gap-x-2">
                 <input
                   type="checkbox"
-                  id="rememberMe"
                   checked={rememberMe}
-                  onChange={() => setRememberMe(!rememberMe)}
+                  onChange={() => setRememberMe((r) => !r)}
                   className="accent-blue-600"
                 />
-                <label htmlFor="rememberMe" className="ml-2 ">
-                  Remember Me
-                </label>
-              </div>
+                Remember Me
+              </label>
               <span
                 onClick={() => openModal("forgotPassword")}
                 className="cursor-pointer text-blue-600"
@@ -545,48 +409,13 @@ const Navbar = () => {
           </>
         )}
 
-        {modalType === "admin" && (
-          <>
-            <Textinput
-              id="adminEmail"
-              label="Email"
-              className="border-b"
-              type="email"
-              value={adminEmail}
-              changed={(e) => setAdminEmail(e.target.value)}
-            />
-            <Textinput
-              label="Password"
-              className="border-b my-5"
-              type="password"
-              id="adminPassword"
-              value={adminPassword}
-              changed={(e) => setAdminPassword(e.target.value)}
-            />
-            <span className="w-full flex justify-between text-blue-600 text-xs">
-              <div className="flex items-center">
-                <input
-                  type="checkbox"
-                  id="rememberMe"
-                  checked={rememberMe}
-                  onChange={() => setRememberMe(!rememberMe)}
-                  className="accent-blue-600"
-                />
-                <label htmlFor="rememberMe" className="ml-2 text-black">
-                  Remember Me
-                </label>
-              </div>
-            </span>
-          </>
-        )}
-
         {modalType === "signup" && (
           <>
             <Textinput
+              id="firstName"
               label="First Name"
               className="border-b my-5"
               type="text"
-              id="firstName"
               value={firstName}
               changed={(e) => setFirstName(e.target.value)}
             />
@@ -599,16 +428,16 @@ const Navbar = () => {
               changed={(e) => setLastName(e.target.value)}
             />
             <Textinput
-              label="Email"
               id="signUpEmail"
+              label="Email"
               className="border-b my-5"
               type="email"
               value={signUpEmail}
               changed={(e) => setSignUpEmail(e.target.value)}
             />
             <Textinput
-              label="Password"
               id="signUpPassword"
+              label="Password"
               className="border-b my-5"
               type="password"
               value={signUpPassword}
@@ -627,7 +456,9 @@ const Navbar = () => {
 
         {modalType === "forgotPassword" && (
           <>
-            <p>Please enter your email</p>
+            <p className="text-sm mb-2">
+              Enter the email linked to your account.
+            </p>
             <Textinput
               id="forgotPasswordEmail"
               label="Email"
@@ -635,6 +466,27 @@ const Navbar = () => {
               type="email"
               value={forgotPasswordEmail}
               changed={(e) => setForgotPasswordEmail(e.target.value)}
+            />
+          </>
+        )}
+
+        {modalType === "admin" && (
+          <>
+            <Textinput
+              id="adminEmail"
+              label="Email"
+              className="border-b"
+              type="email"
+              value={adminEmail}
+              changed={(e) => setAdminEmail(e.target.value)}
+            />
+            <Textinput
+              id="adminPassword"
+              label="Password"
+              className="border-b my-5"
+              type="password"
+              value={adminPassword}
+              changed={(e) => setAdminPassword(e.target.value)}
             />
           </>
         )}

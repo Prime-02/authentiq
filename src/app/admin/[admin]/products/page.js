@@ -1,348 +1,177 @@
 "use client";
-import React, { useEffect, useState } from "react";
-import axios from "axios";
-import { TextArea, Textinput } from "@/components/inputs/Textinput";
-import { CheckBoxList } from "@/components/inputs/CheckBox";
-import Modal from "@/components/Modal/Modal";
-import { FileInput } from "@/components/inputs/FIleInput";
-import { toast } from "react-toastify";
+import React, { useEffect, useState, useCallback } from "react";
+import ProductFilters from "./components/ProductFilters";
+import ProductList from "./components/ProductList";
+import ProductFormModal from "./components/ProductFormModal";
+import ProductStockModal from "./components/ProductStockModal";
+import ProductStatusModal from "./components/ProductStatusModal";
+import ProductDeleteModal from "./components/ProductDeleteModal";
+import PageHeader from "./components/PageHeader";
+import { Loader } from "@/components/Loader/Loader";
 import {
-  AddCategory,
-  CategoryDropdown,
-} from "@/components/inputs/CategoryDropdown";
-import { useGlobalState } from "@/app/GlobalStateProvider";
-import DynamicImage from "@/components/reusables/DynamicImage/DynamicImage";
-import BarcodeDropdown from "@/components/inputs/DynamicDropdown";
-import { Loader, LoaderStyle5Component } from "@/components/Loader/Loader";
-import { Pen, Trash } from "lucide-react";
+  useAuthStore,
+  useBarcodeStore,
+  useCategoryStore,
+  useProductStore,
+} from "@/stores";
+
+const INITIAL_FILTERS = {
+  search: "",
+  category_id: "",
+  barcode: "",
+  sizes: "",
+  is_active: undefined,
+  min_price: "",
+  max_price: "",
+  min_stock: "",
+  max_stock: "",
+  skip: 0,
+  limit: 100,
+};
 
 const ProductTable = () => {
-  const [products, setProducts] = useState([]);
-  const [Prodloading, setProdLoading] = useState(null);
-  const [error, setError] = useState("");
-  const { formData, getToken, DeleteProduct, loading, fetchProducts } =
-    useGlobalState();
+  const { isAdmin } = useAuthStore();
+  const { fetchAdminCategories, loadingProducts } = useCategoryStore();
+  const { fetchBarcodes } = useBarcodeStore();
+  const { fetchAdminProducts, products } = useProductStore();
 
-  // Modal state and product data for editing
-  const [prodModal, setProdModal] = useState(false);
-  const [prodName, setProdName] = useState("");
-  const [prodImg, setProdImg] = useState(null);
-  const [prodPrice, setProdPrice] = useState(0);
-  const [prodDesc, setProdDesc] = useState("");
-  const [prodCategory, setProdCategory] = useState("");
-  const [prodVariants, setProdVariants] = useState([]);
-  const [prodQuantity, setProdQuantity] = useState(0);
-  const [prodId, setProdId] = useState(null); // State to store productId
-  const [prodImgPreview, setProdImgPreview] = useState(null);
-  const [selectedBarcode, setSelectedBarcode] = useState(null);
-  const Barcodes = formData?.barcodes || [];
-  const handleBarcodeSelect = (barcode) => {
-    setSelectedBarcode(barcode);
-  };
+  const [filters, setFilters] = useState(INITIAL_FILTERS);
 
-  // Available sizes for checkboxes
-  const sizeOptions = ["XS", "S", "M", "FS", "L", "XL"];
+  // Modal states
+  const [modals, setModals] = useState({
+    form: false, // Combined create/edit modal
+    stock: false,
+    status: false,
+    delete: false,
+  });
+  const [activeProduct, setActiveProduct] = useState(null);
+  const [formMode, setFormMode] = useState("create"); // 'create' or 'edit'
 
+  // Bootstrap
   useEffect(() => {
-    fetchProducts();
+    fetchAdminProducts(INITIAL_FILTERS);
+    fetchAdminCategories?.();
+    fetchBarcodes();
   }, []);
 
-  if (error) return <p className="text-center text-red-600">{error}</p>;
+  // Debounced auto-fetch on quick filters
+  useEffect(() => {
+    const id = setTimeout(() => fetchAdminProducts(filters), 300);
+    return () => clearTimeout(id);
+  }, [filters.search, filters.category_id, filters.is_active]);
 
-  const handleEdit = (product) => {
-    setProdId(product.id); // Store productId when editing
-    setProdName(product.name);
-    setProdImg(`https://isans.pythonanywhere.com${product.image}`);
-    setProdPrice(product.price);
-    setProdDesc(product.description);
-    setProdCategory(product.category);
-    setProdQuantity(product.quantity);
+  const handleFilterChange = useCallback((key, value) => {
+    setFilters((prev) => ({ ...prev, [key]: value, skip: 0 }));
+  }, []);
 
-    // Create initial variant checkboxes
-    const initialVariants = sizeOptions.map((size) => ({
-      size,
-      checked: product.sizes?.includes(size) || false, // Mark as checked if the size exists in the product's sizes array
-    }));
+  const handleApplyFilters = () => fetchAdminProducts(filters);
 
-    setProdVariants(initialVariants);
-    setProdModal(true);
+  const handleClearFilters = () => {
+    setFilters(INITIAL_FILTERS);
+    fetchAdminProducts(INITIAL_FILTERS);
   };
 
-  // Handle form submission (e.g., updating the product)
-  const editProduct = (e) => {
-    e.preventDefault();
-
-    // Ensure all required fields are provided
-    if (
-      !prodName ||
-      !prodPrice ||
-      !prodDesc ||
-      // !prodCategory ||
-      !prodQuantity
-    ) {
-      toast.error("Please fill in all required fields.");
-      return;
-    }
-
-    // Check if prodId exists
-    if (!prodId) {
-      toast.error("Product ID is missing");
-      return;
-    }
-
-    // Check if user is logged in
-    const token = getToken(`admin`);
-    if (!token) {
-      toast.warning("You must be logged in to edit products.");
-      return;
-    }
-
-    // Extract selected sizes
-    const selectedSizes = prodVariants
-      .filter((variant) => variant.checked) // Get all checked sizes
-      .map((variant) => variant.size); // Extract size names
-
-    // Create FormData object and append fields
-    const formData = new FormData();
-    formData.append("name", prodName);
-    formData.append("price", prodPrice);
-    formData.append("description", prodDesc);
-    formData.append("category", prodCategory);
-    formData.append("sizes", selectedSizes); // Convert to JSON if API expects it this way
-    formData.append("quantity", prodQuantity);
-
-    if (prodImg && prodImg instanceof File) {
-      formData.append("image", prodImg); // Append image file
-    } else if (prodImgPreview && typeof prodImgPreview === "string") {
-      // If the preview is used, it means no new image is selected, so don't append it
-      toast.error("Please upload a valid image file.");
-      return;
-    }
-    console.log(selectedSizes.join(`, `));
-
-    // Make the API request to update the product
-    axios
-      .put(
-        `https://isans.pythonanywhere.com/shop/products/${prodId}/`,
-        formData,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      )
-      .then((response) => {
-        console.log("Response from API:", response);
-        toast.success("Product updated successfully!");
-        setProdModal(false); // Close the modal
-        fetchProducts();
-      })
-      .catch((error) => {
-        console.error("Error updating product:", error);
-        toast.error("Failed to update product");
-      });
+  const handlePageChange = (newSkip) => {
+    const updated = { ...filters, skip: newSkip };
+    setFilters(updated);
+    fetchAdminProducts(updated);
   };
 
-  const handleCheckboxChange = (updatedVariant) => {
-    setProdVariants((prevVariants) =>
-      prevVariants.map(
-        (variant) =>
-          variant.size === updatedVariant.size
-            ? { ...variant, checked: !variant.checked } // Toggle only the selected size
-            : variant // Keep other sizes unchanged
-      )
-    );
+  const openModal = (name, product = null) => {
+    setActiveProduct(product);
+    setModals((m) => ({ ...m, [name]: true }));
   };
 
-  const handleImageChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      const imageUrl = URL.createObjectURL(file);
-      setProdImg(file); // Store the actual file for uploading
-      setProdImgPreview(imageUrl); // Store the preview URL
+  const closeModal = (name) => {
+    setModals((m) => ({ ...m, [name]: false }));
+    setActiveProduct(null);
+    if (name === "form") {
+      setFormMode("create");
     }
   };
-  const validateFileSize = (file, maxSizeMB = 2) => {
-    if (!file) return false; // No file provided
-    const maxSizeBytes = maxSizeMB * 1024 * 1024;
-    return file.size <= maxSizeBytes;
+
+  const handleSuccess = (modalName) => {
+    closeModal(modalName);
+    fetchAdminProducts(filters);
   };
 
-  const handleModalImageChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      if (!validateFileSize(file)) {
-        toast.error("File size exceeds 2MB. Please choose a smaller file.");
-        return;
-      }
-      const imageUrl = URL.createObjectURL(file);
-      setProdImg(file); // Store the actual file for uploading
-      setProdImgPreview(imageUrl); // Store the preview URL
-    }
+  // Open form in create mode
+  const handleAddProduct = () => {
+    setFormMode("create");
+    setActiveProduct(null);
+    openModal("form");
   };
-  return (
-    <div className="container mx-auto  p-4">
-      {Prodloading === `fetch` && <LoaderStyle5Component />}
-      <h1 className="text-2xl font-bold text-center mb-6">Product List</h1>
-      <div className="overflow-x-auto card pt-6  rounded-lg">
-        <span className="">
-          <AddCategory />
-        </span>
-        <table className="min-w-full table-auto border-collapse card shadow-md rounded-lg">
-          <thead className="">
-            <tr>
-              <th className="px-4 py-2 text-left">ID</th>
-              <th className="px-4 py-2 text-left">Name</th>
-              <th className="px-4 py-2 text-left">Image</th>
-              <th className="px-4 py-2 text-left">Price</th>
-              <th className="px-4 py-2 text-left">Description</th>
-              <th className="px-4 py-2 text-left">Category</th>
-              <th className="px-4 py-2 text-left">Sizes</th>
-              <th className="px-4 py-2 text-left">Quantity</th>
-              <th className="px-4 py-2 text-left">Barcode ID</th>
-              <th className="px-4 py-2 text-left">Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            {formData.products.map((product) => (
-              <tr key={product.id} className="border-t">
-                <td className="px-4 py-2">{product.id}</td>
-                <td className="px-4 py-2">{product.name}</td>
-                <td className="px-4 py-2">
-                  <DynamicImage
-                    className={`w-20 h-20 object-cover rounded`}
-                    width={500}
-                    height={500}
-                    prop={product.image}
-                    prod={product.name}
-                  />
-                </td>
-                <td className="px-4 py-2">${product.price}</td>
-                <td className="px-4 py-2 max-w-xs h-16 overflow-hidden text-ellipsis ">
-                  {product.description}
-                </td>
-                <td className="px-4 py-2">{product.category}</td>
-                <td className="px-4 py-2">
-                  {Array.isArray(product.sizes) && product.sizes.length > 0
-                    ? product.sizes.join(", ")
-                    : "N/A"}
-                </td>
 
-                <td className="px-4 py-2">{product.quantity}</td>
-                <td className="px-4 py-2">
-                  {product.barcode ? product.barcode : `Not Set`}
-                </td>
-                <td className="px-4 py-2 text-center flex gap-x-2 items-center">
-                  <button
-                    className="px-4 py-2 text-blue-500  rounded hover:text-blue-600 transition"
-                    onClick={() => handleEdit(product)}
-                  >
-                    <Pen />
-                  </button>
-                  <button
-                    className="px-4 py-2 text-red-500  rounded hover:text-red-600 transition"
-                    onClick={() => DeleteProduct(product.id)}
-                  >
-                    {loading === `deleting_product` ? (
-                      <Loader smaillerSize={true} />
-                    ) : (
-                      <Trash />
-                    )}
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+  // Open form in edit mode
+  const handleEditProduct = (product) => {
+    setFormMode("edit");
+    openModal("form", product);
+  };
+
+  if (loadingProducts && !products?.length) {
+    return (
+      <div className="flex justify-center items-center min-h-[400px]">
+        <Loader />
       </div>
+    );
+  }
 
-      {/* Modal for Editing Product */}
-      <Modal
-        isOpen={prodModal}
-        onClose={() => setProdModal(false)}
-        title={`Edit Product: ${prodName}.`}
-        onSubmit={editProduct}
-        buttonValue={`Save Changes`}
-      >
-        <div className="flex flex-col space-y-5">
-          <section className="flex items-center gap-x-3 justify-between">
-            <span>
-              <Textinput
-                type={`text`}
-                label={`Name`}
-                value={prodName}
-                changed={(e) => setProdName(e.target.value)}
-                className={`border-b border-blue-600`}
-              />
-            </span>
-            <span>
-              <div>
-                {prodImgPreview ? (
-                  <img
-                    src={prodImgPreview}
-                    alt="Current product"
-                    className="w-20 h-20 object-cover rounded"
-                  />
-                ) : (
-                  <p>No image selected</p>
-                )}
-              </div>
-              {/* Allow the user to select a new image */}
-              <FileInput
-                changed={handleModalImageChange} // Ensure validation is applied here
-                type="file"
-                accept="image/*"
-              />
-            </span>
-          </section>
-          <section className="flex items-center justify-between">
-            <span>
-              <Textinput
-                type={`number`}
-                label={`Price`}
-                value={prodPrice}
-                changed={(e) => setProdPrice(e.target.value)}
-                className={`border-b border-blue-600`}
-              />
-            </span>
-            <span>
-              <Textinput
-                type={`number`}
-                label={`Quantity`}
-                value={prodQuantity}
-                changed={(e) => setProdQuantity(e.target.value)}
-                className={`border-b border-blue-600`}
-              />
-            </span>
-          </section>
+  return (
+    <div className="container mx-auto p-4 space-y-4 min-h-screen overflow-auto">
+      <PageHeader
+        productCount={products?.length || 0}
+        onAddProduct={handleAddProduct}
+      />
 
-          <section>
-            <TextArea
-              label={`Description`}
-              rows={3}
-              value={prodDesc}
-              changed={(e) => setProdDesc(e.target.value)}
-              className={`border-b border-blue-600`}
-            />
-          </section>
+      <ProductFilters
+        filters={filters}
+        onFilterChange={handleFilterChange}
+        onApplyFilters={handleApplyFilters}
+        onClearFilters={handleClearFilters}
+        isAdmin={isAdmin}
+      />
 
-          <section>
-            <CategoryDropdown onCategorySelect={setProdCategory} />
-            <BarcodeDropdown
-              products={Barcodes} // Pass the product list with barcode codes
-              onSelectBarcode={handleBarcodeSelect} // Handler to update the selected barcode
-            />
-          </section>
+      <ProductList
+        products={products || []}
+        loading={loadingProducts}
+        onEdit={handleEditProduct}
+        onAdjustStock={(p) => openModal("stock", p)}
+        onToggleStatus={(p) => openModal("status", p)}
+        onDelete={(p) => openModal("delete", p)}
+        onPageChange={handlePageChange}
+        currentSkip={filters.skip}
+        limit={filters.limit}
+        isAdmin={isAdmin}
+      />
 
-          <section>
-            <CheckBoxList
-              items={prodVariants}
-              onChange={handleCheckboxChange}
-            />
-          </section>
-        </div>
-      </Modal>
+      {/* Combined Create/Edit Modal */}
+      <ProductFormModal
+        isOpen={modals.form}
+        product={formMode === "edit" ? activeProduct : null}
+        onClose={() => closeModal("form")}
+        onSuccess={() => handleSuccess("form")}
+      />
+
+      <ProductStockModal
+        isOpen={modals.stock}
+        product={activeProduct}
+        onClose={() => closeModal("stock")}
+        onSuccess={() => handleSuccess("stock")}
+      />
+
+      <ProductStatusModal
+        isOpen={modals.status}
+        product={activeProduct}
+        onClose={() => closeModal("status")}
+        onSuccess={() => handleSuccess("status")}
+      />
+
+      <ProductDeleteModal
+        isOpen={modals.delete}
+        product={activeProduct}
+        onClose={() => closeModal("delete")}
+        onSuccess={() => handleSuccess("delete")}
+      />
     </div>
   );
 };

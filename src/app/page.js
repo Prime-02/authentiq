@@ -1,137 +1,159 @@
 "use client";
+import { useEffect, useState } from "react";
 import DynamicImage from "@/components/reusables/DynamicImage/DynamicImage";
-import { useGlobalState } from "./GlobalStateProvider";
-import { ButtonOne, ButtonTwo } from "@/components/reusables/buttons/Buttons";
-import { Heart, ShoppingCart } from "lucide-react";
+import { LoaderStyle5Component } from "@/components/Loader/Loader";
+import { useCategoryStore } from "@/stores";
+import ProductCard from "@/components/ProductCard/ProductCard";
 import Link from "next/link";
-import { Loader, LoaderStyle5Component } from "@/components/Loader/Loader";
 
 export default function Home() {
-  const { formData, addToEndpoint, loading, fetchProducts } = useGlobalState(); // Access global state
-  const { products } = formData; // Extract the products array
+  const { categories, loadingCategories, fetchCategories } = useCategoryStore();
 
-  // Helper function to group products by category
-  const groupProductsByCategory = (products) => {
-    return products.reduce((acc, product) => {
-      const category = product.category || "Others";
-      if (!acc[category]) {
-        acc[category] = [];
-      }
-      acc[category].push(product);
-      return acc;
-    }, {});
-  };
-
-  const groupedProducts = groupProductsByCategory(products); // Grouped products
-  
-
- const handleAddToCart = (productId) => {
-   addToEndpoint({
-     productId,
-     endpoint: "https://isans.pythonanywhere.com/shop/cart/",
-     action: "cart",
-   });
- };
-  const handleAddToWishlist = (productId) => {
-    addToEndpoint({
-      productId,
-      endpoint: "https://isans.pythonanywhere.com/shop/wishlist/",
-      action: "wishlist",
-      payloadID: "product",
+  useEffect(() => {
+    // Fetch categories with limited products for better performance
+    fetchCategories({
+      includeProducts: true,
+      maxProducts: 10,
     });
-  };
+  }, [fetchCategories]);
+
+  // Group all products by category
+  const groupedCategories = categories.filter(
+    (category) => category.products && category.products.length > 0,
+  );
+
+  if (loadingCategories) {
+    return (
+      <main className="my-32 w-[90%] mx-auto">
+        <div className="w-full md:w-full mx-auto h-auto flex flex-col gap-y-8">
+          <h1 className="font-extrabold text-3xl md:text-5xl">
+            {"What would you like to buy from us?"}
+          </h1>
+          <div className="w-full h-screen flex-col gap-y-12 flex items-center">
+            <LoaderStyle5Component />
+            <p>Loading products...</p>
+          </div>
+        </div>
+      </main>
+    );
+  }
+
+  if (groupedCategories.length === 0) {
+    return (
+      <main className="my-32 w-[90%] mx-auto">
+        <div className="w-full md:w-full mx-auto h-auto flex flex-col gap-y-8">
+          <h1 className="font-extrabold text-3xl md:text-5xl">
+            {"What would you like to buy from us?"}
+          </h1>
+          <div className="w-full h-screen flex-col gap-y-12 flex items-center">
+            <LoaderStyle5Component />
+            <p>No products available</p>
+          </div>
+        </div>
+      </main>
+    );
+  }
 
   return (
     <main className="my-32 w-[90%] mx-auto">
-      <div className="w-full md:w-full mx-auto h-auto flex flex-col gap-y-8">
-        <h1
-          onClick={() => fetchProducts()}
-          className="font-extrabold text-3xl md:text-5xl cursor-pointer"
-        >
+      <div className="w-full mx-auto h-auto flex flex-col gap-y-8">
+        <h1 className="font-extrabold text-3xl md:text-5xl">
           {"What would you like to buy from us?"}
         </h1>
 
-        {/* Iterate over grouped products */}
-        {products.length === 0 ? (
-          <div className="w-full h-screen flex-col gap-y-12 flex items-center">
-            <LoaderStyle5Component />
-            <p>
-              No Item
-            </p>
-          </div>
-        ) : (
-          Object.entries(groupedProducts).map(([category, items], ind) => (
-            <div key={ind}>
-              <h2 className="text-xl md:text-3xl font-bold mb-5">{category}</h2>
-              <div className="flex gap-x-5 min-w-full overflow-x-auto scrollbar-none pb-16 scroll-snap-x scroll-snap-mandatory">
-                {items.map((product) => (
-                  <div
-                    key={product.id}
-                    className="flex-shrink-0 flex flex-col min-h-full items-center justify-between p-5 card relative shadow-2xl overflow-hidden rounded-lg w-full 
-                  sm:w-1/2 md:w-1/3 lg:w-1/4 scroll-snap-align-start"
+        {/* Iterate over categories with hero images */}
+        {groupedCategories.map((category, ind) => (
+          <div key={category.id || ind} className="flex flex-col gap-y-8">
+            {/* Hero Section with Category Image */}
+            <div className="relative w-full h-[300px] md:h-[400px] lg:h-[500px] rounded-2xl overflow-hidden shadow-2xl group">
+              {/* Category Image as Hero */}
+              {category?.image_url && (
+                <DynamicImage
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  width={1200}
+                  height={500}
+                  prod={category?.name || "Category"}
+                  prop={category.image_url}
+                />
+              )}
+
+              {/* Overlay */}
+              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
+
+              {/* Content Overlay */}
+              <div className="absolute bottom-0 left-0 right-0 p-8 md:p-12">
+                <h2 className="text-white text-3xl md:text-5xl font-bold mb-4">
+                  {category?.name || "Category"}
+                </h2>
+                {category?.description && (
+                  <p className="text-white/90 text-lg md:text-xl mb-6 max-w-2xl">
+                    {category.description}
+                  </p>
+                )}
+                <Link
+                  href={`/category/${category?.name?.toLowerCase()?.replace(/\s+/g, "-") || ""}`}
+                  className="inline-flex items-center gap-2 bg-white text-black px-6 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors"
+                >
+                  Shop {category?.name || "Category"}
+                  <svg
+                    className="w-5 h-5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
                   >
-                    <span className="absolute top-2 right-2 cursor-pointer">
-                      {loading === `wishlist${product.id}` ? (
-                        <Loader smaillerSize={true} />
-                      ) : (
-                        <Heart
-                          size={20}
-                          onClick={() => handleAddToWishlist(product.id)}
-                        />
-                      )}
-                    </span>
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M13 7l5 5m0 0l-5 5m5-5H6"
+                    />
+                  </svg>
+                </Link>
+              </div>
 
-                    {/* Image */}
-                    <Link
-                      href={`/product/${product.name
-                        .toLowerCase()
-                        .replace(/\s+/g, "-")}`}
-                      passHref
-                      className="rounded-lg  flex items-center justify-center flex-1"
-                    >
-                      <DynamicImage
-                        className={`object-cover drop-shadow-2xl hover:scale-90 transition w-auto h-auto`}
-                        width={250}
-                        height={250}
-                        prod={product.name}
-                        prop={product.image}
-                      />
-                    </Link>
-                    <div className="w-full flex flex-col items-start justify-between">
-                      <Link
-                        href={`/product/${product.name
-                          .toLowerCase()
-                          .replace(/\s+/g, "-")}`}
-                        passHref
-                        className="flex text-start flex-col "
-                      >
-                        {/* Title */}
-                        <figcaption className="mt-4 text-lg font-bold">
-                          {product.name}
-                        </figcaption>
-                      </Link>
+            </div>
 
-                      <span className="flex justify-between w-full items-end mt-8">
-                        <p className="text-base font-semibold">
-                          ${product.price}
-                        </p>
-                        <ButtonTwo
-                          disabled={
-                            loading === `cart${product.id}` ? true : false
-                          }
-                          className={`rounded-md`}
-                          iconValue={<ShoppingCart size={15} />}
-                          buttonValue={`Add to Cart`}
-                          Clicked={() => handleAddToCart(product.id)}
-                        />
-                      </span>
-                    </div>
+            {/* Products Grid Below Hero */}
+            <div>
+
+              <div className="flex gap-x-5 min-w-full overflow-x-auto scrollbar-none pb-6 scroll-snap-x scroll-snap-mandatory">
+                {category?.products?.map((product) => (
+                  <div
+                    key={product?.id || Math.random()}
+                    className="flex-shrink-0 w-full sm:w-[calc(50%-10px)] md:w-[calc(33.333%-14px)] lg:w-[calc(25%-15px)] scroll-snap-align-start"
+                  >
+                    <ProductCard product={product} />
                   </div>
                 ))}
               </div>
+
+              {/* Show more indicator if there are more products */}
+              {category?.products?.length === 10 && (
+                <div className="mt-4 text-center">
+                  <Link
+                    href={`/category/${category?.name?.toLowerCase()?.replace(/\s+/g, "-") || ""}`}
+                    className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-800 font-medium"
+                  >
+                    See more products in {category?.name || "this category"}
+                    <svg
+                      className="w-4 h-4"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M13 7l5 5m0 0l-5 5m5-5H6"
+                      />
+                    </svg>
+                  </Link>
+                </div>
+              )}
             </div>
-          ))
-        )}
+          </div>
+        ))}
       </div>
     </main>
   );

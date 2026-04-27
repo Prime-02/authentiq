@@ -1,42 +1,30 @@
 "use client";
-import { useGlobalState } from "@/app/GlobalStateProvider";
 import { adminDBSidebar } from "@/components/index";
-import { SearchTwo } from "@/components/inputs/SearchInputs";
 import Modal from "@/components/Modal/Modal";
-import { ButtonOne, ButtonTwo, DBButtonOne } from "@/components/reusables/buttons/Buttons";
-import { Home, LogOutIcon, User, User2Icon, UserCircle, X } from "lucide-react";
+import { useAuthStore } from "@/stores";
+import { LogOutIcon, UserCircle, X } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { RiSideBarLine } from "react-icons/ri";
 
-
 const Sidebar = () => {
   const [sideSlide, setSideSlide] = useState(false);
-  const [searchTwo, setSearchTwo] = useState("");
-  const [activeLink, setActiveLink] = useState("");
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const pathname = usePathname();
   const current = usePathname();
   const isCurrent = (href) => current === href;
 
-  const formattedPath = pathname.replace(/\//g, " > ").replace(/^ > /, "");
+  const { adminFirstName, fetchAdminData } = useAuthStore();
 
-  const { formData, adminToken, fetchProducts, fetchOrders, fetchBarcodes } = useGlobalState(); // Access global state
-  const adminFirstName = formData.adminFirstName
-    ? formData.adminFirstName
-    : "admin"; // Extract adminFirstName from formData
+  useEffect(() => {
+    fetchAdminData();
+  }, []);
 
   // Replace spaces with hyphens in the adminFirstName
-  const formattedadminFirstName = adminFirstName.replace(/\s+/g, "_");
-
-   const handleSearch = (e) => {
-     e.preventDefault();
-     // setSearchTwo(e.target.value);
-     fetchProducts({ name: searchTwo });
-     fetchOrders(searchTwo)
-     fetchBarcodes(searchTwo)
-   };
+  const formattedadminFirstName = adminFirstName
+    ? adminFirstName.replace(/\s+/g, "_")
+    : "admin";
 
   useEffect(() => {
     const handleResize = () => {
@@ -59,11 +47,6 @@ const Sidebar = () => {
     setSideSlide((prevState) => !prevState);
   };
 
-  const handleLinkClick = (href) => {
-    setActiveLink(href);
-    setSideSlide(false);
-  };
-
   const closeSideBar = () => {
     if (window.innerWidth < 768) {
       setSideSlide(false);
@@ -74,146 +57,153 @@ const Sidebar = () => {
     setShowLogoutModal(true);
   };
 
-  const LogoutUser = () => {
-   adminToken
-    setShowLogoutModal(false);
-  };
-
   return (
     <>
+      {/* Mobile overlay */}
       {sideSlide && (
         <div
-          className="fixed inset-0 bg-black bg-opacity-50 z-30 sm:hidden"
+          className="fixed inset-0 bg-black bg-opacity-50 z-30 md:hidden backdrop-blur-sm"
           onClick={closeSideBar}
         ></div>
       )}
 
+      {/* Sidebar */}
       <aside
-        className={`fixed top-0 h-screen w-[70%] sm:w-auto transition-transform duration-300 px-2 bg-gray-800 z-50 ${
-          sideSlide ? "translate-x-0" : "-translate-x-full sm:translate-x-0"
-        }`}
+        className={`fixed top-0 left-0 h-screen w-[75%] md:w-[15%] transition-transform duration-300 ease-in-out z-40 font-Poppins
+          bg-[var(--bg-secondary)] border-r border-[var(--border-color)]
+          ${sideSlide ? "translate-x-0" : "-translate-x-full md:translate-x-0"}`}
       >
+        {/* Mobile close button */}
         {sideSlide && (
-          <span
-            className="absolute sm:hidden text-white right-3 top-3 border rounded-md cursor-pointer"
-            onClick={() => setSideSlide(!sideSlide)}
+          <button
+            className="absolute md:hidden right-3 top-3 p-2 rounded-lg 
+              text-[var(--text-primary)] hover:bg-[var(--bg-hover)] transition-colors duration-200"
+            onClick={() => setSideSlide(false)}
           >
-            <X />
-          </span>
+            <X size={20} />
+          </button>
         )}
-        <div className="flex flex-col h-full text-white pt-12">
-          <div className="h-16 flex items-center sm:items-start gap-1 px-4 pb-2 overflow-hidden cursor-pointer">
-            <Link
-              href={"/"}
-              className="p-2 border-gray-400 border-2 rounded-full"
-            >
-              <Home size={20} />
-            </Link>
+
+        {/* Sidebar content */}
+        <div className="flex flex-col h-full pt-16 px-3">
+          {/* Logo/Brand area */}
+          <div className="mb-8 px-3">
+            <h2 className="text-xl font-Montserrat font-bold text-[var(--text-primary)]">
+              Admin Panel
+            </h2>
+            <p className="text-sm text-[var(--text-muted)] mt-1">
+              {formattedadminFirstName.replace(/_/g, " ")}
+            </p>
           </div>
 
-          <div className="flex flex-col gap-y-2 sm:items-center items-start overflow-y-auto">
-            {adminDBSidebar.map((links, index) => {
-              const updatedHref = links.href.replace(
-                "/name",
-                `/${formattedadminFirstName}`
-              );
-              return (
-                <div className="border-gray-700 my-4" key={index}>
-                  <Link
-                    href={updatedHref}
-                    // onClick={() => handleLinkClick(links.href)}
-                    className={`flex items-center mx-auto gap-2 py-2 hover:text-gray-400 text-base sm:text-lg focus:bg-white focus:text-slate-800 px-3 rounded-xl mr-3 transition duration-200 ${
-                      isCurrent(updatedHref) ? "bg-white text-gray-900" : ""
-                    }`}
-                  >
-                    <span className="text-xl">{links.icons}</span>
-                    <span className="sm:hidden">{links.name}</span>
-                  </Link>
-                </div>
-              );
-            })}
-            <div className="border-gray-700">
-              <button
-                onClick={handleLogoutClick}
-                className="flex items-center mx-auto gap-2 py-1 text-sm sm:text-base hover:text-gray-400 px-3 rounded-xl mr-3 transition duration-200"
-              >
-                <span className="text-xl">
-                  <LogOutIcon />
-                </span>
-                <span className="sm:hidden">Logout</span>
-              </button>
+          {/* Navigation links */}
+          <nav className="flex-1 overflow-y-auto">
+            <div className="flex flex-col gap-y-1">
+              {adminDBSidebar.map((links, index) => {
+                const updatedHref = links.href.replace(
+                  "/name",
+                  `/${formattedadminFirstName}`,
+                );
+                return (
+                  <div key={index}>
+                    <Link
+                      href={updatedHref}
+                      onClick={closeSideBar}
+                      className={`flex items-center gap-3 px-4 py-2.5 rounded-lg transition-all duration-200 group
+                        ${
+                          isCurrent(updatedHref)
+                            ? "bg-[var(--bg-tertiary)] text-[var(--text-primary)] font-medium shadow-sm"
+                            : "text-[var(--text-secondary)] hover:bg-[var(--bg-hover)] hover:text-[var(--text-primary)]"
+                        }`}
+                    >
+                      <span className="text-xl flex-shrink-0 transition-transform duration-200 group-hover:scale-110">
+                        {links.icons}
+                      </span>
+                      <span className="text-sm md:text-base truncate">
+                        {links.name}
+                      </span>
+                      {isCurrent(updatedHref) && (
+                        <span className="ml-auto w-1.5 h-1.5 rounded-full bg-[var(--text-primary)]"></span>
+                      )}
+                    </Link>
+                  </div>
+                );
+              })}
             </div>
+          </nav>
+
+          {/* Logout button */}
+          <div className="border-t border-[var(--border-color)] pt-4 pb-6 mt-auto">
+            <button
+              onClick={handleLogoutClick}
+              className="flex items-center gap-3 px-4 py-2.5 w-full rounded-lg
+                text-[var(--text-secondary)] hover:bg-[var(--bg-hover)] hover:text-[var(--text-primary)] 
+                transition-all duration-200 group"
+            >
+              <span className="text-xl flex-shrink-0 transition-transform duration-200 group-hover:scale-110">
+                <LogOutIcon />
+              </span>
+              <span className="text-sm md:text-base">Logout</span>
+            </button>
           </div>
         </div>
       </aside>
 
-      <nav className="fixed top-0 w-full backdrop-blur-3xl border-b z-10">
-        <div className="flex px-4 sm:px-6 py-3 items-center justify-between w-full gap-4 sm:gap-8">
+      {/* Top Navigation Bar */}
+      <nav className="fixed md:hidden top-0 left-0 right-0 z-20 bg-[var(--bg-primary)] border-b border-[var(--border-color)] shadow-sm">
+        <div className="flex px-4 md:px-6 py-3 items-center justify-between w-full">
           {/* Left Section */}
-          <div className="flex items-center gap-4 sm:gap-8">
+          <div className="flex items-center gap-3 md:gap-6">
             {/* Sidebar Toggle Button */}
-            <span
-              className="p-2 border-gray-400 border-2 rounded-lg flex cursor-pointer"
+            <button
+              className="p-2 rounded-lg border border-[var(--border-color)] 
+                hover:bg-[var(--bg-hover)] transition-colors duration-200
+                text-[var(--text-primary)]"
               onClick={toggleSideSlide}
+              aria-label="Toggle sidebar"
             >
               <RiSideBarLine size={20} />
-            </span>
-
-            {/* Path Indicator (hidden on smaller screens) */}
-            <span className="hidden sm:block text-xs">{formattedPath}</span>
-          </div>
-
-          {/* Middle Section */}
-          <div className="flex-1 md:flex md:justify-center hidden">
-            <SearchTwo
-                searchTwo={searchTwo}
-                onChange={(e) => setSearchTwo(e.target.value)}
-                handleSubmit={handleSearch}
-              />
-          </div>
-
-          {/* Right Section */}
-          <div className="flex items-center gap-4">
-            {/* Search Button (Visible on small screens) */}
-            <span className="block md:hidden">
-              <SearchTwo
-                searchTwo={searchTwo}
-                onChange={(e) => setSearchTwo(e.target.value)}
-                handleSubmit={handleSearch}
-              />
-            </span>
-
-            {/* User Icon or Initial */}
-            <span className="text-2xl border-2 border-gray-400 rounded-full h-10 w-10 flex items-center justify-center">
-              {adminFirstName ? (
-                <strong>{adminFirstName.charAt(0).toUpperCase()}</strong>
-              ) : (
-                <UserCircle />
-              )}
-            </span>
+            </button>
           </div>
         </div>
       </nav>
 
+      {/* Logout Modal */}
       {showLogoutModal && (
         <Modal
           isOpen={showLogoutModal}
           onClose={() => setShowLogoutModal(false)}
         >
-          <div className="flex flex-col items-center justify-center p-6">
-            <h1 className="text-lg font-bold mb-4 text-center text-slate-800">
-              Are you sure you want to log out?
-            </h1>
-            <div className="flex gap-4">
-              <ButtonOne
-                Clicked={() => setShowLogoutModal(false)}
-                buttonValue="No"
+          <div className="flex flex-col items-center justify-center p-8">
+            <div className="mb-6">
+              <LogOutIcon
+                size={48}
+                className="text-[var(--text-secondary)] mx-auto"
               />
-              <Link href="/">
-                <ButtonTwo
-                  Clicked={() => setShowLogoutModal(false)}
-                  buttonValue="Yes"
-                />
+            </div>
+            <h1 className="text-xl font-Montserrat font-bold mb-2 text-center text-[var(--text-primary)]">
+              Ready to Leave?
+            </h1>
+            <p className="text-sm text-[var(--text-muted)] mb-6 text-center">
+              Are you sure you want to log out of your account?
+            </p>
+            <div className="flex gap-3 w-full">
+              <button
+                onClick={() => setShowLogoutModal(false)}
+                className="flex-1 px-4 py-2.5 rounded-lg border border-[var(--border-color)]
+                  text-[var(--text-primary)] hover:bg-[var(--bg-hover)] 
+                  transition-all duration-200 font-Poppins font-medium"
+              >
+                Cancel
+              </button>
+              <Link href="/" className="flex-1">
+                <button
+                  onClick={() => setShowLogoutModal(false)}
+                  className="w-full px-4 py-2.5 rounded-lg bg-[var(--text-primary)] text-[var(--text-inverse)]
+                    hover:opacity-90 transition-all duration-200 font-Poppins font-medium"
+                >
+                  Log Out
+                </button>
               </Link>
             </div>
           </div>

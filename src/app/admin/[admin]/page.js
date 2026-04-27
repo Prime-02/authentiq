@@ -1,19 +1,19 @@
 "use client";
-import { useGlobalState } from "@/app/GlobalStateProvider";
+import { useAuthStore } from "@/stores";
 import { BarChart, Database, TrendingUp } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import React from "react";
 
 const Layout = ({ children }) => {
-  const { formData } = useGlobalState();
+  const { adminFirstName } = useAuthStore();
   const current = usePathname();
 
   // Determine if the current link is active
   const isCurrent = (href) => current === href;
 
   // Format the adminFullName for use in routes
-  const routeId = formData.adminFirstName.replace(/\s+/g, "_");
+  const routeId = adminFirstName.replace(/\s+/g, "_");
 
   // Define the dashboard routes
   const DashBoardRoute = [
@@ -39,9 +39,7 @@ const Layout = ({ children }) => {
             href={links.href}
             key={indx}
             className={`flex gap-2 items-center px-3 py-2 rounded-lg transition duration-300 ${
-              isCurrent(links.href)
-                ? "bg-blue-500 text-white"
-                : ""
+              isCurrent(links.href) ? "bg-blue-500 text-white" : ""
             }`}
           >
             <p>{links.icon}</p>

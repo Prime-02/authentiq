@@ -15,7 +15,7 @@ const Modal = ({ isOpen, onClose, title, children, onSubmit, disabled, loading, 
 
   return (
     <div
-      className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50 px-4 text-customGray"
+      className="fixed inset-0 overflow-auto flex items-center justify-center z-50 bg-black bg-opacity-50 px-4 text-customGray"
       onClick={handleOutsideClick}
     >
       <div className="card rounded-lg p-6 shadow-lg w-full max-w-md relative">

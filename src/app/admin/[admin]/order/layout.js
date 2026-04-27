@@ -1,18 +1,21 @@
 "use client";
 import Link from "next/link";
-import React from "react";
+import React, { useEffect } from "react";
 import { IoMdCheckmarkCircleOutline } from "react-icons/io";
 import { TbTruckDelivery } from "react-icons/tb";
 import { PiPackage } from "react-icons/pi";
 import { MdCancel, MdCategory, MdOutlinePendingActions } from "react-icons/md";
 import { usePathname } from "next/navigation"; // Use usePathname for Next.js 13+
-import { useGlobalState } from "@/app/GlobalStateProvider";
-
+import { useAuthStore } from "@/stores";
 
 const Layout = ({ children }) => {
   const pathname = usePathname(); // Get the current pathname
-  const {formData} = useGlobalState()
-const adminRoute = formData.adminFirstName ? formData.adminFirstName : 'admin';
+  const { adminFirstName, fetchAdminData } = useAuthStore();
+  const adminRoute = adminFirstName ? adminFirstName : "admin";
+
+  useEffect(() => {
+    fetchAdminData();
+  }, []);
   const statusHeader = [
     {
       route: `/admin/${adminRoute}/order`,

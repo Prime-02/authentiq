@@ -1,10 +1,14 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
-     remotePatterns: [
+    remotePatterns: [
       {
-        protocol: 'https',
-        hostname: 'isans.pythonanywhere.com',
+        protocol: "https",
+        hostname: "sans-242869c0.fastapicloud.dev",
+      },
+      {
+        protocol: "https",
+        hostname: "res.cloudinary.com",
       },
     ],
   },

@@ -18,25 +18,33 @@ const Dropdown = ({
   const [dropdown, setDropdownOpen] = useState(false);
 
   return (
-    <div className={`${divClassName} flex items-center relative w-32`}>
+    <div className={`${divClassName} flex items-center w-full relative w-32`}>
       <select
         onClick={() => setDropdownOpen(!dropdown)}
         onChange={(e) => onSelect(e.target.value)}
         className={`bg-transparent select outline-none  w-full cursor-pointer ${className}`}
       >
         {/* Placeholder */}
-        <option value="">{placeholder}</option>
+        <option className="card" value="">
+          {placeholder}
+        </option>
 
         {/* Render Options */}
         {filteredOptions.length > 0 ? (
           filteredOptions.map((option) => (
-            <option key={option[valueKey]} value={option[valueKey]}>
+            <option
+              className="card"
+              key={option[valueKey]}
+              value={option[valueKey]}
+            >
               {option[displayKey]}
             </option>
           ))
         ) : (
           // Empty State
-          <option disabled>{emptyMessage}</option>
+          <option className="card" disabled>
+            {emptyMessage}
+          </option>
         )}
       </select>
       <span className="absolute right-1">

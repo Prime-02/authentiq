@@ -1,4 +1,4 @@
-import { ShoppingCart, User, Users } from "lucide-react";
+import { FolderTree, ShoppingCart, User, Users } from "lucide-react";
 import { FaBox } from "react-icons/fa";
 import { FaBarcode } from "react-icons/fa6";
 import { RiRefund2Line } from "react-icons/ri";
@@ -18,6 +18,7 @@ export const adminDBSidebar = [
   {name: 'Dashboard', href: '/admin/name/dashboard/', icons: <TbLayoutDashboardFilled/>},
   {name: 'Customers', href: '/admin/name/customers/', icons: <Users/>},
   {name: 'Products', href: '/admin/name/products/', icons: <FaBox/>},
+  {name: 'Categories', href: '/admin/name/categories/', icons: <FolderTree/>},
   {name: 'Barcodes', href: '/admin/name/barcode/', icons: <FaBarcode/>},
   {name: 'Orders', href: '/admin/name/order/', icons: <ShoppingCart/>},
   {name: 'Profile', href: '/admin/name/profile/', icons: <User/>},

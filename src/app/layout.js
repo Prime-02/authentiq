@@ -1,7 +1,6 @@
 import localFont from "next/font/local";
 import "./globals.css";
 import { GlobalStateProvider } from "./GlobalStateProvider";
-import DynamicTitle from "./DynamicTitle";
 import ClientLayout from "./ClientLayout";
 import ThemeProvider from "./ThemeProvider";
 
