@@ -1,24 +1,15 @@
 // app/cart/page.jsx or wherever your cart page is
 "use client";
-import React from "react";
+import React, { useEffect } from "react";
 import CartLoading from "./components/CartLoading";
 import CartUnauthenticated from "./components/CartUnauthenticated";
 import CartEmpty from "./components/CartEmpty";
 import CartContent from "./components/CartContent";
-import { useAuthStore, useCartStore } from "@/stores";
+import { useCartStore } from "@/stores";
+import { isAuthenticated } from "../../../lib/axiosInstance";
 
 const CartPage = () => {
   const { userCart, loadingCart, fetchCart } = useCartStore();
-  const { userId, loadingUser, fetchUserData } = useAuthStore();
-
-  // Check if user is authenticated
-  const isAuthenticated = !!userId;
-
-  React.useEffect(() => {
-    if (!userId && !loadingUser) {
-      fetchUserData();
-    }
-  }, [userId, loadingUser, fetchUserData]);
 
   React.useEffect(() => {
     if (isAuthenticated()) {
@@ -27,10 +18,7 @@ const CartPage = () => {
   }, [isAuthenticated]);
 
   // Loading state
-  if (
-    loadingUser ||
-    (loadingCart && userCart.length === 0 && isAuthenticated)
-  ) {
+  if (loadingCart && userCart.length === 0 && isAuthenticated) {
     return <CartLoading />;
   }
 
