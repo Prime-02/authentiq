@@ -21,10 +21,10 @@ const CartPage = () => {
   }, [userId, loadingUser, fetchUserData]);
 
   React.useEffect(() => {
-    if (isAuthenticated) {
+    if (isAuthenticated()) {
       fetchCart();
     }
-  }, [isAuthenticated, fetchCart]);
+  }, [isAuthenticated]);
 
   // Loading state
   if (

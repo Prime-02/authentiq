@@ -45,7 +45,7 @@ export const ButtonTwo = ({
   <button
     disabled={disabled}
     onClick={Clicked}
-    className={`${className} flex items-center justify-center text-sm transition-all duration-300 cursor-pointer shadow-md active:translate-y-1 ${
+    className={`${className}  px-6 py-3 w-auto rounded-md flex items-center justify-center text-sm transition-all duration-300 cursor-pointer shadow-md active:translate-y-1 ${
       IconButton
         ? "w-9 h-9 rounded-full border border-white text-white bg-[#1a1a1a]"
         : "py-2 px-4 rounded-full border border-white text-white bg-[#1a1a1a]"
@@ -55,14 +55,14 @@ export const ButtonTwo = ({
         : ""
     }`}
   >
-    {
-      disabled ? <Loader fill={`#ffffff`} smaillerSize="15px"/> : (
-        <>
+    {disabled ? (
+      <Loader fill={`#ffffff`} smaillerSize="15px" />
+    ) : (
+      <>
         {buttonValue && <p>{buttonValue}</p>}
-    {iconValue && <p className="ml-2">{iconValue}</p>}
-        </>
-      )
-    }
+        {iconValue && <p className="ml-2">{iconValue}</p>}
+      </>
+    )}
   </button>
 );
 

@@ -8,6 +8,7 @@ import {
   Package,
   ShoppingCart,
   X,
+  ArrowRight,
 } from "lucide-react";
 import Link from "next/link";
 import { toast } from "react-toastify";
@@ -137,8 +138,15 @@ const CartContent = () => {
                   href="/"
                   className="flex items-center gap-2 text-primary-600 hover:text-primary-700 transition-colors"
                 >
-                  <ArrowLeft size={18} />
+                  <ArrowRight size={18} />
                   Continue Shopping
+                </Link>
+                <Link
+                  href="/cart/order_history"
+                  className="flex items-center gap-2 text-primary-600 hover:text-primary-700 transition-colors"
+                >
+                  <ArrowLeft size={18} />
+                  Order History
                 </Link>
               </div>
             </div>

@@ -1,27 +1,56 @@
-import { FolderTree, ShoppingCart, User, Users } from "lucide-react";
+import { FolderTree, ShoppingCart, Truck, User, Users } from "lucide-react";
 import { FaBox } from "react-icons/fa";
 import { FaBarcode } from "react-icons/fa6";
 import { RiRefund2Line } from "react-icons/ri";
-import { TbArrowsExchange, TbLayoutDashboardFilled, TbMenuOrder, TbTruckDelivery } from "react-icons/tb";
-
+import {
+  TbArrowsExchange,
+  TbLayoutDashboardFilled,
+  TbMenuOrder,
+  TbTruckDelivery,
+} from "react-icons/tb";
 
 export const Shipping = {
-  title: 'Shipping & Returns',
+  title: "Shipping & Returns",
   points: [
-    {heading: 'Quick Delivery', icon: <TbTruckDelivery/>, text: `Expect your order to reach you in 3-5 business days, either at a pick-up point or directly at your doorstep.`},
-    {heading: 'Simple Exchanges', icon: <TbArrowsExchange/>, text: `Not happy with the fit? We’ll gladly exchange your item for a more suitable size.`},
-    {heading: 'Hassle-Free Returns', icon: <RiRefund2Line/>, text: `If you’re not satisfied, simply return the product, and we’ll refund your money without any questions.`},
-  ]
-}
+    {
+      heading: "Quick Delivery",
+      icon: <TbTruckDelivery />,
+      text: `Expect your order to reach you in 3-5 business days, either at a pick-up point or directly at your doorstep.`,
+    },
+    {
+      heading: "Simple Exchanges",
+      icon: <TbArrowsExchange />,
+      text: `Not happy with the fit? We’ll gladly exchange your item for a more suitable size.`,
+    },
+    {
+      heading: "Hassle-Free Returns",
+      icon: <RiRefund2Line />,
+      text: `If you’re not satisfied, simply return the product, and we’ll refund your money without any questions.`,
+    },
+  ],
+};
 
 export const adminDBSidebar = [
-  {name: 'Dashboard', href: '/admin/name/dashboard/', icons: <TbLayoutDashboardFilled/>},
-  {name: 'Customers', href: '/admin/name/customers/', icons: <Users/>},
-  {name: 'Products', href: '/admin/name/products/', icons: <FaBox/>},
-  {name: 'Categories', href: '/admin/name/categories/', icons: <FolderTree/>},
-  {name: 'Barcodes', href: '/admin/name/barcode/', icons: <FaBarcode/>},
-  {name: 'Orders', href: '/admin/name/order/', icons: <ShoppingCart/>},
-  {name: 'Profile', href: '/admin/name/profile/', icons: <User/>},
+  {
+    name: "Dashboard",
+    href: "/admin/name/dashboard/",
+    icons: <TbLayoutDashboardFilled />,
+  },
+  { name: "Customers", href: "/admin/name/customers/", icons: <Users /> },
+  { name: "Products", href: "/admin/name/products/", icons: <FaBox /> },
+  {
+    name: "Categories",
+    href: "/admin/name/categories/",
+    icons: <FolderTree />,
+  },
+  { name: "Barcodes", href: "/admin/name/barcode/", icons: <FaBarcode /> },
+  { name: "Orders", href: "/admin/name/order/", icons: <ShoppingCart /> },
+  {
+    name: "Delivery Companies",
+    href: "/admin/name/delivery_companies/",
+    icons: <Truck />,
+  },
+  { name: "Profile", href: "/admin/name/profile/", icons: <User /> },
 ];
 
 export const termsAndConditions = [

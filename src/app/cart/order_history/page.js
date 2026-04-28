@@ -1,220 +1,215 @@
+// app/cart/order_history/page.jsx
 "use client";
-import { useGlobalState } from "@/app/GlobalStateProvider";
-import React, { useState } from "react";
-import { IoMdCheckmarkCircleOutline } from "react-icons/io";
-import { TbTruckDelivery } from "react-icons/tb";
-import { PiPackage } from "react-icons/pi";
-import { MdOutlinePendingActions } from "react-icons/md";
+import React, { useEffect, useState } from "react";
+import { useRouter } from "next/navigation"; // Add this import
+import { useOrderStore } from "@/stores";
+import { useAuthStore } from "@/stores";
+import OrderList from "./components/OrderList";
+import OrderFilters from "./components/OrderFilters";
+import OrderPagination from "./components/OrderPagination";
+import {
+  ShoppingBag,
+  Package,
+  Loader2,
+  Clock,
+  CheckCircle2,
+  Truck,
+} from "lucide-react";
+import Link from "next/link";
+import { isAuthenticated } from "../../../../lib/axiosInstance";
 
+const OrderHistoryPage = () => {
+  const router = useRouter(); // Add this
 
-const Page = () => {
-  const { formData, formatBalance } = useGlobalState();
-  const orderHistory = formData.userOrderHistory;
-  const statuses = [
-    { status: "Pending", icon: <MdOutlinePendingActions size={18} /> },
-    { status: "Packaged", icon: <PiPackage size={18} /> },
-    { status: "Shipped", icon: <TbTruckDelivery size={18} /> },
-    { status: "Delivered", icon: <IoMdCheckmarkCircleOutline size={18} /> },
-  ];
+  const {
+    userOrderHistory,
+    userOrdersPagination,
+    userOrdersFilters,
+    loadingOrders,
+    loadingMutation,
+    fetchOrderHistory,
+    cancelOrder,
+    setUserOrdersPage,
+    applyUserFilters,
+    resetUserFilters,
+  } = useOrderStore();
 
-  const [currentPage, setCurrentPage] = useState(1);
-  const ordersPerPage = 10;
+  const [cancellingOrderId, setCancellingOrderId] = useState(null);
 
-  // Calculate total pages
-  const totalPages = Math.ceil(orderHistory?.length / ordersPerPage);
+  useEffect(() => {
+    if (isAuthenticated()) {
+      fetchOrderHistory();
+    }
+  }, []);
 
-  // Get current page orders
-  const currentOrders = orderHistory?.slice(
-    (currentPage - 1) * ordersPerPage,
-    currentPage * ordersPerPage
-  );
+  // Update this function
+  const handleViewOrder = (orderId) => {
+    router.push(`/cart/order_history/${orderId}`);
+  };
 
-  const handleNextPage = () => {
-    if (currentPage < totalPages) {
-      setCurrentPage(currentPage + 1);
+  const handleCancelOrder = async (orderId) => {
+    setCancellingOrderId(orderId);
+    try {
+      await cancelOrder(orderId);
+    } finally {
+      setCancellingOrderId(null);
     }
   };
 
-  const handlePreviousPage = () => {
-    if (currentPage > 1) {
-      setCurrentPage(currentPage - 1);
-    }
+  const handlePageChange = (page) => {
+    setUserOrdersPage(page);
   };
 
-  const getStatusProgress = (status) => {
-    switch (status) {
-      case "pending":
-        return { width: "25%", bgColor: "bg-yellow-500" };
-      case "packaged":
-        return { width: "50%", bgColor: "bg-blue-500" };
-      case "sent_out":
-        return { width: "75%", bgColor: "bg-purple-500" };
-      case "delivered":
-        return { width: "100%", bgColor: "bg-green-500" };
-      case "canceled":
-        return { width: "100%", bgColor: "bg-red-500" };
-      default:
-        return { width: "0%", bgColor: "card" };
-    }
+  const handleFilterChange = (filters) => {
+    applyUserFilters(filters);
   };
 
-  const formatStatus = (status) => {
-    return status
-      .split("_")
-      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-      .join(" ");
+  const handleResetFilters = () => {
+    resetUserFilters();
+  };
+
+  // Order statistics for summary cards (calculated from current page data)
+  const orderStats = {
+    pending: userOrderHistory.filter((o) => o.status === "pending").length,
+    processing: userOrderHistory.filter((o) => o.status === "processing")
+      .length,
+    shipped: userOrderHistory.filter((o) => o.status === "shipped").length,
+    delivered: userOrderHistory.filter((o) => o.status === "delivered").length,
   };
 
   return (
-    <div className=" mx-auto  py-8 px-4 sm:px-6 lg:px-8">
-      <h2 className="text-2xl font-semibold mb-6">Order History</h2>
+    <main className="my-32 w-[90%] max-w-6xl mx-auto">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-8">
+        <div>
+          <h1 className="text-3xl md:text-4xl font-bold font-Montserrat">
+            My Orders
+          </h1>
+          <p className="text-secondary mt-2">Track and manage your orders</p>
+        </div>
+        <Link
+          href="/"
+          className="inline-flex items-center gap-2 px-6 py-3 bg-primary-600 text-white rounded-xl hover:bg-primary-700 transition-colors font-semibold"
+        >
+          <ShoppingBag size={20} />
+          Continue Shopping
+        </Link>
+      </div>
 
-      {orderHistory && orderHistory.length > 0 ? (
-        <div className="w-full overflow-x-scroll">
-          <table className=" border-collapse  min-w-[90rem]">
-            <thead
-              className="border-b border-gray-300 my-4"
-            >
-              <tr className="card">
-                <th className=" px-4 py-2 text-left text-sm font-medium ">#</th>
-                <th className=" px-4 py-2 text-left text-sm font-medium ">
-                  Product Name
-                </th>
-                <th className=" px-4 py-2 text-left text-sm font-medium ">
-                  User
-                </th>
-                <th className=" px-4 py-2 text-left text-sm font-medium ">
-                  Quantity
-                </th>
-                <th className=" px-4 py-2 text-left text-sm font-medium ">
-                  Total Price
-                </th>
-                {/* <th className=" px-4 py-2 text-left text-sm font-medium ">
-                  Status
-                </th> */}
-                <th className=" px-4 py-2 text-left text-sm font-medium ">
-                  Delivery Company
-                </th>
-                <th className=" px-4 py-2 text-left text-sm font-medium ">
-                  Order Date
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {currentOrders.map((order, index) => {
-                const { width, bgColor } = getStatusProgress(order.status);
-                return (
-                  <React.Fragment key={order.id}>
-                    <tr className={`${index % 2 === 0 ? "card" : "card"}`}>
-                      <td className=" px-4 py-2 text-sm ">{index + 1}</td>
-                      <td className=" px-4 py-2 text-sm ">
-                        {order.product.name}
-                      </td>
-                      <td className=" px-4 py-2 text-sm ">{order.user}</td>
-                      <td className=" px-4 py-2 text-sm ">{order.quantity}</td>
-                      <td className=" px-4 py-2 text-sm ">
-                        ${order.total_price}
-                      </td>
-                      {/* <td className=" px-4 py-2 text-sm ">
-                        <p className="text-xs  mt-1">
-                          {formatStatus(order.status)}
-                        </p>
-                      </td> */}
-                      <td className=" px-4 py-2 text-sm ">
-                        <div>
-                          <p>{order.delivery_company.name}</p>
-                          <p className=" text-xs">
-                            {order.delivery_company.contact_number}
-                          </p>
-                          <p className=" text-xs">
-                            {order.delivery_company.branch},{" "}
-                            {order.delivery_company.state}
-                          </p>
-                          <p className=" text-xs">
-                            {order.delivery_company.address}
-                          </p>
-                          <a
-                            href={order.delivery_company.website}
-                            target="_blank"
-                            className="text-blue-500 hover:underline text-xs"
-                          >
-                            Visit Website
-                          </a>
-                        </div>
-                      </td>
-                      <td className=" px-4 py-2 text-sm ">
-                        {new Date(order.created_at).toLocaleString()}
-                      </td>
-                    </tr>
-                    <tr>
-                      <td colSpan={8} className="px-4 py-2">
-                        <div>
-                          <span className="py-2 font-light  text-sm">
-                            Progress:
-                          </span>
-                          <div className="w-full h-1 card rounded-lg overflow-hidden flex flex-col">
-                            <div
-                              className={`${bgColor} h-full`}
-                              style={{ width }}
-                            ></div>
-                          </div>
-                          {order.status === "canceled" ? (
-                            <span className="flex w-full justify-center text-xs my-2">
-                              Canceled
-                            </span>
-                          ) : (
-                            <span className="flex w-full justify-evenly text-xs my-2">
-                              {statuses.map((status, ind) => (
-                                <span key={ind} className="flex items-center">
-                                  <p>{status.status}</p>
-                                  <p>{status.icon}</p>
-                                </span>
-                              ))}
-                            </span>
-                          )}
-                        </div>
-                      </td>
-                    </tr>
-                  </React.Fragment>
-                );
-              })}
-            </tbody>
-          </table>
+      {/* Quick Stats - Only shown when there are orders */}
+      {userOrderHistory.length > 0 && (
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+          <OrderStatCard
+            icon={Clock}
+            label="Pending"
+            value={orderStats.pending}
+            color="text-orange-600"
+            bgColor="bg-orange-50"
+          />
+          <OrderStatCard
+            icon={Package}
+            label="Processing"
+            value={orderStats.processing}
+            color="text-blue-600"
+            bgColor="bg-blue-50"
+          />
+          <OrderStatCard
+            icon={Truck}
+            label="Shipped"
+            value={orderStats.shipped}
+            color="text-purple-600"
+            bgColor="bg-purple-50"
+          />
+          <OrderStatCard
+            icon={CheckCircle2}
+            label="Delivered"
+            value={orderStats.delivered}
+            color="text-green-600"
+            bgColor="bg-green-50"
+          />
+        </div>
+      )}
 
-          {/* Pagination Controls */}
-          <div className="flex items-center justify-between mt-6">
-            <button
-              onClick={handlePreviousPage}
-              disabled={currentPage === 1}
-              className={`px-4 py-2 text-sm font-medium text-white bg-blue-500 rounded-lg ${
-                currentPage === 1
-                  ? "opacity-50 cursor-not-allowed"
-                  : "hover:bg-blue-600"
-              }`}
-            >
-              Previous
-            </button>
-            <p className="text-sm ">
-              Page {currentPage} of {totalPages}
-            </p>
-            <button
-              onClick={handleNextPage}
-              disabled={currentPage === totalPages}
-              className={`px-4 py-2 text-sm font-medium text-white bg-blue-500 rounded-lg ${
-                currentPage === totalPages
-                  ? "opacity-50 cursor-not-allowed"
-                  : "hover:bg-blue-600"
-              }`}
-            >
-              Next
-            </button>
-          </div>
+      {/* Filters */}
+      <div className="mb-6">
+        <OrderFilters
+          currentFilters={userOrdersFilters}
+          onFilterChange={handleFilterChange}
+          onReset={handleResetFilters}
+        />
+      </div>
+
+      {/* Orders List */}
+      {loadingOrders && userOrderHistory.length === 0 ? (
+        <div className="flex flex-col items-center justify-center py-20">
+          <Loader2 size={40} className="text-primary-600 animate-spin mb-4" />
+          <p className="text-secondary">Loading your orders...</p>
+        </div>
+      ) : userOrderHistory.length === 0 ? (
+        <div className="card rounded-2xl p-12 text-center">
+          <Package size={64} className="text-muted mx-auto mb-4" />
+          <h2 className="text-xl font-bold font-Montserrat mb-2">
+            No Orders Yet
+          </h2>
+          <p className="text-secondary mb-6">
+            {userOrdersFilters.status
+              ? `No ${userOrdersFilters.status} orders found.`
+              : "You haven't placed any orders yet. Start shopping to see your orders here."}
+          </p>
+          <Link
+            href="/"
+            className="inline-flex items-center gap-2 px-6 py-3 bg-primary-600 text-white rounded-xl hover:bg-primary-700 transition-colors font-semibold"
+          >
+            <ShoppingBag size={20} />
+            Start Shopping
+          </Link>
         </div>
       ) : (
-        <p>No order history available.</p>
+        <>
+          <OrderList
+            orders={userOrderHistory}
+            onViewOrder={handleViewOrder}
+            onCancelOrder={handleCancelOrder}
+            cancellingOrderId={cancellingOrderId}
+            loadingMutation={loadingMutation}
+          />
+
+          {/* Results Summary */}
+          <div className="text-sm text-muted mt-4">
+            Showing {userOrderHistory.length} of{" "}
+            {userOrdersPagination.totalItems} total orders
+          </div>
+
+          {/* Pagination */}
+          {userOrdersPagination.totalPages > 1 && (
+            <div className="mt-6">
+              <OrderPagination
+                pagination={userOrdersPagination}
+                onPageChange={handlePageChange}
+              />
+            </div>
+          )}
+        </>
       )}
+    </main>
+  );
+};
+
+// Order Stat Card Component
+const OrderStatCard = ({ icon: Icon, label, value, color, bgColor }) => {
+  return (
+    <div className="card rounded-xl p-4">
+      <div className="flex items-center gap-3">
+        <div className={`p-2 rounded-lg ${bgColor}`}>
+          <Icon size={20} className={color} />
+        </div>
+        <div>
+          <p className="text-xs text-muted">{label}</p>
+          <p className="text-xl font-bold">{value}</p>
+        </div>
+      </div>
     </div>
   );
 };
 
-export default Page;
+export default OrderHistoryPage;

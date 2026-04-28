@@ -1,7 +1,7 @@
 // components/CartEmpty.jsx
 import React from "react";
 import Link from "next/link";
-import { ShoppingCart, ArrowLeft } from "lucide-react";
+import { ShoppingCart, ArrowLeft, ArrowRight } from "lucide-react";
 import { useAuthStore } from "@/stores";
 
 const CartEmpty = () => {
@@ -22,13 +22,22 @@ const CartEmpty = () => {
           Hello, {userFirstName || "there"}! Looks like you haven't added
           anything to your cart yet
         </p>
-        <Link
-          href="/"
-          className="inline-flex items-center gap-2 px-8 py-3 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-all font-semibold"
-        >
-          Continue Shopping
-          <ArrowLeft size={20} className="rotate-180" />
-        </Link>
+        <div className="w-full  justify-center flex items-center gap-x-4">
+          <Link
+            href="/"
+            className="flex items-center btn btn-link gap-2 text-primary-600 hover:text-primary-700 transition-colors"
+          >
+            <ArrowLeft size={18} />
+            Continue Shopping
+          </Link>
+          <Link
+            href="/cart/order_history"
+            className="flex items-center btn btn-link gap-2 text-primary-600 hover:text-primary-700 transition-colors"
+          >
+            Order History
+            <ArrowRight size={18} />
+          </Link>
+        </div>
       </div>
     </main>
   );

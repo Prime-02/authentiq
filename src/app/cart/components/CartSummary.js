@@ -17,12 +17,15 @@ import SummaryRow from "./SummaryRow";
 import AdminBadge from "./AdminBadge";
 import PromoCodeInput from "./PromoCodeInput";
 import CheckoutFeatures from "./CheckoutFeature";
+import { useRouter } from "next/navigation";
+import { isAuthenticated } from "../../../../lib/axiosInstance";
 
 const CartSummary = ({ hasStockIssues = false }) => {
   const { userCart, loadingMutation } = useCartStore();
-  const { isAuthenticated } = useAuthStore();
   const { openModal } = useUIStore();
   const [isCheckingOut, setIsCheckingOut] = useState(false);
+      const router = useRouter()
+
 
   const calculateSubtotal = () => {
     return userCart.reduce((total, item) => {
@@ -66,7 +69,7 @@ const CartSummary = ({ hasStockIssues = false }) => {
     setTimeout(() => {
       toast.success("Redirecting to checkout...");
       // Navigate to checkout page
-      // navigate('/checkout');
+      router.push('/checkout');
       setIsCheckingOut(false);
     }, 1000);
   };
@@ -126,7 +129,7 @@ const CartSummary = ({ hasStockIssues = false }) => {
             userCart.length === 0 ||
             hasStockIssues
           }
-          className="w-full bg-primary-600 text-white py-3 rounded-lg font-semibold hover:bg-primary-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+          className="w-full btn btn-secondary py-3 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
           title={
             hasStockIssues
               ? "Please resolve stock issues before checkout"

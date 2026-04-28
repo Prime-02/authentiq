@@ -47,10 +47,10 @@ const Wishlist = () => {
   }, [userId, loadingUser, fetchUserData]);
 
   useEffect(() => {
-    if (isAuthenticated) {
+    if (isAuthenticated()) {
       fetchWishlist();
     }
-  }, [isAuthenticated, fetchWishlist]);
+  }, [isAuthenticated]);
 
   const handleAddToCart = async (productId, wishlistItemId) => {
     if (!isAuthenticated) {

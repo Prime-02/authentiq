@@ -14,6 +14,8 @@ import axiosInstance from "../../lib/axiosInstance";
  *   POST   /orders
  *   PATCH  /orders/:id/cancel
  *   GET    /admin/orders            (paginated: ?page=&per_page=&status=&payment_status=&user_id=&search=&date_from=&date_to=&sort_by=&sort_order=)
+ * POST   /orders/pay              ← ADD THIS
+ *   GET    /orders/:id/verify-payment ← ADD THIS
  *   GET    /admin/orders/quick-stats
  *   PATCH  /admin/orders/:id/status
  *   PATCH  /admin/orders/:id/tracking
@@ -105,8 +107,7 @@ export const useOrderStore = create((set, get) => ({
       });
       if (status) params.append("status", status);
 
-      const { data } = await axiosInstance.get(`/orders?${params}`);
-
+      const { data } = await axiosInstance.get(`/shop/orders?${params}`);
       set({
         userOrderHistory: data.data || [],
         userOrdersPagination: data.pagination || {
@@ -136,7 +137,7 @@ export const useOrderStore = create((set, get) => ({
   fetchOrder: async (orderId) => {
     set({ loadingOrders: true });
     try {
-      const { data } = await axiosInstance.get(`/orders/${orderId}`);
+      const { data } = await axiosInstance.get(`/shop/orders/${orderId}`);
       return data;
     } catch (err) {
       toast.error(err.response?.data?.detail || "Order not found.");
@@ -155,6 +156,74 @@ export const useOrderStore = create((set, get) => ({
    * @param {Object} payload - { shippingAddress, shippingCost?, tax?, deliveryCompanyId? }
    * @returns {Object|undefined} Created order or undefined on failure
    */
+
+  /**
+   * POST /orders/pay
+   * Creates an order AND initializes Paystack payment in one call.
+   * Returns { order, payment: { authorization_url, reference } }
+   */
+  createOrderWithPayment: async ({
+    shippingAddress,
+    shippingCost = 0.0,
+    tax = 0.0,
+    deliveryCompanyId,
+  } = {}) => {
+    set({ loadingMutation: true });
+    try {
+      const params = new URLSearchParams();
+      params.append("shipping_address", shippingAddress);
+      params.append("shipping_cost", String(shippingCost));
+      params.append("tax", String(tax));
+      if (deliveryCompanyId) {
+        params.append("delivery_company_id", deliveryCompanyId);
+      }
+
+      const { data } = await axiosInstance.post(`/shop/orders/pay?${params}`);
+
+      // Refresh order history after creating order with payment
+      const { userOrdersFilters } = get();
+      await get().fetchOrderHistory({
+        page: 1,
+        perPage: get().userOrdersPagination.perPage,
+        ...userOrdersFilters,
+      });
+
+      return data;
+    } catch (err) {
+      const msg =
+        err.response?.data?.detail ||
+        "Failed to initialize payment. Please try again.";
+      toast.error(msg);
+      throw err;
+    } finally {
+      set({ loadingMutation: false });
+    }
+  },
+
+  /** GET /orders/:id/verify-payment */
+  verifyPayment: async (orderId, reference) => {
+    set({ loadingMutation: true });
+    try {
+      const { data } = await axiosInstance.get(
+        `/shop/orders/${orderId}/verify-payment`,
+        { params: { reference } },
+      );
+
+      // Refresh order history after payment verification
+      const { page, perPage } = get().userOrdersPagination;
+      const { userOrdersFilters } = get();
+      await get().fetchOrderHistory({ page, perPage, ...userOrdersFilters });
+
+      return data;
+    } catch (err) {
+      const msg = err.response?.data?.detail || "Payment verification failed.";
+      toast.error(msg);
+      throw err;
+    } finally {
+      set({ loadingMutation: false });
+    }
+  },
+
   createOrder: async ({
     shippingAddress,
     shippingCost = 0.0,
@@ -171,7 +240,7 @@ export const useOrderStore = create((set, get) => ({
         params.append("delivery_company_id", deliveryCompanyId);
       }
 
-      const { data } = await axiosInstance.post(`/orders?${params}`);
+      const { data } = await axiosInstance.post(`/shop/orders?${params}`);
       toast.success("Order placed successfully!");
 
       // Refresh order history to first page after creating order
@@ -198,7 +267,7 @@ export const useOrderStore = create((set, get) => ({
   cancelOrder: async (orderId) => {
     set({ loadingMutation: true });
     try {
-      const { data } = await axiosInstance.patch(`/orders/${orderId}/cancel`);
+      const { data } = await axiosInstance.patch(`/shop/orders/${orderId}/cancel`);
       toast.success("Order cancelled.");
 
       // Refresh current page of order history
