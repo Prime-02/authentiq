@@ -6,7 +6,6 @@ import { useGlobalState } from "@/app/GlobalStateProvider";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { Loader } from "@/components/Loader/Loader";
-import { TableFooter } from "@mui/material";
 import axios from "axios";
 
 const OrdersByStatusPage = () => {
