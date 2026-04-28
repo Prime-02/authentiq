@@ -19,27 +19,26 @@ import {
   Package,
   Home,
   Lock,
+  Receipt,
+  Box,
 } from "lucide-react";
 import { toast } from "react-toastify";
 import Confetti from "./Confetti";
 
 const PaymentSuccess = ({ details }) => {
   const [showOrderDetails, setShowOrderDetails] = useState(false);
+  const [showOrderItems, setShowOrderItems] = useState(false);
   const [copied, setCopied] = useState(false);
-
-  // Show confetti on mount
-  useEffect(() => {
-    // You can add confetti animation here
-  }, []);
 
   const formatCurrency = (amount) => {
     return new Intl.NumberFormat("en-NG", {
       style: "currency",
       currency: details?.currency || "NGN",
-    }).format(amount);
+    }).format(amount || 0);
   };
 
   const formatDate = (dateString) => {
+    if (!dateString) return "N/A";
     return new Date(dateString).toLocaleDateString("en-NG", {
       year: "numeric",
       month: "long",
@@ -50,15 +49,42 @@ const PaymentSuccess = ({ details }) => {
   };
 
   const handleCopyReference = () => {
-    navigator.clipboard.writeText(details?.reference);
-    setCopied(true);
-    toast.success("Reference copied to clipboard");
-    setTimeout(() => setCopied(false), 2000);
+    if (details?.reference) {
+      navigator.clipboard.writeText(details.reference);
+      setCopied(true);
+      toast.success("Reference copied to clipboard");
+      setTimeout(() => setCopied(false), 2000);
+    }
   };
 
   const handleDownloadReceipt = () => {
     // Implement receipt download logic
     toast.info("Receipt download started");
+  };
+
+  const getOrderStatusColor = (status) => {
+    switch (status) {
+      case "paid":
+        return {
+          bg: "var(--success-100)",
+          color: "var(--success-700)",
+        };
+      case "pending":
+        return {
+          bg: "var(--warning-100)",
+          color: "var(--warning-700)",
+        };
+      case "failed":
+        return {
+          bg: "var(--error-100)",
+          color: "var(--error-700)",
+        };
+      default:
+        return {
+          bg: "var(--bg-tertiary)",
+          color: "var(--text-secondary)",
+        };
+    }
   };
 
   return (
@@ -89,7 +115,8 @@ const PaymentSuccess = ({ details }) => {
             Payment Successful!
           </h1>
           <p className="text-lg" style={{ color: "var(--text-secondary)" }}>
-            Thank you for your purchase. Your payment has been confirmed.
+            {details?.message ||
+              "Thank you for your purchase. Your payment has been confirmed."}
           </p>
         </div>
 
@@ -110,13 +137,11 @@ const PaymentSuccess = ({ details }) => {
               color: "var(--text-inverse)",
             }}
           >
-            <p className="text-sm mb-2" style={{ color: "var(--success-100)" }}>
-              Amount Paid
-            </p>
+            <p className="text-sm mb-2 opacity-90">Amount Paid</p>
             <p className="text-4xl md:text-5xl font-bold mb-1">
               {formatCurrency(details?.amount)}
             </p>
-            <p className="text-sm" style={{ color: "var(--success-100)" }}>
+            <p className="text-sm opacity-90">
               via {details?.channel || "Card"}
             </p>
           </div>
@@ -124,7 +149,7 @@ const PaymentSuccess = ({ details }) => {
           {/* Transaction Details */}
           <div className="p-6" style={{ color: "var(--text-primary)" }}>
             <h2 className="text-lg font-semibold flex items-center gap-2 mb-4">
-              <CreditCard size={20} style={{ color: "var(--primary-600)" }} />
+              <Receipt size={20} style={{ color: "var(--primary-600)" }} />
               Transaction Details
             </h2>
 
@@ -134,7 +159,7 @@ const PaymentSuccess = ({ details }) => {
                 style={{ backgroundColor: "var(--bg-secondary)" }}
               >
                 <Hash size={18} style={{ color: "var(--text-muted)" }} />
-                <div className="min-w-0">
+                <div className="min-w-0 flex-1">
                   <p className="text-xs" style={{ color: "var(--text-muted)" }}>
                     Reference
                   </p>
@@ -168,25 +193,10 @@ const PaymentSuccess = ({ details }) => {
                 <Calendar size={18} style={{ color: "var(--text-muted)" }} />
                 <div>
                   <p className="text-xs" style={{ color: "var(--text-muted)" }}>
-                    Date
+                    Payment Date
                   </p>
                   <p className="text-sm font-medium">
-                    {formatDate(details?.transactionDate || details?.paidAt)}
-                  </p>
-                </div>
-              </div>
-
-              <div
-                className="flex items-center gap-3 p-3 rounded-lg"
-                style={{ backgroundColor: "var(--bg-secondary)" }}
-              >
-                <Mail size={18} style={{ color: "var(--text-muted)" }} />
-                <div className="min-w-0">
-                  <p className="text-xs" style={{ color: "var(--text-muted)" }}>
-                    Email
-                  </p>
-                  <p className="text-sm font-medium truncate">
-                    {details?.email}
+                    {formatDate(details?.paidAt)}
                   </p>
                 </div>
               </div>
@@ -201,13 +211,38 @@ const PaymentSuccess = ({ details }) => {
                     Payment Method
                   </p>
                   <p className="text-sm font-medium capitalize">
-                    {details?.channel || "Card"}
+                    {details?.channel || "N/A"}
                   </p>
+                </div>
+              </div>
+
+              <div
+                className="flex items-center gap-3 p-3 rounded-lg"
+                style={{ backgroundColor: "var(--bg-secondary)" }}
+              >
+                <Shield size={18} style={{ color: "var(--text-muted)" }} />
+                <div>
+                  <p className="text-xs" style={{ color: "var(--text-muted)" }}>
+                    Payment Status
+                  </p>
+                  <span
+                    className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium"
+                    style={{
+                      backgroundColor: getOrderStatusColor(
+                        details?.orderPaymentStatus,
+                      ).bg,
+                      color: getOrderStatusColor(details?.orderPaymentStatus)
+                        .color,
+                    }}
+                  >
+                    <CheckCircle2 size={12} />
+                    {details?.orderPaymentStatus || "Paid"}
+                  </span>
                 </div>
               </div>
             </div>
 
-            {/* Order Details Toggle */}
+            {/* Order Summary Section */}
             {details?.orderId && (
               <div
                 className="mt-4 pt-4"
@@ -215,7 +250,7 @@ const PaymentSuccess = ({ details }) => {
               >
                 <button
                   onClick={() => setShowOrderDetails(!showOrderDetails)}
-                  className="w-full flex items-center justify-between p-3 rounded-lg transition-colors"
+                  className="w-full flex items-center justify-between p-3 rounded-lg transition-colors hover:bg-opacity-80"
                   style={{ backgroundColor: "var(--bg-secondary)" }}
                 >
                   <div className="flex items-center gap-2">
@@ -223,9 +258,9 @@ const PaymentSuccess = ({ details }) => {
                       size={18}
                       style={{ color: "var(--primary-600)" }}
                     />
-                    <span className="font-medium">Order Details</span>
+                    <span className="font-medium">Order Summary</span>
                     <span style={{ color: "var(--text-muted)" }}>
-                      (#{details?.orderId})
+                      (#{details?.orderId.slice(0, 8)})
                     </span>
                   </div>
                   {showOrderDetails ? (
@@ -243,13 +278,16 @@ const PaymentSuccess = ({ details }) => {
 
                 {showOrderDetails && (
                   <div
-                    className="mt-3 p-4 rounded-lg space-y-3"
+                    className="mt-3 p-4 rounded-lg space-y-4"
                     style={{ backgroundColor: "var(--bg-secondary)" }}
                   >
+                    {/* Order Info Grid */}
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
                       <div>
                         <p style={{ color: "var(--text-muted)" }}>Order ID</p>
-                        <p className="font-semibold">{details?.orderId}</p>
+                        <p className="font-semibold font-mono">
+                          {details?.orderId?.slice(0, 8)}...
+                        </p>
                       </div>
                       <div>
                         <p style={{ color: "var(--text-muted)" }}>
@@ -263,24 +301,84 @@ const PaymentSuccess = ({ details }) => {
                           }}
                         >
                           <CheckCircle2 size={12} />
-                          Confirmed
+                          {details?.orderStatus || "Confirmed"}
                         </span>
                       </div>
                       <div>
-                        <p style={{ color: "var(--text-muted)" }}>
-                          Estimated Delivery
-                        </p>
+                        <p style={{ color: "var(--text-muted)" }}>Order Date</p>
                         <p className="font-semibold">
-                          {new Date(
-                            Date.now() + 3 * 24 * 60 * 60 * 1000,
-                          ).toLocaleDateString("en-NG", {
-                            weekday: "short",
-                            month: "short",
-                            day: "numeric",
-                          })}
+                          {formatDate(details?.orderDate)}
                         </p>
                       </div>
                     </div>
+
+                    {/* Order Total */}
+                    <div
+                      className="flex justify-between items-center p-3 rounded-lg"
+                      style={{ backgroundColor: "var(--bg-primary)" }}
+                    >
+                      <span className="font-medium">Order Total</span>
+                      <span className="font-bold text-lg">
+                        {formatCurrency(details?.orderTotalAmount)}
+                      </span>
+                    </div>
+
+                    {/* Order Items Toggle */}
+                    {details?.orderItems && details.orderItems.length > 0 && (
+                      <div>
+                        <button
+                          onClick={() => setShowOrderItems(!showOrderItems)}
+                          className="w-full flex items-center justify-between p-2 rounded-lg transition-colors"
+                          style={{ backgroundColor: "var(--bg-primary)" }}
+                        >
+                          <div className="flex items-center gap-2">
+                            <Box
+                              size={16}
+                              style={{ color: "var(--primary-600)" }}
+                            />
+                            <span className="text-sm font-medium">
+                              Items ({details.orderItems.length})
+                            </span>
+                          </div>
+                          {showOrderItems ? (
+                            <ChevronUp
+                              size={16}
+                              style={{ color: "var(--text-muted)" }}
+                            />
+                          ) : (
+                            <ChevronDown
+                              size={16}
+                              style={{ color: "var(--text-muted)" }}
+                            />
+                          )}
+                        </button>
+
+                        {showOrderItems && (
+                          <div className="mt-2 space-y-2">
+                            {details.orderItems.map((item, index) => (
+                              <div
+                                key={index}
+                                className="flex justify-between items-center p-2 rounded-lg text-sm"
+                                style={{ backgroundColor: "var(--bg-primary)" }}
+                              >
+                                <div className="flex-1">
+                                  <p className="font-medium">
+                                    {item.product_name}
+                                  </p>
+                                  <p style={{ color: "var(--text-muted)" }}>
+                                    Qty: {item.quantity} ×{" "}
+                                    {formatCurrency(item.unit_price)}
+                                  </p>
+                                </div>
+                                <p className="font-semibold">
+                                  {formatCurrency(item.total_price)}
+                                </p>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
@@ -320,8 +418,8 @@ const PaymentSuccess = ({ details }) => {
                   Confirmation Email Sent
                 </p>
                 <p style={{ color: "var(--text-secondary)" }}>
-                  We've sent a confirmation email to {details?.email} with your
-                  order details and receipt.
+                  We've sent a confirmation email with your order details and
+                  receipt.
                 </p>
               </div>
             </div>
@@ -386,7 +484,7 @@ const PaymentSuccess = ({ details }) => {
           </button>
 
           <Link
-            href="/orders"
+            href={`/orders/${details?.orderId}`}
             className="flex-1 flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-semibold transition-all duration-200 hover:-translate-y-px hover:shadow-md"
             style={{
               backgroundColor: "var(--primary-600)",
@@ -394,7 +492,7 @@ const PaymentSuccess = ({ details }) => {
             }}
           >
             <ShoppingBag size={20} />
-            View Orders
+            View Order
             <ArrowRight size={20} />
           </Link>
         </div>
@@ -403,7 +501,7 @@ const PaymentSuccess = ({ details }) => {
         <div className="text-center mt-6">
           <Link
             href="/"
-            className="inline-flex items-center gap-2 font-semibold transition-colors"
+            className="inline-flex items-center gap-2 font-semibold transition-colors hover:underline"
             style={{ color: "var(--primary-600)" }}
           >
             <Home size={18} />

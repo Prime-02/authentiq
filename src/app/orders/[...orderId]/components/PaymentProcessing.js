@@ -1,6 +1,6 @@
 // components/PaymentProcessing.jsx
 import React from "react";
-import { Loader2 } from "lucide-react";
+import { Loader, Loader2 } from "lucide-react";
 
 const PaymentProcessing = () => {
   return (
@@ -13,10 +13,9 @@ const PaymentProcessing = () => {
           className="inline-flex items-center justify-center w-20 h-20 rounded-full mb-6"
           style={{ backgroundColor: "var(--primary-100)" }}
         >
-          <Loader2
-            size={40}
+          <Loader
+            size={100}
             className="animate-spin"
-            style={{ color: "var(--primary-600)" }}
           />
         </div>
         <h1

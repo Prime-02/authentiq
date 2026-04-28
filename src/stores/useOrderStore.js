@@ -207,6 +207,7 @@ export const useOrderStore = create((set, get) => ({
       const { data } = await axiosInstance.get(
         `/shop/orders/${orderId}/verify-payment?reference=${reference}`,
       );
+      console.log("Verification data: ", JSON.stringify(data))
 
       // Refresh order history after payment verification
       const { page, perPage } = get().userOrdersPagination;

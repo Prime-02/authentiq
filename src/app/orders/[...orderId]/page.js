@@ -44,19 +44,35 @@ const PaystackCallbackPage = () => {
       // Call your Zustand store to verify the payment
       const data = await verifyPaystackPayment(orderId, reference);
 
-      // The store already returns the parsed data
-      if (data && data.status === "success") {
+      // The store now returns the new structure with success, message, payment, and order
+      if (data && data.success) {
         setPaymentDetails({
-          reference: data.reference,
-          amount: data.amount,
-          channel: data.channel,
-          orderId: orderId,
+          // Payment information
+          reference: data.payment.reference,
+          amount: data.payment.amount,
+          currency: data.payment.currency,
+          channel: data.payment.channel,
+          paidAt: data.payment.paid_at,
+          gatewayResponse: data.payment.gateway_response,
+          status: data.payment.status,
+
+          // Order information
+          orderId: data.order.id,
+          orderStatus: data.order.status,
+          orderPaymentStatus: data.order.payment_status,
+          orderTotalAmount: data.order.total_amount,
+          orderDate: data.order.order_date,
+          orderItems: data.order.items,
+
+          // Success message
+          message: data.message,
         });
         setPaymentStatus("success");
       } else {
         setPaymentDetails({
           reference: reference,
           message: data?.message || "Payment verification failed",
+          status: data?.payment?.status || "failed",
         });
         setPaymentStatus("failed");
       }
@@ -66,6 +82,7 @@ const PaystackCallbackPage = () => {
         reference: reference,
         message:
           error?.response?.data?.detail ||
+          error?.message ||
           "Unable to verify payment. Please contact support.",
       });
       setPaymentStatus("failed");

@@ -1,7 +1,13 @@
 // components/PaymentFailed.jsx
 import React from "react";
 import Link from "next/link";
-import { XCircle, ArrowLeft, RefreshCw, HelpCircle } from "lucide-react";
+import {
+  XCircle,
+  ArrowLeft,
+  RefreshCw,
+  HelpCircle,
+  AlertTriangle,
+} from "lucide-react";
 
 const PaymentFailed = ({ details }) => {
   return (
@@ -29,9 +35,20 @@ const PaymentFailed = ({ details }) => {
         </p>
 
         {details?.reference && (
-          <p className="text-sm mb-6" style={{ color: "var(--text-muted)" }}>
-            Reference: {details.reference}
-          </p>
+          <div className="mb-6">
+            <p className="text-sm" style={{ color: "var(--text-muted)" }}>
+              Reference: <span className="font-mono">{details.reference}</span>
+            </p>
+            {details?.status && (
+              <p
+                className="text-sm mt-1"
+                style={{ color: "var(--text-muted)" }}
+              >
+                Status:{" "}
+                <span className="font-medium capitalize">{details.status}</span>
+              </p>
+            )}
+          </div>
         )}
 
         <div className="flex flex-col gap-3">
@@ -54,9 +71,6 @@ const PaymentFailed = ({ details }) => {
               backgroundColor: "var(--bg-primary)",
               color: "var(--text-primary)",
               border: "2px solid var(--border-color)",
-              ":hover": {
-                backgroundColor: "var(--bg-secondary)",
-              },
             }}
           >
             <HelpCircle size={20} />
