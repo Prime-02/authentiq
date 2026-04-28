@@ -18,6 +18,7 @@ import {
   Truck,
   Package,
   Home,
+  Lock,
 } from "lucide-react";
 import { toast } from "react-toastify";
 import Confetti from "./Confetti";
