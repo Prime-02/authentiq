@@ -205,8 +205,7 @@ export const useOrderStore = create((set, get) => ({
     set({ loadingMutation: true });
     try {
       const { data } = await axiosInstance.get(
-        `/shop/orders/${orderId}/verify-payment`,
-        { params: { reference } },
+        `/shop/orders/${orderId}/verify-payment?reference=${reference}`,
       );
 
       // Refresh order history after payment verification
@@ -267,7 +266,9 @@ export const useOrderStore = create((set, get) => ({
   cancelOrder: async (orderId) => {
     set({ loadingMutation: true });
     try {
-      const { data } = await axiosInstance.patch(`/shop/orders/${orderId}/cancel`);
+      const { data } = await axiosInstance.patch(
+        `/shop/orders/${orderId}/cancel`,
+      );
       toast.success("Order cancelled.");
 
       // Refresh current page of order history
