@@ -6,7 +6,6 @@ import {
   useUIStore,
   useWishlistStore,
 } from "@/stores";
-import { useRouter } from "next/navigation";
 import React, { createContext, useContext, useEffect } from "react";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -29,19 +28,14 @@ export const formatBalance = (balance) => {
 // ── Provider ───────────────────────────────────────────────────────────────
 export const GlobalStateProvider = ({ children }) => {
   const { fetchUserData } = useAuthStore();
-  const { modalType } = useUIStore();
-  const router = useRouter();
   const { fetchCart } = useCartStore();
   const { fetchWishlist } = useWishlistStore();
 
-  useEffect(() => {
-    // Fetch user data on initial load
-    fetchUserData();
-  }, [router, modalType]);
 
   useEffect(() => {
-    if(!isAuthenticated()) return;
+    if (!isAuthenticated()) return;
     fetchCart();
+    fetchUserData();
     fetchWishlist();
   }, []);
 

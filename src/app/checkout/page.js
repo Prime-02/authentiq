@@ -8,7 +8,7 @@ import OrderSummary from "./components/OrderSummary";
 import ShippingForm from "./components/ShippingForm";
 import PaymentSummary from "./components/PaymentSummary";
 import DeliverySelector from "./components/DeliverySelector";
-import { ShoppingCart, ArrowLeft, Loader2 } from "lucide-react";
+import { ShoppingCart, ArrowLeft, Loader2, Loader } from "lucide-react";
 import Link from "next/link";
 import { toast } from "react-toastify";
 import { isAuthenticated } from "../../../lib/axiosInstance";
@@ -155,8 +155,8 @@ const CheckoutPage = () => {
     return (
       <main className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <Loader2
-            size={40}
+          <Loader
+            size={100}
             className="animate-spin text-primary-600 mx-auto mb-4"
           />
           <p className="text-secondary">Loading checkout...</p>

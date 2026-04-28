@@ -1,50 +1,36 @@
 "use client";
-import { useGlobalState } from "@/app/GlobalStateProvider";
-import { Loader } from "@/components/Loader/Loader";
-import { ButtonOne, ButtonTwo } from "@/components/reusables/buttons/Buttons";
 import DynamicImage from "@/components/reusables/DynamicImage/DynamicImage";
 import { useWishlistStore } from "@/stores";
 import { useCartStore } from "@/stores/useCartStore";
 import { useUIStore } from "@/stores/useUIStore";
-import { useAuthStore } from "@/stores/useAuthStore";
 import {
   ShoppingCart,
   Trash2,
   Heart,
   ArrowLeft,
-  X,
   ShoppingBag,
   Loader2,
+  Loader,
 } from "lucide-react";
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
+import { isAuthenticated } from "../../../lib/axiosInstance";
 
 const Wishlist = () => {
   const {
     userWishlist,
     wishlistNo,
     loadingWishlist,
-    loadingMutation,
     fetchWishlist,
     removeWishlistItem,
-    addToWishlist,
   } = useWishlistStore();
 
   const { addToCart, loadingMutation: cartLoading } = useCartStore();
   const { openModal } = useUIStore();
-  const { userId, loadingUser, fetchUserData } = useAuthStore();
 
   const [addingToCartId, setAddingToCartId] = useState(null);
   const [deletingId, setDeletingId] = useState(null);
-
-  const isAuthenticated = !!userId;
-
-  useEffect(() => {
-    if (!userId && !loadingUser) {
-      fetchUserData();
-    }
-  }, [userId, loadingUser, fetchUserData]);
 
   useEffect(() => {
     if (isAuthenticated()) {
@@ -52,7 +38,7 @@ const Wishlist = () => {
     }
   }, [isAuthenticated]);
 
-  const handleAddToCart = async (productId, wishlistItemId) => {
+  const handleAddToCart = async (productId) => {
     if (!isAuthenticated) {
       openModal("login");
       return;
@@ -106,15 +92,12 @@ const Wishlist = () => {
   };
 
   // Loading state
-  if (
-    loadingUser ||
-    (loadingWishlist && userWishlist.length === 0 && isAuthenticated)
-  ) {
+  if (loadingWishlist && userWishlist.length === 0 && isAuthenticated) {
     return (
       <main className="my-32 w-[90%] mx-auto">
         <div className="w-full h-screen flex flex-col gap-y-12 items-center justify-center">
           <div className="relative">
-            <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-primary-600"></div>
+            <Loader size={100} className="animate-spin" />
           </div>
           <p className="text-lg text-secondary">Loading your wishlist...</p>
         </div>

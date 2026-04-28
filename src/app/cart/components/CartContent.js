@@ -134,20 +134,22 @@ const CartContent = () => {
                   <Trash2 size={18} />
                   Clear Cart
                 </button>
-                <Link
-                  href="/"
-                  className="flex items-center gap-2 text-primary-600 hover:text-primary-700 transition-colors"
-                >
-                  <ArrowRight size={18} />
-                  Continue Shopping
-                </Link>
-                <Link
-                  href="/cart/order_history"
-                  className="flex items-center gap-2 text-primary-600 hover:text-primary-700 transition-colors"
-                >
-                  <ArrowLeft size={18} />
-                  Order History
-                </Link>
+                <div className="flex items-center justify-center gap-x-3">
+                  <Link
+                    href="/"
+                    className="flex items-center btn btn-link gap-2 text-primary-600 hover:text-primary-700 transition-colors"
+                  >
+                    <ArrowLeft size={18} />
+                    Continue Shopping
+                  </Link>
+                  <Link
+                    href="/cart/order_history"
+                    className="flex items-center btn btn-link gap-2 text-primary-600 hover:text-primary-700 transition-colors"
+                  >
+                    Order History
+                    <ArrowRight size={18} />
+                  </Link>
+                </div>
               </div>
             </div>
           </div>

@@ -1,6 +1,6 @@
 // app/cart/page.jsx or wherever your cart page is
 "use client";
-import React, { useEffect } from "react";
+import React from "react";
 import CartLoading from "./components/CartLoading";
 import CartUnauthenticated from "./components/CartUnauthenticated";
 import CartEmpty from "./components/CartEmpty";

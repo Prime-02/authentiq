@@ -14,6 +14,7 @@ import {
   Clock,
   CheckCircle2,
   Truck,
+  Loader,
 } from "lucide-react";
 import Link from "next/link";
 import { isAuthenticated } from "../../../../lib/axiosInstance";
@@ -142,7 +143,7 @@ const OrderHistoryPage = () => {
       {/* Orders List */}
       {loadingOrders && userOrderHistory.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-20">
-          <Loader2 size={40} className="text-primary-600 animate-spin mb-4" />
+          <Loader size={100} className="text-primary-600 animate-spin mb-4" />
           <p className="text-secondary">Loading your orders...</p>
         </div>
       ) : userOrderHistory.length === 0 ? (
