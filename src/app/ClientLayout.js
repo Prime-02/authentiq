@@ -2,17 +2,13 @@
 
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-import LoadingScreen from "@/components/Loader/LoadingScreen";
 import Footer from "@/components/footer/Footer";
 import Navbar from "@/components/navbar/Navbar";
-import { disablePageScroll, enablePageScroll } from "scroll-lock";
+import { Loader } from "lucide-react";
 
 export default function ClientLayout({ children }) {
   const pathname = usePathname(); // Current route path
   const [loading, setLoading] = useState(false);
-
-  
-
 
   // Check if the current path starts with '/admin'
   const shouldHideNavbarAndFooter =
@@ -21,20 +17,20 @@ export default function ClientLayout({ children }) {
   useEffect(() => {
     const handleRouteChange = () => {
       setLoading(true);
-      disablePageScroll(); // Disable scroll when loading starts
     };
 
     handleRouteChange();
 
     // Hide loading screen after navigation completes
-    const timer = setTimeout(() => {
-      setLoading(false);
-      enablePageScroll(); // Re-enable scroll after loading ends
-    }, Math.floor(Math.random() * (5000 - 1000 + 1)) + 1000);
+    const timer = setTimeout(
+      () => {
+        setLoading(false);
+      },
+      Math.floor(Math.random() * (5000 - 1000 + 1)) + 1000,
+    );
 
     return () => {
       clearTimeout(timer);
-      enablePageScroll(); // Ensure scroll is re-enabled on cleanup
     };
   }, [pathname]);
 
@@ -44,7 +40,7 @@ export default function ClientLayout({ children }) {
       {loading && (
         <div className="fixed z-50 h-screen w-full card justify-center flex flex-col items-center top-0 bottom-0 left-0 right-0 overflow-hidden">
           <span>
-            <LoadingScreen />
+            <Loader size={100} className="animate-spin" />
           </span>
         </div>
       )}

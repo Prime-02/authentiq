@@ -58,6 +58,7 @@ const Modal = ({
                     buttonValue={buttonValue}
                     disabled={disabled}
                     loading={loading}
+                    className={"btn btn-primary btn-full"}
                   />
                 )}
                 {subChildren && subChildren}

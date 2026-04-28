@@ -5,6 +5,7 @@ import { LoaderStyle5Component } from "@/components/Loader/Loader";
 import { useCategoryStore } from "@/stores";
 import ProductCard from "@/components/ProductCard/ProductCard";
 import Link from "next/link";
+import { Loader } from "lucide-react";
 
 export default function Home() {
   const { categories, loadingCategories, fetchCategories } = useCategoryStore();
@@ -29,9 +30,11 @@ export default function Home() {
           <h1 className="font-extrabold text-3xl md:text-5xl">
             {"What would you like to buy from us?"}
           </h1>
-          <div className="w-full h-screen flex-col gap-y-12 flex items-center">
-            <LoaderStyle5Component />
-            <p>Loading products...</p>
+          <div className="w-full h-screen flex flex-col gap-y-12 items-center justify-center">
+            <div className="relative">
+              <Loader size={100} className="animate-spin" />
+            </div>
+            <p className="text-lg text-secondary">Loading Products...</p>
           </div>
         </div>
       </main>

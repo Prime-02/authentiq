@@ -15,6 +15,7 @@ import {
   Shield,
   RotateCcw,
   Loader2,
+  Loader,
 } from "lucide-react";
 import Link from "next/link";
 import { LoaderStyle5Component } from "@/components/Loader/Loader";
@@ -160,8 +161,10 @@ const ProductPage = () => {
     return (
       <main className="my-32 w-[90%] mx-auto">
         <div className="w-full h-screen flex flex-col gap-y-12 items-center justify-center">
-          <LoaderStyle5Component />
-          <p className="text-lg">Loading product...</p>
+          <div className="relative">
+            <Loader size={100} className="animate-spin" />
+          </div>
+          <p className="text-lg text-secondary">Loading Products...</p>
         </div>
       </main>
     );
