@@ -62,92 +62,144 @@ const PaymentSuccess = ({ details }) => {
   };
 
   return (
-    <main className="min-h-screen bg-gradient-to-b from-green-50 to-white">
+    <main
+      className="min-h-screen"
+      style={{
+        background:
+          "linear-gradient(to bottom, var(--success-50), var(--bg-primary))",
+      }}
+    >
       {/* Confetti Animation */}
       <Confetti />
 
       <div className="w-[90%] max-w-3xl mx-auto py-16">
         {/* Success Header */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-20 h-20 bg-green-100 rounded-full mb-6 animate-bounce">
-            <CheckCircle2 size={48} className="text-green-600" />
+          <div
+            className="inline-flex items-center justify-center w-20 h-20 rounded-full mb-6 animate-bounce"
+            style={{ backgroundColor: "var(--success-100)" }}
+          >
+            <CheckCircle2 size={48} style={{ color: "var(--success-600)" }} />
           </div>
 
-          <h1 className="text-3xl md:text-4xl font-bold text-green-700 mb-3">
+          <h1
+            className="text-3xl md:text-4xl font-bold mb-3"
+            style={{ color: "var(--success-700)" }}
+          >
             Payment Successful!
           </h1>
-          <p className="text-lg text-secondary">
+          <p className="text-lg" style={{ color: "var(--text-secondary)" }}>
             Thank you for your purchase. Your payment has been confirmed.
           </p>
         </div>
 
         {/* Payment Card */}
-        <div className="bg-white rounded-2xl shadow-lg border border-green-100 overflow-hidden mb-6">
+        <div
+          className="rounded-2xl shadow-lg overflow-hidden mb-6"
+          style={{
+            backgroundColor: "var(--bg-primary)",
+            border: "1px solid var(--success-100)",
+          }}
+        >
           {/* Amount Section */}
-          <div className="p-8 bg-gradient-to-r from-green-500 to-green-600 text-white text-center">
-            <p className="text-sm text-green-100 mb-2">Amount Paid</p>
+          <div
+            className="p-8 text-center"
+            style={{
+              background:
+                "linear-gradient(to right, var(--success-500), var(--success-600))",
+              color: "var(--text-inverse)",
+            }}
+          >
+            <p className="text-sm mb-2" style={{ color: "var(--success-100)" }}>
+              Amount Paid
+            </p>
             <p className="text-4xl md:text-5xl font-bold mb-1">
               {formatCurrency(details?.amount)}
             </p>
-            <p className="text-sm text-green-100">
+            <p className="text-sm" style={{ color: "var(--success-100)" }}>
               via {details?.channel || "Card"}
             </p>
           </div>
 
           {/* Transaction Details */}
-          <div className="p-6 space-y-4">
-            <h2 className="text-lg font-semibold flex items-center gap-2">
-              <CreditCard size={20} className="text-primary-600" />
+          <div className="p-6" style={{ color: "var(--text-primary)" }}>
+            <h2 className="text-lg font-semibold flex items-center gap-2 mb-4">
+              <CreditCard size={20} style={{ color: "var(--primary-600)" }} />
               Transaction Details
             </h2>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="flex items-center gap-3 p-3 bg-secondary rounded-lg">
-                <Hash size={18} className="text-muted flex-shrink-0" />
+              <div
+                className="flex items-center gap-3 p-3 rounded-lg"
+                style={{ backgroundColor: "var(--bg-secondary)" }}
+              >
+                <Hash size={18} style={{ color: "var(--text-muted)" }} />
                 <div className="min-w-0">
-                  <p className="text-xs text-muted">Reference</p>
+                  <p className="text-xs" style={{ color: "var(--text-muted)" }}>
+                    Reference
+                  </p>
                   <div className="flex items-center gap-2">
                     <p className="font-mono text-sm font-medium truncate">
                       {details?.reference}
                     </p>
                     <button
                       onClick={handleCopyReference}
-                      className="flex-shrink-0 p-1 hover:bg-tertiary rounded transition-colors"
+                      className="flex-shrink-0 p-1 rounded transition-colors"
+                      style={{ backgroundColor: "var(--bg-tertiary)" }}
                       title="Copy reference"
                     >
                       <Copy
                         size={14}
-                        className={copied ? "text-green-500" : "text-muted"}
+                        style={{
+                          color: copied
+                            ? "var(--success-500)"
+                            : "var(--text-muted)",
+                        }}
                       />
                     </button>
                   </div>
                 </div>
               </div>
 
-              <div className="flex items-center gap-3 p-3 bg-secondary rounded-lg">
-                <Calendar size={18} className="text-muted flex-shrink-0" />
+              <div
+                className="flex items-center gap-3 p-3 rounded-lg"
+                style={{ backgroundColor: "var(--bg-secondary)" }}
+              >
+                <Calendar size={18} style={{ color: "var(--text-muted)" }} />
                 <div>
-                  <p className="text-xs text-muted">Date</p>
+                  <p className="text-xs" style={{ color: "var(--text-muted)" }}>
+                    Date
+                  </p>
                   <p className="text-sm font-medium">
                     {formatDate(details?.transactionDate || details?.paidAt)}
                   </p>
                 </div>
               </div>
 
-              <div className="flex items-center gap-3 p-3 bg-secondary rounded-lg">
-                <Mail size={18} className="text-muted flex-shrink-0" />
+              <div
+                className="flex items-center gap-3 p-3 rounded-lg"
+                style={{ backgroundColor: "var(--bg-secondary)" }}
+              >
+                <Mail size={18} style={{ color: "var(--text-muted)" }} />
                 <div className="min-w-0">
-                  <p className="text-xs text-muted">Email</p>
+                  <p className="text-xs" style={{ color: "var(--text-muted)" }}>
+                    Email
+                  </p>
                   <p className="text-sm font-medium truncate">
                     {details?.email}
                   </p>
                 </div>
               </div>
 
-              <div className="flex items-center gap-3 p-3 bg-secondary rounded-lg">
-                <CreditCard size={18} className="text-muted flex-shrink-0" />
+              <div
+                className="flex items-center gap-3 p-3 rounded-lg"
+                style={{ backgroundColor: "var(--bg-secondary)" }}
+              >
+                <CreditCard size={18} style={{ color: "var(--text-muted)" }} />
                 <div>
-                  <p className="text-xs text-muted">Payment Method</p>
+                  <p className="text-xs" style={{ color: "var(--text-muted)" }}>
+                    Payment Method
+                  </p>
                   <p className="text-sm font-medium capitalize">
                     {details?.channel || "Card"}
                   </p>
@@ -157,41 +209,67 @@ const PaymentSuccess = ({ details }) => {
 
             {/* Order Details Toggle */}
             {details?.orderId && (
-              <div className="border-t border-border pt-4">
+              <div
+                className="mt-4 pt-4"
+                style={{ borderTop: "1px solid var(--border-color)" }}
+              >
                 <button
                   onClick={() => setShowOrderDetails(!showOrderDetails)}
-                  className="w-full flex items-center justify-between p-3 hover:bg-secondary rounded-lg transition-colors"
+                  className="w-full flex items-center justify-between p-3 rounded-lg transition-colors"
+                  style={{ backgroundColor: "var(--bg-secondary)" }}
                 >
                   <div className="flex items-center gap-2">
-                    <Package size={18} className="text-primary-600" />
+                    <Package
+                      size={18}
+                      style={{ color: "var(--primary-600)" }}
+                    />
                     <span className="font-medium">Order Details</span>
-                    <span className="text-sm text-muted">
+                    <span style={{ color: "var(--text-muted)" }}>
                       (#{details?.orderId})
                     </span>
                   </div>
                   {showOrderDetails ? (
-                    <ChevronUp size={20} className="text-muted" />
+                    <ChevronUp
+                      size={20}
+                      style={{ color: "var(--text-muted)" }}
+                    />
                   ) : (
-                    <ChevronDown size={20} className="text-muted" />
+                    <ChevronDown
+                      size={20}
+                      style={{ color: "var(--text-muted)" }}
+                    />
                   )}
                 </button>
 
                 {showOrderDetails && (
-                  <div className="mt-3 p-4 bg-secondary rounded-lg space-y-3">
+                  <div
+                    className="mt-3 p-4 rounded-lg space-y-3"
+                    style={{ backgroundColor: "var(--bg-secondary)" }}
+                  >
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
                       <div>
-                        <p className="text-muted">Order ID</p>
+                        <p style={{ color: "var(--text-muted)" }}>Order ID</p>
                         <p className="font-semibold">{details?.orderId}</p>
                       </div>
                       <div>
-                        <p className="text-muted">Order Status</p>
-                        <span className="inline-flex items-center gap-1 px-2 py-1 bg-green-100 text-green-700 rounded-full text-xs font-medium">
+                        <p style={{ color: "var(--text-muted)" }}>
+                          Order Status
+                        </p>
+                        <span
+                          className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium"
+                          style={{
+                            backgroundColor: "var(--success-100)",
+                            color: "var(--success-700)",
+                          }}
+                        >
                           <CheckCircle2 size={12} />
                           Confirmed
                         </span>
                       </div>
                       <div>
-                        <p className="text-muted">Estimated Delivery</p>
+                        <p style={{ color: "var(--text-muted)" }}>
+                          Estimated Delivery
+                        </p>
                         <p className="font-semibold">
                           {new Date(
                             Date.now() + 3 * 24 * 60 * 60 * 1000,
@@ -211,20 +289,37 @@ const PaymentSuccess = ({ details }) => {
         </div>
 
         {/* Delivery Information */}
-        <div className="bg-white rounded-2xl shadow-lg border border-border p-6 mb-6">
-          <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
-            <Truck size={20} className="text-primary-600" />
+        <div
+          className="rounded-2xl shadow-lg p-6 mb-6"
+          style={{
+            backgroundColor: "var(--bg-primary)",
+            border: "1px solid var(--border-color)",
+          }}
+        >
+          <h2
+            className="text-lg font-semibold mb-4 flex items-center gap-2"
+            style={{ color: "var(--text-primary)" }}
+          >
+            <Truck size={20} style={{ color: "var(--primary-600)" }} />
             What's Next?
           </h2>
 
           <div className="space-y-4">
             <div className="flex gap-4">
-              <div className="flex-shrink-0 w-8 h-8 bg-primary-100 rounded-full flex items-center justify-center">
-                <Mail size={16} className="text-primary-600" />
+              <div
+                className="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center"
+                style={{ backgroundColor: "var(--primary-100)" }}
+              >
+                <Mail size={16} style={{ color: "var(--primary-600)" }} />
               </div>
               <div>
-                <p className="font-medium">Confirmation Email Sent</p>
-                <p className="text-sm text-secondary">
+                <p
+                  className="font-medium"
+                  style={{ color: "var(--text-primary)" }}
+                >
+                  Confirmation Email Sent
+                </p>
+                <p style={{ color: "var(--text-secondary)" }}>
                   We've sent a confirmation email to {details?.email} with your
                   order details and receipt.
                 </p>
@@ -232,12 +327,20 @@ const PaymentSuccess = ({ details }) => {
             </div>
 
             <div className="flex gap-4">
-              <div className="flex-shrink-0 w-8 h-8 bg-primary-100 rounded-full flex items-center justify-center">
-                <Package size={16} className="text-primary-600" />
+              <div
+                className="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center"
+                style={{ backgroundColor: "var(--primary-100)" }}
+              >
+                <Package size={16} style={{ color: "var(--primary-600)" }} />
               </div>
               <div>
-                <p className="font-medium">Order Processing</p>
-                <p className="text-sm text-secondary">
+                <p
+                  className="font-medium"
+                  style={{ color: "var(--text-primary)" }}
+                >
+                  Order Processing
+                </p>
+                <p style={{ color: "var(--text-secondary)" }}>
                   Your order is being processed and will be shipped within 1-2
                   business days.
                 </p>
@@ -245,12 +348,20 @@ const PaymentSuccess = ({ details }) => {
             </div>
 
             <div className="flex gap-4">
-              <div className="flex-shrink-0 w-8 h-8 bg-primary-100 rounded-full flex items-center justify-center">
-                <Truck size={16} className="text-primary-600" />
+              <div
+                className="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center"
+                style={{ backgroundColor: "var(--primary-100)" }}
+              >
+                <Truck size={16} style={{ color: "var(--primary-600)" }} />
               </div>
               <div>
-                <p className="font-medium">Track Your Order</p>
-                <p className="text-sm text-secondary">
+                <p
+                  className="font-medium"
+                  style={{ color: "var(--text-primary)" }}
+                >
+                  Track Your Order
+                </p>
+                <p style={{ color: "var(--text-secondary)" }}>
                   Once shipped, you'll receive a tracking number to monitor your
                   delivery status.
                 </p>
@@ -263,7 +374,12 @@ const PaymentSuccess = ({ details }) => {
         <div className="flex flex-col sm:flex-row gap-3">
           <button
             onClick={handleDownloadReceipt}
-            className="flex-1 flex items-center justify-center gap-2 px-6 py-3 bg-white border-2 border-border rounded-xl hover:bg-secondary transition-colors font-semibold"
+            className="flex-1 flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-semibold transition-all duration-200 hover:-translate-y-px"
+            style={{
+              backgroundColor: "var(--bg-primary)",
+              color: "var(--text-primary)",
+              border: "2px solid var(--border-color)",
+            }}
           >
             <Download size={20} />
             Download Receipt
@@ -271,7 +387,11 @@ const PaymentSuccess = ({ details }) => {
 
           <Link
             href="/orders"
-            className="flex-1 flex items-center justify-center gap-2 px-6 py-3 bg-primary-600 text-white rounded-xl hover:bg-primary-700 transition-colors font-semibold"
+            className="flex-1 flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-semibold transition-all duration-200 hover:-translate-y-px hover:shadow-md"
+            style={{
+              backgroundColor: "var(--primary-600)",
+              color: "var(--text-inverse)",
+            }}
           >
             <ShoppingBag size={20} />
             View Orders
@@ -283,7 +403,8 @@ const PaymentSuccess = ({ details }) => {
         <div className="text-center mt-6">
           <Link
             href="/"
-            className="inline-flex items-center gap-2 text-primary-600 hover:text-primary-700 transition-colors font-semibold"
+            className="inline-flex items-center gap-2 font-semibold transition-colors"
+            style={{ color: "var(--primary-600)" }}
           >
             <Home size={18} />
             Continue Shopping
@@ -291,13 +412,22 @@ const PaymentSuccess = ({ details }) => {
         </div>
 
         {/* Security Badge */}
-        <div className="flex items-center justify-center gap-4 mt-8 pt-8 border-t border-border">
-          <div className="flex items-center gap-2 text-sm text-muted">
-            <Shield size={16} className="text-green-500" />
+        <div
+          className="flex items-center justify-center gap-4 mt-8 pt-8"
+          style={{ borderTop: "1px solid var(--border-color)" }}
+        >
+          <div
+            className="flex items-center gap-2 text-sm"
+            style={{ color: "var(--text-muted)" }}
+          >
+            <Shield size={16} style={{ color: "var(--success-500)" }} />
             <span>Secure Payment</span>
           </div>
-          <div className="flex items-center gap-2 text-sm text-muted">
-            <Lock size={16} className="text-green-500" />
+          <div
+            className="flex items-center gap-2 text-sm"
+            style={{ color: "var(--text-muted)" }}
+          >
+            <Lock size={16} style={{ color: "var(--success-500)" }} />
             <span>SSL Encrypted</span>
           </div>
         </div>
