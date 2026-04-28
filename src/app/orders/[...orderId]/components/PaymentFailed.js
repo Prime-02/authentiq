@@ -5,21 +5,31 @@ import { XCircle, ArrowLeft, RefreshCw, HelpCircle } from "lucide-react";
 
 const PaymentFailed = ({ details }) => {
   return (
-    <main className="min-h-screen flex items-center justify-center bg-gray-50">
+    <main
+      className="min-h-screen flex items-center justify-center"
+      style={{ backgroundColor: "var(--bg-secondary)" }}
+    >
       <div className="w-[90%] max-w-md mx-auto text-center">
-        <div className="inline-flex items-center justify-center w-20 h-20 bg-red-100 rounded-full mb-6">
-          <XCircle size={40} className="text-red-500" />
+        <div
+          className="inline-flex items-center justify-center w-20 h-20 rounded-full mb-6"
+          style={{ backgroundColor: "var(--error-100)" }}
+        >
+          <XCircle size={40} style={{ color: "var(--error-500)" }} />
         </div>
-        
-        <h1 className="text-2xl md:text-3xl font-bold mb-3">
+
+        <h1
+          className="text-2xl md:text-3xl font-bold mb-3"
+          style={{ color: "var(--text-primary)" }}
+        >
           Payment Failed
         </h1>
-        <p className="text-secondary mb-6">
-          {details?.message || "Your payment could not be processed. Please try again."}
+        <p className="mb-6" style={{ color: "var(--text-secondary)" }}>
+          {details?.message ||
+            "Your payment could not be processed. Please try again."}
         </p>
 
         {details?.reference && (
-          <p className="text-sm text-muted mb-6">
+          <p className="text-sm mb-6" style={{ color: "var(--text-muted)" }}>
             Reference: {details.reference}
           </p>
         )}
@@ -27,15 +37,27 @@ const PaymentFailed = ({ details }) => {
         <div className="flex flex-col gap-3">
           <Link
             href="/cart"
-            className="flex items-center justify-center gap-2 px-6 py-3 bg-primary-600 text-white rounded-xl hover:bg-primary-700 transition-colors font-semibold"
+            className="flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-semibold transition-all duration-200 hover:-translate-y-px hover:shadow-md"
+            style={{
+              backgroundColor: "var(--primary-600)",
+              color: "var(--text-inverse)",
+            }}
           >
             <RefreshCw size={20} />
             Try Again
           </Link>
-          
+
           <Link
             href="/contact"
-            className="flex items-center justify-center gap-2 px-6 py-3 bg-white border-2 border-border rounded-xl hover:bg-secondary transition-colors font-semibold"
+            className="flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-semibold transition-all duration-200 hover:-translate-y-px"
+            style={{
+              backgroundColor: "var(--bg-primary)",
+              color: "var(--text-primary)",
+              border: "2px solid var(--border-color)",
+              ":hover": {
+                backgroundColor: "var(--bg-secondary)",
+              },
+            }}
           >
             <HelpCircle size={20} />
             Contact Support

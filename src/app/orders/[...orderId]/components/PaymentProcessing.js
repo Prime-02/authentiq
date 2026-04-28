@@ -4,13 +4,28 @@ import { Loader2 } from "lucide-react";
 
 const PaymentProcessing = () => {
   return (
-    <main className="min-h-screen flex items-center justify-center bg-gray-50">
+    <main
+      className="min-h-screen flex items-center justify-center"
+      style={{ backgroundColor: "var(--bg-secondary)" }}
+    >
       <div className="text-center">
-        <div className="inline-flex items-center justify-center w-20 h-20 bg-primary-100 rounded-full mb-6">
-          <Loader2 size={40} className="text-primary-600 animate-spin" />
+        <div
+          className="inline-flex items-center justify-center w-20 h-20 rounded-full mb-6"
+          style={{ backgroundColor: "var(--primary-100)" }}
+        >
+          <Loader2
+            size={40}
+            className="animate-spin"
+            style={{ color: "var(--primary-600)" }}
+          />
         </div>
-        <h1 className="text-2xl font-bold mb-2">Verifying Payment</h1>
-        <p className="text-secondary">
+        <h1
+          className="text-2xl font-bold mb-2"
+          style={{ color: "var(--text-primary)" }}
+        >
+          Verifying Payment
+        </h1>
+        <p style={{ color: "var(--text-secondary)" }}>
           Please wait while we confirm your payment...
         </p>
       </div>
