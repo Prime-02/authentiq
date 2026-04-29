@@ -11,7 +11,7 @@ const ProductInfo = ({ product, sizes, selectedSize, onSizeSelect }) => {
         </h1>
         <div className="flex items-center gap-4">
           <p className="text-3xl md:text-4xl font-bold text-green-600">
-            ${product?.price?.toLocaleString()}
+            ₦{product?.price?.toLocaleString()}
           </p>
           {product?.original_price &&
             product.original_price > product.price && (

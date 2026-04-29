@@ -26,7 +26,7 @@ export default function ClientLayout({ children }) {
       () => {
         setLoading(false);
       },
-      Math.floor(Math.random() * (5000 - 1000 + 1)) + 1000,
+      Math.floor(Math.random() * (2000 - 1000 + 1)) + 1000,
     );
 
     return () => {
