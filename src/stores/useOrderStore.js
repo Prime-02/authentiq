@@ -321,7 +321,7 @@ export const useOrderStore = create((set, get) => ({
       if (dateFrom) params.append("date_from", dateFrom);
       if (dateTo) params.append("date_to", dateTo);
 
-      const { data } = await axiosInstance.get(`/admin/orders?${params}`);
+      const { data } = await axiosInstance.get(`/shop/admin/orders?${params}`);
 
       set({
         orders: data.data || [],
@@ -359,7 +359,7 @@ export const useOrderStore = create((set, get) => ({
     set({ loadingStats: true });
     try {
       const { data } = await axiosInstance.get(
-        `/admin/orders/quick-stats?days=${days}`,
+        `/shop/admin/orders/quick-stats?days=${days}`,
       );
       return data;
     } catch (err) {
@@ -379,7 +379,7 @@ export const useOrderStore = create((set, get) => ({
     set({ loadingMutation: true });
     try {
       const { data } = await axiosInstance.patch(
-        `/admin/orders/${orderId}/status`,
+        `/shop/admin/orders/${orderId}/status`,
         null,
         { params: { order_status: orderStatus } },
       );
@@ -409,7 +409,7 @@ export const useOrderStore = create((set, get) => ({
       if (shippingMethod) params.shipping_method = shippingMethod;
 
       const { data } = await axiosInstance.patch(
-        `/admin/orders/${orderId}/tracking`,
+        `/shop/admin/orders/${orderId}/tracking`,
         null,
         { params },
       );
@@ -438,7 +438,7 @@ export const useOrderStore = create((set, get) => ({
       if (transactionId) params.transaction_id = transactionId;
 
       const { data } = await axiosInstance.patch(
-        `/admin/orders/${orderId}/payment`,
+        `/shop/admin/orders/${orderId}/payment`,
         null,
         { params },
       );
@@ -465,7 +465,7 @@ export const useOrderStore = create((set, get) => ({
     set({ loadingMutation: true });
     try {
       const { data } = await axiosInstance.patch(
-        `/admin/orders/${orderId}/delivery-company`,
+        `/shop/admin/orders/${orderId}/delivery-company`,
         null,
         { params: { delivery_company_id: deliveryCompanyId } },
       );
@@ -491,7 +491,7 @@ export const useOrderStore = create((set, get) => ({
   unassignDeliveryCompany: async (orderId) => {
     set({ loadingMutation: true });
     try {
-      await axiosInstance.delete(`/admin/orders/${orderId}/delivery-company`);
+      await axiosInstance.delete(`/shop/admin/orders/${orderId}/delivery-company`);
       toast.success("Delivery company removed from order.");
 
       // Refresh current admin page with current filters
@@ -512,7 +512,7 @@ export const useOrderStore = create((set, get) => ({
   deleteOrder: async (orderId) => {
     set({ loadingMutation: true });
     try {
-      await axiosInstance.delete(`/admin/orders/${orderId}`);
+      await axiosInstance.delete(`/shop/admin/orders/${orderId}`);
       toast.success("Order deleted.");
 
       // Refresh current admin page with current filters
@@ -615,7 +615,7 @@ export const useOrderStore = create((set, get) => ({
       if (userId) params.append("user_id", userId);
       const queryString = params.toString();
       const { data } = await axiosInstance.get(
-        `/stats/orders/summary${queryString ? `?${queryString}` : ""}`,
+        `/shop/stats/orders/summary${queryString ? `?${queryString}` : ""}`,
       );
       return data;
     } catch (err) {
@@ -631,7 +631,7 @@ export const useOrderStore = create((set, get) => ({
     try {
       const params = days ? `?days=${days}` : "";
       const { data } = await axiosInstance.get(
-        `/stats/orders/my-summary${params}`,
+        `/shop/stats/orders/my-summary${params}`,
       );
       return data;
     } catch (err) {
@@ -651,7 +651,7 @@ export const useOrderStore = create((set, get) => ({
       });
       if (userId) params.append("user_id", userId);
       const { data } = await axiosInstance.get(
-        `/stats/orders/revenue-trend?${params}`,
+        `/shop/stats/orders/revenue-trend?${params}`,
       );
       return data;
     } catch (err) {
@@ -668,7 +668,7 @@ export const useOrderStore = create((set, get) => ({
       const params = new URLSearchParams({ limit: String(limit) });
       if (days) params.append("days", String(days));
       const { data } = await axiosInstance.get(
-        `/stats/orders/top-customers?${params}`,
+        `/shop/stats/orders/top-customers?${params}`,
       );
       return data;
     } catch (err) {
@@ -685,7 +685,7 @@ export const useOrderStore = create((set, get) => ({
       const params = new URLSearchParams({ limit: String(limit) });
       if (days) params.append("days", String(days));
       const { data } = await axiosInstance.get(
-        `/stats/orders/popular-products?${params}`,
+        `/shop/stats/orders/popular-products?${params}`,
       );
       return data;
     } catch (err) {
@@ -700,7 +700,7 @@ export const useOrderStore = create((set, get) => ({
   fetchFulfillmentMetrics: async (days = 30) => {
     try {
       const { data } = await axiosInstance.get(
-        `/stats/orders/fulfillment-metrics?days=${days}`,
+        `/shop/stats/orders/fulfillment-metrics?days=${days}`,
       );
       return data;
     } catch (err) {
@@ -715,7 +715,7 @@ export const useOrderStore = create((set, get) => ({
   fetchHourlyDistribution: async (days = 30) => {
     try {
       const { data } = await axiosInstance.get(
-        `/stats/orders/hourly-distribution?days=${days}`,
+        `/shop/stats/orders/hourly-distribution?days=${days}`,
       );
       return data;
     } catch (err) {
@@ -730,7 +730,7 @@ export const useOrderStore = create((set, get) => ({
   fetchDailyDistribution: async (days = 30) => {
     try {
       const { data } = await axiosInstance.get(
-        `/stats/orders/daily-distribution?days=${days}`,
+        `/shop/stats/orders/daily-distribution?days=${days}`,
       );
       return data;
     } catch (err) {
@@ -749,7 +749,7 @@ export const useOrderStore = create((set, get) => ({
       if (limit) params.append("limit", String(limit));
       const queryString = params.toString();
       const { data } = await axiosInstance.get(
-        `/stats/orders/category-revenue${queryString ? `?${queryString}` : ""}`,
+        `/shop/stats/orders/category-revenue${queryString ? `?${queryString}` : ""}`,
       );
       return data;
     } catch (err) {
@@ -765,7 +765,7 @@ export const useOrderStore = create((set, get) => ({
     try {
       const params = days ? `?days=${days}` : "";
       const { data } = await axiosInstance.get(
-        `/stats/orders/shipping-analysis${params}`,
+        `/shop/stats/orders/shipping-analysis${params}`,
       );
       return data;
     } catch (err) {
@@ -781,7 +781,7 @@ export const useOrderStore = create((set, get) => ({
     try {
       const params = days ? `?days=${days}` : "";
       const { data } = await axiosInstance.get(
-        `/stats/orders/payment-analysis${params}`,
+        `/shop/stats/orders/payment-analysis${params}`,
       );
       return data;
     } catch (err) {
@@ -797,7 +797,7 @@ export const useOrderStore = create((set, get) => ({
     set({ loadingStats: true });
     try {
       const { data } = await axiosInstance.get(
-        `/stats/orders/dashboard?days=${days}`,
+        `/shop/stats/orders/dashboard?days=${days}`,
       );
       return data;
     } catch (err) {

@@ -1,9 +1,12 @@
 "use client";
 import React from "react";
-import { Plus, Package, TrendingUp } from "lucide-react";
-import { AddCategory } from "@/components/inputs/CategoryDropdown";
+import { Plus, Package, TrendingUp, BarChart } from "lucide-react";
 
-const PageHeader = ({ productCount, onAddProduct }) => {
+const PageHeader = ({
+  productCount,
+  onViewProductStatistics,
+  onAddProduct,
+}) => {
   return (
     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
       <div>
@@ -17,8 +20,13 @@ const PageHeader = ({ productCount, onAddProduct }) => {
         </p>
       </div>
       <div className="flex items-center gap-2">
-        <AddCategory />
-
+        <button
+          onClick={onViewProductStatistics}
+          className="flex items-center gap-2 px-5 py-2.5 btn btn-ghost active:scale-95 transition-all font-medium shadow-sm"
+        >
+          <BarChart size={18} />
+          Product Statistics
+        </button>
         <button
           onClick={onAddProduct}
           className="flex items-center gap-2 px-5 py-2.5 bg-[var(--primary-600)] text-[var(--text-inverse)] rounded-lg

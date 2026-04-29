@@ -15,6 +15,7 @@ import {
   Loader2,
   ChevronLeft,
   ChevronRight,
+  Loader,
 } from "lucide-react";
 import { toast } from "react-toastify";
 
@@ -184,7 +185,7 @@ const DeliveryCompaniesAdminPage = () => {
         {/* Loading State */}
         {loadingCompanies && companies.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-20">
-            <Loader2 size={40} className="text-primary-600 animate-spin mb-4" />
+            <Loader size={100} className="text-primary-600 animate-spin mb-4" />
             <p className="text-secondary">Loading companies...</p>
           </div>
         ) : (

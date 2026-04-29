@@ -10,7 +10,7 @@ const Footer = () => {
       <div className="md:w-[80%] w-full px-5 md:px-0 mx-auto flex flex-col sm:flex-row justify-between">
         <div className='w-full sm:w-1/3 mb-8 sm:mb-0'>
           {/* Title Section */}
-          <h2 className="text-2xl sm:text-3xl font-semibold">iSANS ORIGINALS</h2>
+          <h2 className="text-2xl sm:text-3xl font-semibold">AuthentiQ</h2>
           <p className=" text-gray-400">Quality craftsmanship meets innovative design. Explore our exclusive collection.</p>
         </div>
 
@@ -68,7 +68,7 @@ const Footer = () => {
 
       {/* Footer Bottom */}
       <div className="text-center pt-6 mt-4 text-sm sm:text-base border-t py-5 w-full sm:w-[80%] mx-auto border-gray-500 text-gray-400">
-        <p>&copy; 2024 iSans Originals. All Rights Reserved.</p>
+        <p>&copy; 2024 AuthentiQ. All Rights Reserved.</p>
       </div>
     </footer>
   );

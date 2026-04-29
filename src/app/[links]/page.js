@@ -1,5 +1,8 @@
-import { cookiePolicy, privacyPolicy, termsAndConditions } from "@/components/index";
-
+import {
+  cookiePolicy,
+  privacyPolicy,
+  termsAndConditions,
+} from "@/components/index";
 
 const policies = {
   "terms-of-services": {
@@ -28,31 +31,115 @@ const PolicyPage = ({ params }) => {
 
   if (!policy) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <h1 className="text-2xl font-bold">Page Not Found</h1>
+      <div
+        className="min-h-screen flex items-center justify-center"
+        style={{ backgroundColor: "var(--bg-primary)" }}
+      >
+        <h1
+          className="text-2xl font-bold"
+          style={{ color: "var(--text-primary)" }}
+        >
+          Page Not Found
+        </h1>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-100 text-gray-800 px-5 py-32">
+    <div
+      className="min-h-screen px-5 py-32"
+      style={{ backgroundColor: "var(--bg-secondary)" }}
+    >
       <div className="max-w-4xl mx-auto">
-        <h1 className="text-3xl font-bold mb-6">{policy.title} </h1>
-        {policy.content.map((section, index) => (
-          <div key={index} className="mb-8">
-            <h2 className="text-2xl font-semibold mb-3">{section.title}</h2>
-            <p className="text-lg">{section.content}</p>
-            
-            {/* Render subsections if they exist */}
-            {section.subsections &&
-              section.subsections.map((sub, subIndex) => (
-                <div key={subIndex} className="ml-4">
-                  <h3 className="text-xl font-semibold">{sub.subtitle}</h3>
-                  <p>{sub.content}</p>
-                </div>
-              ))}
+        {/* Card container */}
+        <div
+          className="card rounded-lg p-8 md:p-12 shadow-sm"
+          style={{
+            backgroundColor: "var(--bg-primary)",
+            border: "1px solid var(--border-light)",
+          }}
+        >
+          {/* Title */}
+          <h1
+            className="text-3xl md:text-4xl font-bold mb-8 pb-4"
+            style={{
+              color: "var(--text-primary)",
+              borderBottom: "2px solid var(--border-light)",
+            }}
+          >
+            {policy.title}
+          </h1>
+
+          {/* Content Sections */}
+          <div className="space-y-8">
+            {policy.content.map((section, index) => (
+              <div key={index}>
+                {/* Section Title */}
+                <h2
+                  className="text-2xl font-semibold mb-4"
+                  style={{ color: "var(--text-primary)" }}
+                >
+                  {section.title}
+                </h2>
+
+                {/* Section Content */}
+                <p
+                  className="text-base leading-relaxed mb-4"
+                  style={{ color: "var(--text-secondary)" }}
+                >
+                  {section.content}
+                </p>
+
+                {/* Subsections */}
+                {section.subsections && (
+                  <div className="ml-4 md:ml-6 space-y-4">
+                    {section.subsections.map((sub, subIndex) => (
+                      <div
+                        key={subIndex}
+                        className="p-4 rounded-lg"
+                        style={{ backgroundColor: "var(--bg-secondary)" }}
+                      >
+                        <h3
+                          className="text-xl font-semibold mb-2"
+                          style={{ color: "var(--text-primary)" }}
+                        >
+                          {sub.subtitle}
+                        </h3>
+                        <p
+                          className="text-base leading-relaxed"
+                          style={{ color: "var(--text-secondary)" }}
+                        >
+                          {sub.content}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {/* Divider between sections (except last) */}
+                {index < policy.content.length - 1 && (
+                  <div
+                    className="mt-6 pt-6"
+                    style={{ borderTop: "1px solid var(--border-light)" }}
+                  />
+                )}
+              </div>
+            ))}
           </div>
-        ))}
+        </div>
+
+        {/* Footer note */}
+        <p
+          className="text-sm text-center mt-8"
+          style={{ color: "var(--text-muted)" }}
+        >
+          Last updated:{" "}
+          {new Date().toLocaleDateString("en-US", {
+            year: "numeric",
+            month: "long",
+            day: "numeric",
+          })}
+        </p>
       </div>
     </div>
   );

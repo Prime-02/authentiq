@@ -223,7 +223,7 @@ const Wishlist = () => {
                 className="card rounded-2xl overflow-hidden hover:shadow-xl transition-all duration-300 group"
               >
                 {/* Image Container */}
-                <Link href={`/shop/${productId}`} className="relative block">
+                <Link href={`/product/${productId}`} className="relative block">
                   <div className="relative aspect-square overflow-hidden bg-secondary">
                     <DynamicImage
                       prop={productImage}
@@ -247,7 +247,7 @@ const Wishlist = () => {
 
                 {/* Product Info */}
                 <div className="p-4">
-                  <Link href={`/shop/${productId}`}>
+                  <Link href={`/product/${productId}`}>
                     <h3 className="font-semibold text-lg hover:text-primary-600 transition-colors line-clamp-1">
                       {productName}
                     </h3>
@@ -266,11 +266,11 @@ const Wishlist = () => {
                   {/* Price */}
                   <div className="mt-3 flex items-baseline gap-2">
                     <span className="text-2xl font-bold text-primary-600">
-                      ${productPrice.toFixed(2)}
+                      ₦{productPrice.toFixed(2)}
                     </span>
                     {originalPrice && originalPrice > productPrice && (
                       <span className="text-sm text-muted line-through">
-                        ${originalPrice.toFixed(2)}
+                        ₦{originalPrice.toFixed(2)}
                       </span>
                     )}
                   </div>

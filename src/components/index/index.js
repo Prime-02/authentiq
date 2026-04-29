@@ -1,4 +1,12 @@
-import { FolderTree, ShoppingCart, Truck, User, Users } from "lucide-react";
+import {
+  Bell,
+  FolderTree,
+  ShoppingCart,
+  Star,
+  Truck,
+  User,
+  Users,
+} from "lucide-react";
 import { FaBox } from "react-icons/fa";
 import { FaBarcode } from "react-icons/fa6";
 import { RiRefund2Line } from "react-icons/ri";
@@ -31,33 +39,34 @@ export const Shipping = {
 };
 
 export const adminDBSidebar = [
-  {
-    name: "Dashboard",
-    href: "/admin/name/dashboard/",
-    icons: <TbLayoutDashboardFilled />,
-  },
   { name: "Customers", href: "/admin/name/customers/", icons: <Users /> },
   { name: "Products", href: "/admin/name/products/", icons: <FaBox /> },
+  { name: "Product Reviews", href: "/admin/name/reviews/", icons: <Star /> },
   {
     name: "Categories",
     href: "/admin/name/categories/",
     icons: <FolderTree />,
   },
   { name: "Barcodes", href: "/admin/name/barcode/", icons: <FaBarcode /> },
-  { name: "Orders", href: "/admin/name/order/", icons: <ShoppingCart /> },
+  { name: "Orders", href: "/admin/name/orders/", icons: <ShoppingCart /> },
   {
     name: "Delivery Companies",
     href: "/admin/name/delivery_companies/",
     icons: <Truck />,
   },
   { name: "Profile", href: "/admin/name/profile/", icons: <User /> },
+  {
+    name: "Notifications",
+    href: "/admin/name/notifications/",
+    icons: <Bell />,
+  },
 ];
 
 export const termsAndConditions = [
   {
     title: "Acceptance of Terms",
     content: `
-      By visiting, browsing, or purchasing from iSANS Originals, you acknowledge that you:
+      By visiting, browsing, or purchasing from AuthentiQ, you acknowledge that you:
       - Are at least 18 years old or have obtained parental/guardian consent to use the Site and purchase our products.
       - Agree to abide by these Terms, as well as any other policies or guidelines we may publish.
     `,
@@ -65,7 +74,7 @@ export const termsAndConditions = [
   {
     title: "Modification of Terms",
     content: `
-      iSANS Originals reserves the right to update, amend, or revise these Terms at any time without prior notice. 
+      AuthentiQ reserves the right to update, amend, or revise these Terms at any time without prior notice. 
       Any changes will be effective immediately upon posting to the Site. Continued use of the Site or services 
       after such changes constitutes acceptance of the updated Terms.
     `,
@@ -77,7 +86,7 @@ export const termsAndConditions = [
         subtitle: "Product Descriptions",
         content: `
           We strive to provide accurate descriptions of all products, including images, colors, materials, and sizes. 
-          However, slight variations may occur due to manufacturing or display differences. iSANS Originals does not 
+          However, slight variations may occur due to manufacturing or display differences. AuthentiQ does not 
           guarantee that product descriptions or images are error-free.
         `,
       },
@@ -92,7 +101,7 @@ export const termsAndConditions = [
         subtitle: "Pricing and Taxes",
         content: `
           Prices displayed on the Site are in [Insert Currency] and exclude taxes unless otherwise specified. 
-          Applicable taxes (e.g., VAT, GST) and shipping charges will be calculated at checkout. iSANS Originals 
+          Applicable taxes (e.g., VAT, GST) and shipping charges will be calculated at checkout. AuthentiQ 
           reserves the right to change prices at any time without prior notice.
         `,
       },
@@ -127,7 +136,7 @@ export const termsAndConditions = [
       {
         subtitle: "Order Acceptance",
         content: `
-          iSANS Originals reserves the right to accept or cancel any order for any reason, including but not limited to:
+          AuthentiQ reserves the right to accept or cancel any order for any reason, including but not limited to:
           - Product unavailability
           - Pricing errors
           - Suspicious or fraudulent activity
@@ -138,7 +147,7 @@ export const termsAndConditions = [
         subtitle: "Cancellations",
         content: `
           Customers may cancel their orders within [Insert Hours/Days] of placement, provided the order has not been shipped. 
-          iSANS Originals reserves the right to refuse cancellation requests for shipped orders.
+          AuthentiQ reserves the right to refuse cancellation requests for shipped orders.
         `,
       },
     ],
@@ -157,13 +166,13 @@ export const termsAndConditions = [
         subtitle: "Delivery Times",
         content: `
           Delivery times are estimates and may vary due to unforeseen circumstances such as customs delays or 
-          carrier issues. iSANS Originals is not liable for delays caused by shipping carriers or other external factors.
+          carrier issues. AuthentiQ is not liable for delays caused by shipping carriers or other external factors.
         `,
       },
       {
         subtitle: "Shipping Address",
         content: `
-          It is your responsibility to provide a valid and accurate shipping address. iSANS Originals is not responsible 
+          It is your responsibility to provide a valid and accurate shipping address. AuthentiQ is not responsible 
           for lost or delayed shipments due to incorrect addresses.
         `,
       },
@@ -229,7 +238,7 @@ export const termsAndConditions = [
     title: "Intellectual Property",
     content: `
       All content on the Site, including but not limited to images, logos, product descriptions, and text, is the 
-      property of iSANS Originals and protected under applicable copyright and trademark laws. You may not 
+      property of AuthentiQ and protected under applicable copyright and trademark laws. You may not 
       reproduce, distribute, or use this content without prior written permission.
     `,
   },
@@ -246,7 +255,7 @@ export const termsAndConditions = [
   {
     title: "Limitation of Liability",
     content: `
-      To the fullest extent permitted by law, iSANS Originals shall not be liable for:
+      To the fullest extent permitted by law, AuthentiQ shall not be liable for:
       - Indirect, incidental, or consequential damages arising from the use of our Site or products.
       - Losses caused by user-provided information errors.
       - Delays or failures beyond our reasonable control.
@@ -274,7 +283,7 @@ export const privacyPolicy = [
   {
     title: "Introduction",
     content: `
-      At iSANS Originals, we value your privacy and are committed to protecting your personal data. This Privacy 
+      At AuthentiQ, we value your privacy and are committed to protecting your personal data. This Privacy 
       Policy explains how we collect, use, and safeguard your information when you visit our website or use 
       our services.
     `,
@@ -319,7 +328,7 @@ export const privacyPolicy = [
   {
     title: "Sharing Your Information",
     content: `
-      iSANS Originals does not sell your personal information. However, we may share your data with:
+      AuthentiQ does not sell your personal information. However, we may share your data with:
       - Payment processors to complete transactions.
       - Shipping providers to deliver your orders.
       - Third-party service providers for analytics and marketing.

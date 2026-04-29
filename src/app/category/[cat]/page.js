@@ -3,9 +3,8 @@ import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { useCategoryStore, useProductStore } from "@/stores";
 import DynamicImage from "@/components/reusables/DynamicImage/DynamicImage";
-import { ShoppingCart, ArrowLeft } from "lucide-react";
+import { ShoppingCart, ArrowLeft, Loader } from "lucide-react";
 import Link from "next/link";
-import { LoaderStyle5Component } from "@/components/Loader/Loader";
 import ProductCard from "@/components/ProductCard/ProductCard";
 
 const CategoryPage = () => {
@@ -16,13 +15,13 @@ const CategoryPage = () => {
   const [currentCategory, setCurrentCategory] = useState(null);
   const [categoryProducts, setCategoryProducts] = useState([]);
 
-  // Fetch categories with products
+  // Fetch categories with products - only once on mount
   useEffect(() => {
     fetchCategories({
       includeProducts: true,
       maxProducts: 100,
     });
-  }, [fetchCategories]);
+  }, []); // Empty dependency array - runs only once on mount
 
   // Find the matching category from the URL slug
   useEffect(() => {
@@ -58,7 +57,7 @@ const CategoryPage = () => {
         limit: 100,
       });
     }
-  }, [currentCategory, fetchProducts]);
+  }, [currentCategory?.id]); // Only depends on the category ID
 
   // Update category products when products store updates
   useEffect(() => {
@@ -67,15 +66,18 @@ const CategoryPage = () => {
     }
   }, [products]);
 
+  // Rest of your component remains the same...
   // Loading state
   if (loadingCategories || loadingProducts) {
     return (
       <main className="my-32 w-[90%] mx-auto">
         <div className="w-full h-screen flex flex-col gap-y-12 items-center justify-center">
-          <LoaderStyle5Component />
+          <Loader size={100} className="animate-spin" />
           <p className="text-lg">Loading category...</p>
           {params?.cat && (
-            <p className="text-sm text-gray-500">URL param: {params.cat}</p>
+            <p className="text-sm text-gray-500">
+              Category: {`${params.cat}`.replace(/-/g, " ").toUpperCase()}
+            </p>
           )}
         </div>
       </main>

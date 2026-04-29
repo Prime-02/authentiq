@@ -97,40 +97,6 @@ const OrderHistoryPage = () => {
         </Link>
       </div>
 
-      {/* Quick Stats - Only shown when there are orders */}
-      {userOrderHistory.length > 0 && (
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-          <OrderStatCard
-            icon={Clock}
-            label="Pending"
-            value={orderStats.pending}
-            color="text-orange-600"
-            bgColor="bg-orange-50"
-          />
-          <OrderStatCard
-            icon={Package}
-            label="Processing"
-            value={orderStats.processing}
-            color="text-blue-600"
-            bgColor="bg-blue-50"
-          />
-          <OrderStatCard
-            icon={Truck}
-            label="Shipped"
-            value={orderStats.shipped}
-            color="text-purple-600"
-            bgColor="bg-purple-50"
-          />
-          <OrderStatCard
-            icon={CheckCircle2}
-            label="Delivered"
-            value={orderStats.delivered}
-            color="text-green-600"
-            bgColor="bg-green-50"
-          />
-        </div>
-      )}
-
       {/* Filters */}
       <div className="mb-6">
         <OrderFilters

@@ -7,13 +7,14 @@ import ProductStockModal from "./components/ProductStockModal";
 import ProductStatusModal from "./components/ProductStatusModal";
 import ProductDeleteModal from "./components/ProductDeleteModal";
 import PageHeader from "./components/PageHeader";
-import { Loader } from "@/components/Loader/Loader";
 import {
   useAuthStore,
   useBarcodeStore,
   useCategoryStore,
   useProductStore,
 } from "@/stores";
+import { useRouter } from "next/navigation";
+import { Loader2 } from "lucide-react";
 
 const INITIAL_FILTERS = {
   search: "",
@@ -30,7 +31,7 @@ const INITIAL_FILTERS = {
 };
 
 const ProductTable = () => {
-  const { isAdmin } = useAuthStore();
+  const { isAdmin, userFirstName } = useAuthStore();
   const { fetchAdminCategories, loadingProducts } = useCategoryStore();
   const { fetchBarcodes } = useBarcodeStore();
   const { fetchAdminProducts, products } = useProductStore();
@@ -46,6 +47,8 @@ const ProductTable = () => {
   });
   const [activeProduct, setActiveProduct] = useState(null);
   const [formMode, setFormMode] = useState("create"); // 'create' or 'edit'
+
+  const router = useRouter();
 
   // Bootstrap
   useEffect(() => {
@@ -108,10 +111,14 @@ const ProductTable = () => {
     openModal("form", product);
   };
 
+  const handleViewProductStatistics = () => {
+    router.push(`/admin/${userFirstName || "admin"}/products/statistics`);
+  };
+
   if (loadingProducts && !products?.length) {
     return (
       <div className="flex justify-center items-center min-h-[400px]">
-        <Loader />
+        <Loader2 size={100} className="animate-spin" />
       </div>
     );
   }
@@ -121,6 +128,7 @@ const ProductTable = () => {
       <PageHeader
         productCount={products?.length || 0}
         onAddProduct={handleAddProduct}
+        onViewProductStatistics={handleViewProductStatistics}
       />
 
       <ProductFilters

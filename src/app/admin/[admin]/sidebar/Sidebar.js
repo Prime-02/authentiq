@@ -80,25 +80,22 @@ const Sidebar = () => {
               text-[var(--text-primary)] hover:bg-[var(--bg-hover)] transition-colors duration-200"
             onClick={() => setSideSlide(false)}
           >
-            <X size={20} />
+            <X size={18} />
           </button>
         )}
 
         {/* Sidebar content */}
-        <div className="flex flex-col h-full pt-16 px-3">
+        <div className="flex flex-col h-full pt-8 px-3">
           {/* Logo/Brand area */}
-          <div className="mb-8 px-3">
-            <h2 className="text-xl font-Montserrat font-bold text-[var(--text-primary)]">
-              Admin Panel
-            </h2>
-            <p className="text-sm text-[var(--text-muted)] mt-1">
+          <Link href="/"className=" px-3">
+            <h2 className="text-lg font-Montserrat font-bold text-[var(--text-primary)]">
               {formattedadminFirstName.replace(/_/g, " ")}
-            </p>
-          </div>
+            </h2>
+          </Link>
 
           {/* Navigation links */}
           <nav className="flex-1 overflow-y-auto">
-            <div className="flex flex-col gap-y-1">
+            <div className="flex flex-col gap-y-0.5">
               {adminDBSidebar.map((links, index) => {
                 const updatedHref = links.href.replace(
                   "/name",
@@ -109,21 +106,21 @@ const Sidebar = () => {
                     <Link
                       href={updatedHref}
                       onClick={closeSideBar}
-                      className={`flex items-center gap-3 px-4 py-2.5 rounded-lg transition-all duration-200 group
+                      className={`flex items-center gap-2.5 px-3 py-2 rounded-lg transition-all duration-200 group
                         ${
                           isCurrent(updatedHref)
                             ? "bg-[var(--bg-tertiary)] text-[var(--text-primary)] font-medium shadow-sm"
                             : "text-[var(--text-secondary)] hover:bg-[var(--bg-hover)] hover:text-[var(--text-primary)]"
                         }`}
                     >
-                      <span className="text-xl flex-shrink-0 transition-transform duration-200 group-hover:scale-110">
+                      <span className="text-lg flex-shrink-0 transition-transform duration-200 group-hover:scale-110">
                         {links.icons}
                       </span>
-                      <span className="text-sm md:text-base truncate">
+                      <span className="text-xs md:text-sm truncate">
                         {links.name}
                       </span>
                       {isCurrent(updatedHref) && (
-                        <span className="ml-auto w-1.5 h-1.5 rounded-full bg-[var(--text-primary)]"></span>
+                        <span className="ml-auto w-1 h-1 rounded-full bg-[var(--text-primary)]"></span>
                       )}
                     </Link>
                   </div>
@@ -133,17 +130,17 @@ const Sidebar = () => {
           </nav>
 
           {/* Logout button */}
-          <div className="border-t border-[var(--border-color)] pt-4 pb-6 mt-auto">
+          <div className="border-t border-[var(--border-color)] pt-3 pb-6 mt-auto">
             <button
               onClick={handleLogoutClick}
-              className="flex items-center gap-3 px-4 py-2.5 w-full rounded-lg
+              className="flex items-center gap-2.5 px-3 py-2 w-full rounded-lg
                 text-[var(--text-secondary)] hover:bg-[var(--bg-hover)] hover:text-[var(--text-primary)] 
                 transition-all duration-200 group"
             >
-              <span className="text-xl flex-shrink-0 transition-transform duration-200 group-hover:scale-110">
-                <LogOutIcon />
+              <span className="text-lg flex-shrink-0 transition-transform duration-200 group-hover:scale-110">
+                <LogOutIcon size={18} />
               </span>
-              <span className="text-sm md:text-base">Logout</span>
+              <span className="text-xs md:text-sm">Logout</span>
             </button>
           </div>
         </div>
@@ -162,7 +159,7 @@ const Sidebar = () => {
               onClick={toggleSideSlide}
               aria-label="Toggle sidebar"
             >
-              <RiSideBarLine size={20} />
+              <RiSideBarLine size={18} />
             </button>
           </div>
         </div>
@@ -174,33 +171,33 @@ const Sidebar = () => {
           isOpen={showLogoutModal}
           onClose={() => setShowLogoutModal(false)}
         >
-          <div className="flex flex-col items-center justify-center p-8">
-            <div className="mb-6">
+          <div className="flex flex-col items-center justify-center p-6">
+            <div className="mb-4">
               <LogOutIcon
-                size={48}
+                size={40}
                 className="text-[var(--text-secondary)] mx-auto"
               />
             </div>
-            <h1 className="text-xl font-Montserrat font-bold mb-2 text-center text-[var(--text-primary)]">
+            <h1 className="text-lg font-Montserrat font-bold mb-2 text-center text-[var(--text-primary)]">
               Ready to Leave?
             </h1>
-            <p className="text-sm text-[var(--text-muted)] mb-6 text-center">
+            <p className="text-xs text-[var(--text-muted)] mb-5 text-center">
               Are you sure you want to log out of your account?
             </p>
-            <div className="flex gap-3 w-full">
+            <div className="flex gap-2 w-full">
               <button
                 onClick={() => setShowLogoutModal(false)}
-                className="flex-1 px-4 py-2.5 rounded-lg border border-[var(--border-color)]
+                className="flex-1 px-3 py-2 rounded-lg border border-[var(--border-color)]
                   text-[var(--text-primary)] hover:bg-[var(--bg-hover)] 
-                  transition-all duration-200 font-Poppins font-medium"
+                  transition-all duration-200 font-Poppins text-sm font-medium"
               >
                 Cancel
               </button>
               <Link href="/" className="flex-1">
                 <button
                   onClick={() => setShowLogoutModal(false)}
-                  className="w-full px-4 py-2.5 rounded-lg bg-[var(--text-primary)] text-[var(--text-inverse)]
-                    hover:opacity-90 transition-all duration-200 font-Poppins font-medium"
+                  className="w-full px-3 py-2 rounded-lg bg-[var(--text-primary)] text-[var(--text-inverse)]
+                    hover:opacity-90 transition-all duration-200 font-Poppins text-sm font-medium"
                 >
                   Log Out
                 </button>

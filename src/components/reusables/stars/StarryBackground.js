@@ -84,7 +84,7 @@ const StarryBackground = ({ fill }) => {
             initial={{opacity:0, y:-100}}
             transition={{duration: 1.5}}
           >
-            iSANS ORIGINAL
+            AuthentiQ
           </motion.span>
           <motion.p
             className="text-white text-sm text-center px-3 pb-5"

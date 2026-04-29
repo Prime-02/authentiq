@@ -12,6 +12,7 @@ import {
   Clock,
   ChevronLeft,
   ChevronRight,
+  Loader,
 } from "lucide-react";
 
 const DeliveryCompanyOrders = ({ companyId, onClose }) => {
@@ -53,7 +54,7 @@ const DeliveryCompanyOrders = ({ companyId, onClose }) => {
         {/* Orders List */}
         {loadingCompanies ? (
           <div className="flex flex-col items-center justify-center py-12">
-            <Loader2 size={32} className="text-primary-600 animate-spin mb-3" />
+            <Loader size={100} className="animate-spin mb-3" />
             <p className="text-secondary">Loading orders...</p>
           </div>
         ) : orders.length === 0 ? (

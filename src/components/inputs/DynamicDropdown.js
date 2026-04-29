@@ -1,4 +1,3 @@
-import { ArrowDown, ArrowUp } from "lucide-react";
 import React, { useState } from "react";
 
 const Dropdown = ({
@@ -47,9 +46,6 @@ const Dropdown = ({
           </option>
         )}
       </select>
-      <span className="absolute right-1">
-        {!dropdown ? <ArrowDown size={15} /> : <ArrowUp size={15} />}
-      </span>
     </div>
   );
 };

@@ -196,7 +196,7 @@ const ProductCard = ({ product }) => {
         {/* Price and Add to Cart */}
         <div className="flex justify-between items-center w-full mt-4">
           <p className="text-xl font-bold">
-            ${product.price?.toLocaleString() || "0"}
+            ₦{product.price?.toLocaleString() || "0"}
           </p>
           <ButtonTwo
             Clicked={handleAddToCart}

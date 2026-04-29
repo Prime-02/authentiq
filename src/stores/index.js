@@ -26,3 +26,4 @@ export { useWishlistStore } from "./useWishlistStore";
 export { useOrderStore } from "./useOrderStore";
 export { useDeliveryCompanyStore } from "./useDeliveryCompanyStore";
 export { useReviewStore } from "./useReviewStore";
+export { useNotificationStore } from "./useNotificationStore";
