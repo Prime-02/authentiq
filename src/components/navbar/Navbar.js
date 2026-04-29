@@ -513,11 +513,11 @@ const Navbar = () => {
           </section>
 
           <section className="flex flex-row justify-evenly items-center gap-x-5">
-            <SearchTwo
+            {/* <SearchTwo
               searchTwo={searchTwo}
               onChange={(e) => setSearchTwo(e.target.value)}
               handleSubmit={handleSearchSubmit}
-            />
+            /> */}
             <span className="rounded-full text-2xl h-10 w-10 flex items-center justify-center cursor-pointer">
               {UserAvatar}
             </span>
@@ -557,15 +557,14 @@ const Navbar = () => {
         {isDropdownOpen && (
           <div className="absolute top-full left-0 w-full card border-t shadow-lg md:hidden h-auto">
             <div className="flex flex-col px-5 py-4">
-              <div className="flex items-end w-full gap-x-4">
+              {/* <div className="flex items-end w-full gap-x-4">
                 {CategoryDropdown}
                 <SearchTwo
                   searchTwo={searchTwo}
                   onChange={(e) => setSearchTwo(e.target.value)}
                   handleSubmit={handleSearchSubmit}
                 />
-              </div>
-              <hr className="my-2" />
+              </div> */}
               <span>
                 {userFirstName ? (
                   <Link
