@@ -1,6 +1,6 @@
 // components/CheckoutFeatures.jsx
 import React from "react";
-import { Truck, Shield, RotateCcw } from "lucide-react";
+import { Truck, Shield, RotateCcw, CreditCard, Lock } from "lucide-react";
 
 const CheckoutFeatures = () => {
   return (
@@ -9,7 +9,7 @@ const CheckoutFeatures = () => {
         <div className="flex items-center gap-3 text-sm">
           <Shield size={18} className="text-muted" />
           <span className="text-secondary">
-            Secure checkout powered by Stripe
+            Secure checkout powered by Paystack
           </span>
         </div>
         <div className="flex items-center gap-3 text-sm">
@@ -25,9 +25,9 @@ const CheckoutFeatures = () => {
       </div>
 
       <div className="flex justify-center gap-3 mt-4 pt-4 border-t border-border">
-        <span className="text-2xl">💳</span>
-        <span className="text-2xl">🔒</span>
-        <span className="text-2xl">🛡️</span>
+        <span className="text-2xl"><CreditCard/></span>
+        <span className="text-2xl"><Lock/></span>
+        <span className="text-2xl"><Shield/></span>
       </div>
     </div>
   );

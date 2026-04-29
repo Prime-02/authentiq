@@ -115,7 +115,7 @@ const CartSummary = ({ hasStockIssues = false }) => {
             <div className="flex justify-between">
               <span className="text-lg font-bold">Total</span>
               <span className="text-2xl font-bold text-primary-600">
-                ${total.toFixed(2)}
+                ₦{total.toFixed(2)}
               </span>
             </div>
           </div>
