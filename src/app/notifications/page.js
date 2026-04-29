@@ -114,7 +114,7 @@ const NotificationsPage = () => {
   }
 
   return (
-    <main className="w-full max-w-4xl mx-auto px-4">
+    <main className="w-full max-w-4xl my-32 mx-auto px-4">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4 mb-8">
         <div>
