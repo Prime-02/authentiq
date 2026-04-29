@@ -127,19 +127,6 @@ const PolicyPage = ({ params }) => {
             ))}
           </div>
         </div>
-
-        {/* Footer note */}
-        <p
-          className="text-sm text-center mt-8"
-          style={{ color: "var(--text-muted)" }}
-        >
-          Last updated:{" "}
-          {new Date().toLocaleDateString("en-US", {
-            year: "numeric",
-            month: "long",
-            day: "numeric",
-          })}
-        </p>
       </div>
     </div>
   );
