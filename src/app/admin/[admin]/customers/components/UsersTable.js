@@ -96,26 +96,10 @@ export function UsersTable({
           }}
         >
           <tr>
-            <th className="w-10 p-3">
-              <input
-                type="checkbox"
-                checked={
-                  users.length > 0 && selectedUsers.size === users.length
-                }
-                onChange={onSelectAll}
-                disabled={loading}
-                className="rounded"
-                style={{
-                  borderColor: "var(--border-color)",
-                  color: "var(--info-600)",
-                }}
-              />
-            </th>
             <th className="w-11" />
             <th
               className="p-3 text-left font-semibold text-xs uppercase tracking-wider cursor-pointer select-none"
               style={{ color: "var(--text-muted)" }}
-              onClick={() => onSort("lastname")}
               onMouseEnter={(e) => {
                 e.currentTarget.style.backgroundColor = "var(--bg-hover)";
               }}
@@ -124,16 +108,10 @@ export function UsersTable({
               }}
             >
               Name{" "}
-              <SortIcon
-                col="lastname"
-                sortBy={filters.sortBy}
-                sortDir={filters.sortDir}
-              />
             </th>
             <th
               className="p-3 text-left font-semibold text-xs uppercase tracking-wider cursor-pointer select-none"
               style={{ color: "var(--text-muted)" }}
-              onClick={() => onSort("email")}
               onMouseEnter={(e) => {
                 e.currentTarget.style.backgroundColor = "var(--bg-hover)";
               }}
@@ -142,11 +120,6 @@ export function UsersTable({
               }}
             >
               Email{" "}
-              <SortIcon
-                col="email"
-                sortBy={filters.sortBy}
-                sortDir={filters.sortDir}
-              />
             </th>
             <th
               className="p-3 text-left font-semibold text-xs uppercase tracking-wider"
@@ -163,7 +136,6 @@ export function UsersTable({
             <th
               className="p-3 text-left font-semibold text-xs uppercase tracking-wider cursor-pointer select-none"
               style={{ color: "var(--text-muted)" }}
-              onClick={() => onSort("date_joined")}
               onMouseEnter={(e) => {
                 e.currentTarget.style.backgroundColor = "var(--bg-hover)";
               }}
@@ -172,16 +144,10 @@ export function UsersTable({
               }}
             >
               Joined{" "}
-              <SortIcon
-                col="date_joined"
-                sortBy={filters.sortBy}
-                sortDir={filters.sortDir}
-              />
             </th>
             <th
               className="p-3 text-left font-semibold text-xs uppercase tracking-wider cursor-pointer select-none"
               style={{ color: "var(--text-muted)" }}
-              onClick={() => onSort("last_login")}
               onMouseEnter={(e) => {
                 e.currentTarget.style.backgroundColor = "var(--bg-hover)";
               }}
@@ -190,11 +156,6 @@ export function UsersTable({
               }}
             >
               Last Login{" "}
-              <SortIcon
-                col="last_login"
-                sortBy={filters.sortBy}
-                sortDir={filters.sortDir}
-              />
             </th>
             <th
               className="p-3 text-right font-semibold text-xs uppercase tracking-wider"
@@ -259,18 +220,6 @@ export function UsersTable({
                   }
                 }}
               >
-                <td className="p-3.5">
-                  <input
-                    type="checkbox"
-                    checked={selectedUsers.has(user.id)}
-                    onChange={(e) => onSelectUser(user.id, e.target.checked)}
-                    className="rounded"
-                    style={{
-                      borderColor: "var(--border-color)",
-                      color: "var(--info-600)",
-                    }}
-                  />
-                </td>
                 <td className="p-3.5">
                   <UserAvatar
                     firstname={user.firstname}

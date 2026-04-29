@@ -25,7 +25,6 @@ const ProductReviews = ({ productId }) => {
   // Fetch reviews and rating summary on mount
   useEffect(() => {
     if (productId) {
-      // Pass pagination params - default to page 1, 50 per page
       fetchProductReviews(productId, { page: 1, perPage: 50 });
       fetchProductRatingSummary(productId);
     }
@@ -93,8 +92,14 @@ const ProductReviews = ({ productId }) => {
         key={index}
         size={size}
         className={`${
-          index < rating ? "fill-yellow-400 text-yellow-400" : "text-gray-300"
+          index < rating
+            ? "fill-yellow-400 text-yellow-400"
+            : "text-gray-300 dark:text-gray-600"
         }`}
+        style={{
+          color: index < rating ? "var(--warning-500)" : "var(--border-color)",
+          fill: index < rating ? "var(--warning-500)" : "none",
+        }}
       />
     ));
   };
@@ -108,15 +113,18 @@ const ProductReviews = ({ productId }) => {
             key={index}
             type="button"
             onClick={() => setNewRating(index + 1)}
-            className="focus:outline-none"
+            className="focus:outline-none transition-transform hover:scale-110"
           >
             <Star
               size={24}
-              className={`transition-colors ${
-                index < newRating
-                  ? "fill-yellow-400 text-yellow-400"
-                  : "text-gray-300 hover:text-yellow-400"
-              }`}
+              style={{
+                color:
+                  index < newRating
+                    ? "var(--warning-500)"
+                    : "var(--border-color)",
+                fill: index < newRating ? "var(--warning-500)" : "none",
+              }}
+              className="transition-colors hover:text-yellow-400"
             />
           </button>
         ))}
@@ -126,8 +134,17 @@ const ProductReviews = ({ productId }) => {
 
   if (loading && reviews.length === 0) {
     return (
-      <div className="mt-12 p-6 card rounded-2xl">
-        <div className="flex items-center justify-center gap-2">
+      <div
+        className="mt-12 p-6 card rounded-2xl"
+        style={{
+          backgroundColor: "var(--bg-primary)",
+          border: "1px solid var(--border-light)",
+        }}
+      >
+        <div
+          className="flex items-center justify-center gap-2"
+          style={{ color: "var(--text-secondary)" }}
+        >
           <Loader2 size={24} className="animate-spin" />
           <span>Loading reviews...</span>
         </div>
@@ -136,21 +153,35 @@ const ProductReviews = ({ productId }) => {
   }
 
   return (
-    <div className="mt-12 p-6 card rounded-2xl">
+    <div
+      className="mt-12 p-6 card rounded-2xl"
+      style={{
+        backgroundColor: "var(--bg-primary)",
+        border: "1px solid var(--border-light)",
+      }}
+    >
       <div className="flex flex-col gap-y-6">
         {/* Reviews Header */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
-            <h2 className="text-2xl font-bold">Customer Reviews</h2>
+            <h2
+              className="text-2xl font-bold"
+              style={{ color: "var(--text-primary)" }}
+            >
+              Customer Reviews
+            </h2>
             {productRating && (
               <div className="flex items-center gap-2 mt-2">
                 <div className="flex gap-1">
                   {renderStars(Math.round(productRating.average))}
                 </div>
-                <span className="text-lg font-semibold">
+                <span
+                  className="text-lg font-semibold"
+                  style={{ color: "var(--text-primary)" }}
+                >
                   {productRating.average.toFixed(1)}
                 </span>
-                <span className="text-gray-500">
+                <span style={{ color: "var(--text-muted)" }}>
                   ({productRating.count}{" "}
                   {productRating.count === 1 ? "review" : "reviews"})
                 </span>
@@ -167,7 +198,7 @@ const ProductReviews = ({ productId }) => {
                 setNewComment("");
               }
             }}
-            className="px-4 py-2 bg-black text-white rounded-lg hover:bg-gray-800 transition-colors"
+            className="btn btn-primary px-4 py-2"
           >
             {showReviewForm
               ? "Cancel"
@@ -179,13 +210,19 @@ const ProductReviews = ({ productId }) => {
 
         {/* Rating Distribution */}
         {productRating?.distribution && (
-          <div className="grid grid-cols-5 gap-2">
+          <div
+            className="grid grid-cols-5 gap-2 p-4 rounded-lg"
+            style={{ backgroundColor: "var(--bg-secondary)" }}
+          >
             {[5, 4, 3, 2, 1].map((star) => (
               <div key={star} className="text-center">
                 <div className="flex justify-center mb-1">
                   {renderStars(star, 12)}
                 </div>
-                <div className="text-sm text-gray-600">
+                <div
+                  className="text-sm"
+                  style={{ color: "var(--text-secondary)" }}
+                >
                   {productRating.distribution[star] || 0}
                 </div>
               </div>
@@ -195,17 +232,32 @@ const ProductReviews = ({ productId }) => {
 
         {/* Review Form */}
         {showReviewForm && (
-          <form onSubmit={handleSubmitReview} className="border-t pt-4">
-            <h3 className="text-lg font-semibold mb-3">
+          <form
+            onSubmit={handleSubmitReview}
+            className="pt-4"
+            style={{ borderTop: "1px solid var(--border-light)" }}
+          >
+            <h3
+              className="text-lg font-semibold mb-3"
+              style={{ color: "var(--text-primary)" }}
+            >
               {editingReview ? "Edit Your Review" : "Write Your Review"}
             </h3>
             <div className="flex flex-col gap-4">
               <div>
-                <label className="block text-sm font-medium mb-2">Rating</label>
+                <label
+                  className="block text-sm font-medium mb-2"
+                  style={{ color: "var(--text-secondary)" }}
+                >
+                  Rating
+                </label>
                 {renderStarInput()}
               </div>
               <div>
-                <label className="block text-sm font-medium mb-2">
+                <label
+                  className="block text-sm font-medium mb-2"
+                  style={{ color: "var(--text-secondary)" }}
+                >
                   Comment (optional)
                 </label>
                 <textarea
@@ -213,13 +265,28 @@ const ProductReviews = ({ productId }) => {
                   onChange={(e) => setNewComment(e.target.value)}
                   placeholder="Share your experience with this product..."
                   rows={4}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
+                  className="w-full px-3 py-2 rounded-lg focus:outline-none focus:ring-2 transition-all resize-none"
+                  style={{
+                    backgroundColor: "var(--bg-secondary)",
+                    color: "var(--text-primary)",
+                    border: "1px solid var(--border-color)",
+                    outline: "none",
+                  }}
+                  onFocus={(e) => {
+                    e.target.style.borderColor = "var(--primary-500)";
+                    e.target.style.boxShadow =
+                      "0 0 0 2px rgba(115, 115, 115, 0.1)";
+                  }}
+                  onBlur={(e) => {
+                    e.target.style.borderColor = "var(--border-color)";
+                    e.target.style.boxShadow = "none";
+                  }}
                 />
               </div>
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full sm:w-auto px-6 py-2 bg-black text-white rounded-lg hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                className="btn btn-primary w-full sm:w-auto flex items-center justify-center gap-2"
               >
                 {isSubmitting ? (
                   <>
@@ -237,10 +304,13 @@ const ProductReviews = ({ productId }) => {
         )}
 
         {/* Reviews List */}
-        <div className="border-t pt-4">
+        <div
+          className="pt-4"
+          style={{ borderTop: "1px solid var(--border-light)" }}
+        >
           {reviews.length === 0 ? (
             <div className="text-center py-8">
-              <p className="text-gray-500">
+              <p style={{ color: "var(--text-muted)" }}>
                 No reviews yet. Be the first to review this product!
               </p>
             </div>
@@ -249,20 +319,46 @@ const ProductReviews = ({ productId }) => {
               {reviews.map((review) => (
                 <div
                   key={review.id}
-                  className="p-4 border border-gray-200 rounded-lg hover:border-gray-300 transition-colors"
+                  className="p-4 rounded-lg transition-all duration-200 hover:shadow-md"
+                  style={{
+                    backgroundColor: "var(--bg-secondary)",
+                    border: "1px solid var(--border-light)",
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.borderColor = "var(--border-hover)";
+                    e.currentTarget.style.backgroundColor =
+                      "var(--bg-tertiary)";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.borderColor = "var(--border-light)";
+                    e.currentTarget.style.backgroundColor =
+                      "var(--bg-secondary)";
+                  }}
                 >
                   <div className="flex justify-between items-start mb-2">
                     <div className="flex items-center gap-2">
-                      <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center">
-                        <User size={20} className="text-gray-600" />
+                      <div
+                        className="w-10 h-10 rounded-full flex items-center justify-center"
+                        style={{ backgroundColor: "var(--bg-tertiary)" }}
+                      >
+                        <User
+                          size={20}
+                          style={{ color: "var(--text-secondary)" }}
+                        />
                       </div>
                       <div>
-                        <p className="font-semibold text-sm">
+                        <p
+                          className="font-semibold text-sm"
+                          style={{ color: "var(--text-primary)" }}
+                        >
                           {review.user?.firstname
                             ? `${review.user.firstname} ${review.user.lastname || ""}`
                             : "Anonymous"}
                         </p>
-                        <p className="text-xs text-gray-500">
+                        <p
+                          className="text-xs"
+                          style={{ color: "var(--text-muted)" }}
+                        >
                           {new Date(review.created_at).toLocaleDateString()}
                         </p>
                       </div>
@@ -273,23 +369,42 @@ const ProductReviews = ({ productId }) => {
                   </div>
 
                   {review.comment && (
-                    <p className="text-gray-600 text-sm mt-2">
+                    <p
+                      className="text-sm mt-2 leading-relaxed"
+                      style={{ color: "var(--text-secondary)" }}
+                    >
                       {review.comment}
                     </p>
                   )}
 
-                  {/* Edit/Delete buttons - Only show for the review owner */}
-                  {/* In a real app, you'd compare with current user ID */}
-                  <div className="flex gap-2 mt-3">
+                  {/* Edit/Delete buttons */}
+                  <div
+                    className="flex gap-3 mt-3 pt-3"
+                    style={{ borderTop: "1px solid var(--border-light)" }}
+                  >
                     <button
                       onClick={() => handleEditReview(review)}
-                      className="text-xs text-gray-500 hover:text-gray-700 transition-colors"
+                      className="text-xs font-medium transition-colors duration-200"
+                      style={{ color: "var(--text-muted)" }}
+                      onMouseEnter={(e) =>
+                        (e.currentTarget.style.color = "var(--primary-600)")
+                      }
+                      onMouseLeave={(e) =>
+                        (e.currentTarget.style.color = "var(--text-muted)")
+                      }
                     >
                       Edit
                     </button>
                     <button
                       onClick={() => handleDeleteReview(review.id)}
-                      className="text-xs text-red-500 hover:text-red-700 transition-colors"
+                      className="text-xs font-medium transition-colors duration-200"
+                      style={{ color: "var(--error-500)" }}
+                      onMouseEnter={(e) =>
+                        (e.currentTarget.style.color = "var(--error-600)")
+                      }
+                      onMouseLeave={(e) =>
+                        (e.currentTarget.style.color = "var(--error-500)")
+                      }
                     >
                       Delete
                     </button>

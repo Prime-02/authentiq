@@ -270,17 +270,6 @@ export default function AdminUsersPage() {
               Grid
             </button>
           </div>
-          <button className="btn btn-secondary btn-sm" onClick={exportUsers}>
-            <Download className="w-4 h-4 mr-1.5" />
-            Export
-          </button>
-          <button
-            className="btn btn-primary btn-sm"
-            onClick={() => openDrawer(null)}
-          >
-            <UserPlus className="w-4 h-4 mr-1.5" />
-            Add User
-          </button>
         </div>
       </div>
 
