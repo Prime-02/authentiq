@@ -5,6 +5,8 @@
 **Developed by:** Utojiuba Chidera Gospel  
 **Backend API Docs:** [https://sans-242869c0.fastapicloud.dev/docs](https://sans-242869c0.fastapicloud.dev/docs) _(view only)_  
 **Live Frontend:** [https://originals-three.vercel.app/](https://originals-three.vercel.app/)
+**GitHub Repository:** [https://github.com/Prime-02/authentiq](https://github.com/Prime-02/authentiq).
+
 
 ---
 
